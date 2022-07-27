@@ -61,7 +61,7 @@ class ByteBufferByteArray implements ReadableWritableByteArray{
 
   @Override
   public void read(long byteIndex, @Nonnull WriteOnlyByteArray destination)
-  throws ByteArrayIndexOutOfBoundsException, ByteArrayLengthOverBoundsException, ByteArrayInvalidLengthException{
+  throws ByteArrayIndexOutOfBoundsException, ByteArrayLengthOverBoundsException{
 
     // Check parameters
     checkRead(byteIndex, destination, this.size());

@@ -13,7 +13,10 @@ import java.util.TreeMap;
 import static com.ansill.arrays.IndexingUtility.*;
 import static com.ansill.arrays.MultipleByteArray.ReadableWritable.innerSubsetOf;
 
-public interface MultipleByteArray{
+/**
+ * ByteArray implementation for multiple ByteArrays
+ */
+interface MultipleByteArray{
 
   /** ReadableWritableByteArray implementation that supports multiple byte arrays */
   final class ReadableWritable implements ReadableWritableByteArray, MultipleByteArray{
@@ -26,7 +29,7 @@ public interface MultipleByteArray{
     @Nonnegative
     private final long size;
 
-    /** List of readonly byte arrays used for getData() method */
+    /** List of readonly byte arrays used for toReadOnly() method */
     @Nonnull
     private final List<ReadOnlyByteArray> readOnlyByteArrays;
 
@@ -153,7 +156,7 @@ public interface MultipleByteArray{
 
     @Override
     public void read(long byteIndex, @Nonnull WriteOnlyByteArray destination)
-    throws ByteArrayIndexOutOfBoundsException, ByteArrayLengthOverBoundsException, ByteArrayInvalidLengthException{
+    throws ByteArrayIndexOutOfBoundsException, ByteArrayLengthOverBoundsException{
 
       // Check parameters
       checkRead(byteIndex, destination, size);
@@ -320,7 +323,7 @@ public interface MultipleByteArray{
       @Nonnull TreeMap<Long,T> indexMap,
       long byteIndex,
       @Nonnull WriteOnlyByteArray destination
-    ) throws ByteArrayIndexOutOfBoundsException, ByteArrayLengthOverBoundsException, ByteArrayInvalidLengthException{
+    ) throws ByteArrayIndexOutOfBoundsException, ByteArrayLengthOverBoundsException{
 
       // Get floor index
       long floorIndex = indexMap.floorKey(byteIndex);
@@ -339,7 +342,11 @@ public interface MultipleByteArray{
         long lenToCopy = Long.min(byteArray.size() - relativeByteIndex, remainingLength);
 
         // Subset and read
-        byteArray.read(relativeByteIndex, destination.subsetOf(destination.size() - remainingLength, lenToCopy));
+        try{
+          byteArray.read(relativeByteIndex, destination.subsetOf(destination.size() - remainingLength, lenToCopy));
+        }catch(ByteArrayInvalidLengthException e){
+          throw new RuntimeException(e); // TODO undo me when exception becomes runtime
+        }
 
         // Adjust relative byte index and remaining length
         relativeByteIndex = Long.max(0, relativeByteIndex - byteArray.size() - lenToCopy);
@@ -364,7 +371,7 @@ public interface MultipleByteArray{
 
     @Override
     public void read(long byteIndex, @Nonnull WriteOnlyByteArray destination)
-    throws ByteArrayIndexOutOfBoundsException, ByteArrayLengthOverBoundsException, ByteArrayInvalidLengthException{
+    throws ByteArrayIndexOutOfBoundsException, ByteArrayLengthOverBoundsException{
 
       // Check parameters
       checkRead(byteIndex, destination, size);

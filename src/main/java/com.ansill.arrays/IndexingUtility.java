@@ -7,15 +7,17 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+/** Utility to provide convenient Indexing checks */
 public final class IndexingUtility{
 
+  /** Private constructor that will throw AssertionError */
   private IndexingUtility(){
     throw new AssertionError("Utility class");
   }
 
   @SafeVarargs
   @Nonnull
-  public static <T> List<T> combineVariadic(@Nonnull T first, @Nonnull T... rest) throws IllegalArgumentException{
+  static <T> List<T> combineVariadic(@Nonnull T first, @Nonnull T... rest) throws IllegalArgumentException{
 
     // Check first
     //noinspection ConstantConditions
@@ -37,7 +39,7 @@ public final class IndexingUtility{
 
   @SafeVarargs
   @Nonnull
-  public static <T> List<T> combineVariadic(@Nonnull T first, @Nonnull T second, @Nonnull T... rest)
+  static <T> List<T> combineVariadic(@Nonnull T first, @Nonnull T second, @Nonnull T... rest)
   throws IllegalArgumentException{
 
     // Check first

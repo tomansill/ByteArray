@@ -6,7 +6,8 @@ import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.channels.SeekableByteChannel;
 
-public class ChannelByteArray implements ReadableWritableByteArray{
+/** Channel implementation for ByteArray */
+class ChannelByteArray implements ReadableWritableByteArray{
 
   @Nonnull
   final SeekableByteChannel channel;
@@ -112,7 +113,7 @@ public class ChannelByteArray implements ReadableWritableByteArray{
 
   @Override
   public void read(@Nonnegative long byteIndex, @Nonnull WriteOnlyByteArray destination)
-  throws ByteArrayIndexOutOfBoundsException, ByteArrayLengthOverBoundsException, ByteArrayInvalidLengthException{
+  throws ByteArrayIndexOutOfBoundsException, ByteArrayLengthOverBoundsException{
 
     // Check parameters
     IndexingUtility.checkRead(byteIndex, destination, size);
@@ -159,7 +160,7 @@ public class ChannelByteArray implements ReadableWritableByteArray{
       ByteBuffer destinationBB = ByteBuffer.wrap(((PrimitiveByteArray) destination).data);
 
       // Adjust start/end
-      destinationBB.position(pbadestination.start).limit(pbadestination.start + pbadestination.data.length);
+      destinationBB.position(pbadestination.start).limit(pbadestination.start + pbadestination.size);
 
       // Synchronize on this and channel
       synchronized(this){
@@ -258,7 +259,7 @@ public class ChannelByteArray implements ReadableWritableByteArray{
       ByteBuffer sourceBB = ByteBuffer.wrap(((PrimitiveByteArray) source).data);
 
       // Adjust start/end
-      sourceBB.position(pbaSource.start).limit(pbaSource.start + pbaSource.data.length);
+      sourceBB.position(pbaSource.start).limit(pbaSource.start + pbaSource.size);
 
       // Synchronize on this and channel
       synchronized(this){

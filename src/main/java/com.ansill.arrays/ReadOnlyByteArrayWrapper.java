@@ -33,7 +33,7 @@ class ReadOnlyByteArrayWrapper implements ReadOnlyByteArray{
 
   @Override
   public void read(long byteIndex, @Nonnull WriteOnlyByteArray destination)
-  throws ByteArrayIndexOutOfBoundsException, ByteArrayLengthOverBoundsException, ByteArrayInvalidLengthException{
+  throws ByteArrayIndexOutOfBoundsException, ByteArrayLengthOverBoundsException{
     original.read(byteIndex, destination);
   }
 

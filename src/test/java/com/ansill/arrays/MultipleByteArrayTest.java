@@ -24,6 +24,40 @@ public interface MultipleByteArrayTest extends ByteArrayTest{
     return true;
   }
 
+  @Nonnull
+  default ReadableWritableByteArray createTestReadableWritableByteArray(long size, int seed){
+
+    // Seed RNG using size
+    Random random = new Random(seed);
+
+    // Build the list
+    List<ReadableWritableByteArray> bytearrays = new ArrayList<>();
+    long runningSize = size;
+    while(runningSize > 0){
+
+      // Set up size
+      long innerSize = Long.min(random.nextInt(20) + 1, runningSize);
+
+      // 25% chance that it'll be inner multiplebytearray
+      if(random.nextFloat() <= 0.25){
+
+        // Add to the list
+        bytearrays.add(createTestReadableWritableByteArray(innerSize, random.nextInt()));
+
+      }else{
+
+        // Add to the list
+        bytearrays.add(new TestOnlyByteArray(innerSize));
+
+      }
+
+      // Update running size
+      runningSize -= innerSize;
+    }
+
+    return new MultipleByteArray.ReadableWritable(bytearrays);
+  }
+
   @DisplayName("MultipleByteArray - ReadableWritable test")
   class ReadableWritableTest implements ReadableWritableByteArrayTest, MultipleByteArrayTest{
 
@@ -103,40 +137,6 @@ public interface MultipleByteArrayTest extends ByteArrayTest{
       return createTestReadableWritableByteArray(size, 34343);
     }
 
-    @Nonnull
-    private ReadableWritableByteArray createTestReadableWritableByteArray(long size, int seed){
-
-      // Seed RNG using size
-      Random random = new Random(seed);
-
-      // Build the list
-      List<ReadableWritableByteArray> bytearrays = new ArrayList<>();
-      long runningSize = size;
-      while(runningSize > 0){
-
-        // Set up size
-        long innerSize = Long.min(random.nextInt(20) + 1, runningSize);
-
-        // 25% chance that it'll be inner multiplebytearray
-        if(random.nextFloat() <= 0.25){
-
-          // Add to the list
-          bytearrays.add(createTestReadableWritableByteArray(innerSize, random.nextInt()));
-
-        }else{
-
-          // Add to the list
-          bytearrays.add(new TestOnlyByteArray(innerSize));
-
-        }
-
-        // Update running size
-        runningSize -= innerSize;
-      }
-
-      return new MultipleByteArray.ReadableWritable(bytearrays);
-    }
-
     @Override
     public boolean isReadableWritableOK(){
       return true;
@@ -170,12 +170,15 @@ public interface MultipleByteArrayTest extends ByteArrayTest{
         if(innerSize != 1 && random.nextFloat() <= 0.25){
 
           // Add to the list
-          bytearrays.add(createTestReadOnlyByteArray(innerSize, random.nextInt()));
+          if(random.nextBoolean()) bytearrays.add(createTestReadOnlyByteArray(innerSize, random.nextInt()));
+          else bytearrays.add(createTestReadableWritableByteArray(innerSize, random.nextInt()));
 
         }else{
 
+          TestOnlyByteArray ba = new TestOnlyByteArray(innerSize);
+
           // Add to the list
-          bytearrays.add(new TestOnlyByteArray(innerSize).toReadOnly());
+          bytearrays.add(random.nextBoolean() ? ba : ba.toReadOnly());
 
         }
 
@@ -284,7 +287,7 @@ public interface MultipleByteArrayTest extends ByteArrayTest{
         if(random.nextFloat() <= 0.25f){
 
           // Add to the list
-          bytearrays.add((ReadableWritableByteArray) createTestByteArray(innerSize));
+          bytearrays.add(createTestReadableWritableByteArray(innerSize, seed));
 
         }else{
 

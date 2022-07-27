@@ -25,6 +25,7 @@ public interface WriteOnlyByteArray extends ByteArray{
    * @param byteIndex non-negative index on this WriteOnlyByteArray
    * @param source    source ReadOnlyByteArray to copy bytes to this WriteOnlyByteArray
    * @throws ByteArrayIndexOutOfBoundsException thrown if byteIndex is out of bounds or if source ReadOnlyByteArray is too large
+   * @throws ByteArrayLengthOverBoundsException thrown if length goes over the bounds
    */
   default void write(@Nonnegative long byteIndex, @Nonnull ReadOnlyByteArray source)
   throws ByteArrayIndexOutOfBoundsException, ByteArrayLengthOverBoundsException{
@@ -45,7 +46,10 @@ public interface WriteOnlyByteArray extends ByteArray{
    * @param length the length of new subset after the start point
    * @return Subset as WriteOnlyByteArray
    * @throws ByteArrayIndexOutOfBoundsException thrown if start or length is out of the bounds
+   * @throws ByteArrayInvalidLengthException    thrown if the length is negative
+   * @throws ByteArrayLengthOverBoundsException thrown if length goes over the bounds
    */
+  @SuppressWarnings("unchecked")
   @Nonnull
   @Override
   WriteOnlyByteArray subsetOf(@Nonnegative long start, @Nonnegative long length)

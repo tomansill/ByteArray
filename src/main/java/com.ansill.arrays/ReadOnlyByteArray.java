@@ -27,9 +27,10 @@ public interface ReadOnlyByteArray extends ByteArray{
    * @param byteIndex   non-negative index on this ReadOnlyByteArray
    * @param destination destination WriteOnlyByteArray to be written to while reading the ReadOnlyByteArray
    * @throws ByteArrayIndexOutOfBoundsException thrown if byteIndex is out of bounds or if destination WriteOnlyByteArray is too large
+   * @throws ByteArrayLengthOverBoundsException thrown if destination byte array goes over the bounds
    */
   default void read(@Nonnegative long byteIndex, @Nonnull WriteOnlyByteArray destination)
-  throws ByteArrayIndexOutOfBoundsException, ByteArrayLengthOverBoundsException, ByteArrayInvalidLengthException{
+  throws ByteArrayIndexOutOfBoundsException, ByteArrayLengthOverBoundsException{
 
     // Check parameters
     checkRead(byteIndex, destination, this.size());
@@ -47,7 +48,10 @@ public interface ReadOnlyByteArray extends ByteArray{
    * @param length the length of new subset after the start point
    * @return Subset as ReadOnlyByteArray
    * @throws ByteArrayIndexOutOfBoundsException thrown if start or length is out of the bounds
+   * @throws ByteArrayInvalidLengthException    thrown if the length is negative
+   * @throws ByteArrayLengthOverBoundsException thrown if length goes over the bounds
    */
+  @SuppressWarnings("unchecked")
   @Nonnull
   @Override
   ReadOnlyByteArray subsetOf(@Nonnegative long start, @Nonnegative long length)
