@@ -55,7 +55,7 @@ public interface MultipleByteArrayTest extends ByteArrayTest{
       runningSize -= innerSize;
     }
 
-    return new MultipleByteArray.ReadableWritable(bytearrays);
+    return new ReadableWritableMultipleByteArray(bytearrays);
   }
 
   @DisplayName("MultipleByteArray - ReadableWritable test")
@@ -70,12 +70,12 @@ public interface MultipleByteArrayTest extends ByteArrayTest{
       }
 
       // Check if it's ours
-      if(!(testByteArray instanceof MultipleByteArray.ReadableWritable)) throw new IllegalArgumentException(
+      if(!(testByteArray instanceof ReadableWritableMultipleByteArray)) throw new IllegalArgumentException(
         "Not multiplebytearray");
 
       // Read
       try{
-        return ((MultipleByteArray.ReadableWritable) testByteArray).readByte(byteIndex);
+        return ((ReadableWritableMultipleByteArray) testByteArray).readByte(byteIndex);
       }catch(ByteArrayIndexOutOfBoundsException e){
         throw new RuntimeException(e);
       }
@@ -90,10 +90,10 @@ public interface MultipleByteArrayTest extends ByteArrayTest{
       }
 
       // Check type
-      if(testByteArray instanceof MultipleByteArray.ReadOnly){
+      if(testByteArray instanceof ReadOnlyMultipleByteArray){
 
         // Get the array
-        Map.Entry<Long,ReadOnlyByteArray> entry = ((MultipleByteArray.ReadOnly) testByteArray).indexMap.floorEntry(
+        Map.Entry<Long,ReadOnlyByteArray> entry = ((ReadOnlyMultipleByteArray) testByteArray).indexMap.floorEntry(
           byteIndex);
 
         // Extract
@@ -111,10 +111,10 @@ public interface MultipleByteArrayTest extends ByteArrayTest{
           throw new RuntimeException(e);
         }
 
-      }else if(testByteArray instanceof MultipleByteArray.ReadableWritable){
+      }else if(testByteArray instanceof ReadableWritableMultipleByteArray){
 
         // Get the array
-        Map.Entry<Long,ReadableWritableByteArray> entry = ((MultipleByteArray.ReadableWritable) testByteArray).indexMap.floorEntry(
+        Map.Entry<Long,ReadableWritableByteArray> entry = ((ReadableWritableMultipleByteArray) testByteArray).indexMap.floorEntry(
           byteIndex);
 
         // Extract
@@ -186,7 +186,7 @@ public interface MultipleByteArrayTest extends ByteArrayTest{
         runningSize -= innerSize;
       }
 
-      return new MultipleByteArray.ReadOnly(bytearrays);
+      return new ReadOnlyMultipleByteArray(bytearrays);
     }
 
     @Override
@@ -198,10 +198,10 @@ public interface MultipleByteArrayTest extends ByteArrayTest{
       }
 
       // Check type
-      if(testByteArray instanceof MultipleByteArray.ReadOnly){
+      if(testByteArray instanceof ReadOnlyMultipleByteArray){
 
         // Get the array
-        Map.Entry<Long,ReadOnlyByteArray> entry = ((MultipleByteArray.ReadOnly) testByteArray).indexMap.floorEntry(
+        Map.Entry<Long,ReadOnlyByteArray> entry = ((ReadOnlyMultipleByteArray) testByteArray).indexMap.floorEntry(
           byteIndex);
 
         // Extract
@@ -234,10 +234,10 @@ public interface MultipleByteArrayTest extends ByteArrayTest{
           }
         }else throw new IllegalArgumentException("Not testonlybytearray");
 
-      }else if(testByteArray instanceof MultipleByteArray.ReadableWritable){
+      }else if(testByteArray instanceof ReadableWritableMultipleByteArray){
 
         // Get the array
-        Map.Entry<Long,ReadableWritableByteArray> entry = ((MultipleByteArray.ReadableWritable) testByteArray).indexMap.floorEntry(
+        Map.Entry<Long,ReadableWritableByteArray> entry = ((ReadableWritableMultipleByteArray) testByteArray).indexMap.floorEntry(
           byteIndex);
 
         // Extract
@@ -300,7 +300,7 @@ public interface MultipleByteArrayTest extends ByteArrayTest{
         runningSize -= innerSize;
       }
 
-      return new MultipleByteArray.ReadableWritable(bytearrays).toWriteOnly();
+      return new ReadableWritableMultipleByteArray(bytearrays).toWriteOnly();
     }
 
     @Override
@@ -312,13 +312,13 @@ public interface MultipleByteArrayTest extends ByteArrayTest{
       }
 
       // Check if it's ours
-      if(!(testByteArray instanceof MultipleByteArray.ReadableWritable)){
+      if(!(testByteArray instanceof ReadableWritableMultipleByteArray)){
         throw new IllegalArgumentException("Not multiplebytearray");
       }
 
       // Read
       try{
-        return ((MultipleByteArray.ReadableWritable) testByteArray).readByte(byteIndex);
+        return ((ReadableWritableMultipleByteArray) testByteArray).readByte(byteIndex);
       }catch(ByteArrayIndexOutOfBoundsException e){
         throw new RuntimeException(e);
       }

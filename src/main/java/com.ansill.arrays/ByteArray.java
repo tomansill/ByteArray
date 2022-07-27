@@ -42,7 +42,7 @@ public interface ByteArray{
     if(byteArrays.size() == 1) return byteArrays.get(0);
 
     // Return
-    return new MultipleByteArray.ReadOnly(byteArrays);
+    return new ReadOnlyMultipleByteArray(byteArrays);
   }
 
   /**
@@ -73,7 +73,7 @@ public interface ByteArray{
     }
 
     // Return
-    return new MultipleByteArray.ReadOnly(byteArrays);
+    return new ReadOnlyMultipleByteArray(byteArrays);
   }
 
   /**
@@ -97,7 +97,7 @@ public interface ByteArray{
     if(byteArrays.size() == 1) return byteArrays.get(0);
 
     // Return
-    return new MultipleByteArray.ReadableWritable(byteArrays);
+    return new ReadableWritableMultipleByteArray(byteArrays);
   }
 
 
@@ -120,7 +120,7 @@ public interface ByteArray{
     List<ReadableWritableByteArray> byteArrays = combineVariadic(firstByteArray, secondByteArray, restByteArrays);
 
     // Return
-    return new MultipleByteArray.ReadableWritable(byteArrays);
+    return new ReadableWritableMultipleByteArray(byteArrays);
   }
 
   /**
@@ -134,9 +134,9 @@ public interface ByteArray{
   static ReadableWritableByteArray wrap(@Nonnull byte[] firstByteArray, @Nonnull byte[]... restByteArrays){
     List<byte[]> bytesList = combineVariadic(firstByteArray, restByteArrays);
     if(bytesList.size() == 1) return new PrimitiveByteArray(bytesList.get(0));
-    return new MultipleByteArray.ReadableWritable(bytesList.stream()
-                                                           .map(PrimitiveByteArray::new)
-                                                           .collect(Collectors.toList()));
+    return new ReadableWritableMultipleByteArray(bytesList.stream()
+                                                          .map(PrimitiveByteArray::new)
+                                                          .collect(Collectors.toList()));
   }
 
   /**
@@ -161,9 +161,9 @@ public interface ByteArray{
     if(byteBuffers.size() == 1) return new ByteBufferByteArray(byteBuffers.get(0));
 
     // Return as multiple
-    return new MultipleByteArray.ReadableWritable(byteBuffers.stream()
-                                                             .map(ByteBufferByteArray::new)
-                                                             .collect(Collectors.toList()));
+    return new ReadableWritableMultipleByteArray(byteBuffers.stream()
+                                                            .map(ByteBufferByteArray::new)
+                                                            .collect(Collectors.toList()));
   }
 
   /**
