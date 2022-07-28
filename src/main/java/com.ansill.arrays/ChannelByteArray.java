@@ -95,8 +95,11 @@ class ChannelByteArray implements ReadableWritableByteArray{
       synchronized(channel){
         try{
 
+          // Set up real position
+          long position = byteIndex + start;
+
           // Position the channel
-          channel.position(byteIndex + start);
+          channel.position(position);
 
           // Read
           channel.write(reusableSingleByteBuffer);
@@ -106,7 +109,7 @@ class ChannelByteArray implements ReadableWritableByteArray{
         }
       }
 
-      // Flip bytebuffer
+      // Clear bytebuffer
       reusableSingleByteBuffer.clear();
     }
   }
