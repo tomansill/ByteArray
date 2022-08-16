@@ -4,7 +4,10 @@ import javax.annotation.Nonnegative;
 import javax.annotation.Nonnull;
 import java.nio.ByteBuffer;
 
-import static com.ansill.arrays.IndexingUtility.*;
+import static com.ansill.arrays.IndexingUtility.checkRead;
+import static com.ansill.arrays.IndexingUtility.checkReadWriteByte;
+import static com.ansill.arrays.IndexingUtility.checkSubsetOf;
+import static com.ansill.arrays.IndexingUtility.checkWrite;
 
 /** ReadableWritableByteArray implementation using primitive byte array as backing data */
 final class PrimitiveByteArray implements ReadableWritableByteArray, ReadOnlyByteArray{
@@ -27,6 +30,7 @@ final class PrimitiveByteArray implements ReadableWritableByteArray, ReadOnlyByt
    * @param data byte array data
    */
   PrimitiveByteArray(@Nonnull byte[] data){
+    // TODO check against zero-sized bytearray?
     this.data = data;
     this.start = 0;
     this.size = data.length;

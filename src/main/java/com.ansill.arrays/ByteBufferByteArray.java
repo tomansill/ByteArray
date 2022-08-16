@@ -6,7 +6,10 @@ import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.List;
 
-import static com.ansill.arrays.IndexingUtility.*;
+import static com.ansill.arrays.IndexingUtility.checkRead;
+import static com.ansill.arrays.IndexingUtility.checkReadWriteByte;
+import static com.ansill.arrays.IndexingUtility.checkSubsetOf;
+import static com.ansill.arrays.IndexingUtility.checkWrite;
 
 /** ReadableWritableByteArray implementation using ByteBuffer as backing data */
 class ByteBufferByteArray implements ReadableWritableByteArray{
@@ -21,6 +24,7 @@ class ByteBufferByteArray implements ReadableWritableByteArray{
    * @param data bytebuffer data
    */
   ByteBufferByteArray(@Nonnull ByteBuffer data){
+    // TODO check against zero-sized bytebuffers?
     this.data = data.duplicate();
   }
 

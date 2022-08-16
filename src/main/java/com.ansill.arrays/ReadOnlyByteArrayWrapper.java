@@ -59,11 +59,7 @@ class ReadOnlyByteArrayWrapper implements ReadOnlyByteArray{
 
       // Read
       byte value;
-      try{
-        value = this.readByte(index);
-      }catch(ByteArrayIndexOutOfBoundsException e){
-        throw new RuntimeException(e); // TODO remove when runtimeexcepton
-      }
+      value = this.readByte(index);
 
       // Convert to hex
       String hexValue = Long.toHexString(value & 0xffL);

@@ -26,10 +26,10 @@ public interface ByteArray{
 
     // Assert non-empty
     //noinspection ConstantConditions
-    if(byteArrays == null) throw new IllegalArgumentException("byteArrays list is null");
-    if(byteArrays.isEmpty()) throw new IllegalArgumentException("byteArrays list is empty");
+    if(byteArrays == null) throw new IllegalArgumentException("ByteArrays list is null");
+    if(byteArrays.isEmpty()) throw new IllegalArgumentException("ByteArrays list is empty");
     for(ReadOnlyByteArray byteArray : byteArrays){
-      if(byteArray == null) throw new IllegalArgumentException("There is null element in the byteArray list");
+      if(byteArray == null) throw new IllegalArgumentException("There is a null element in the ByteArray list");
     }
 
     // Make sure all byte arrays are ReadOnly, not ReadableWritable in disguise
@@ -87,10 +87,10 @@ public interface ByteArray{
 
     // Assert non-empty
     //noinspection ConstantConditions
-    if(byteArrays == null) throw new IllegalArgumentException("byteArrays list is null");
-    if(byteArrays.isEmpty()) throw new IllegalArgumentException("byteArrays list is empty");
-    for(ReadOnlyByteArray byteArray : byteArrays){
-      if(byteArray == null) throw new IllegalArgumentException("There is null element in the byteArray list");
+    if(byteArrays == null) throw new IllegalArgumentException("ByteArrays list is null");
+    if(byteArrays.isEmpty()) throw new IllegalArgumentException("ByteArrays list is empty");
+    for(ReadableWritableByteArray byteArray : byteArrays){
+      if(byteArray == null) throw new IllegalArgumentException("There is a null element in the ByteArray list");
     }
 
     // If only one, return that one

@@ -8,7 +8,9 @@ import java.util.Map;
 import java.util.NavigableMap;
 import java.util.TreeMap;
 
-import static com.ansill.arrays.IndexingUtility.*;
+import static com.ansill.arrays.IndexingUtility.checkRead;
+import static com.ansill.arrays.IndexingUtility.checkReadWriteByte;
+import static com.ansill.arrays.IndexingUtility.checkSubsetOf;
 import static com.ansill.arrays.ReadableWritableMultipleByteArray.innerSubsetOf;
 
 /** ReadOnlyByteArray implementation that supports multiple byte arrays */
@@ -103,11 +105,7 @@ final class ReadOnlyMultipleByteArray implements ReadOnlyByteArray{
       long lenToCopy = Long.min(byteArray.size() - relativeByteIndex, remainingLength);
 
       // Subset and read
-      try{
-        byteArray.read(relativeByteIndex, destination.subsetOf(destination.size() - remainingLength, lenToCopy));
-      }catch(ByteArrayInvalidLengthException e){
-        throw new RuntimeException(e); // TODO undo me when exception becomes runtime
-      }
+      byteArray.read(relativeByteIndex, destination.subsetOf(destination.size() - remainingLength, lenToCopy));
 
       // Adjust relative byte index and remaining length
       relativeByteIndex = Long.max(0, relativeByteIndex - byteArray.size() - lenToCopy);
@@ -192,12 +190,7 @@ final class ReadOnlyMultipleByteArray implements ReadOnlyByteArray{
         if(byteIndex != 0) sb.append("_");
 
         // Get data
-        byte value;
-        try{
-          value = byteArray.readByte(i);
-        }catch(ByteArrayIndexOutOfBoundsException e){
-          throw new RuntimeException(e); // TODO change me later when no longer checked exception
-        }
+        byte value = byteArray.readByte(i);
 
         // Convert to hex
         String hexValue = Long.toHexString(value & 0xffL);

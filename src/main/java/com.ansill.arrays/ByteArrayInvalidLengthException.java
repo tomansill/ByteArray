@@ -3,10 +3,10 @@ package com.ansill.arrays;
 import javax.annotation.Nonnull;
 
 /** Exception that indicates provided length is invalid */
-public class ByteArrayInvalidLengthException extends Exception{
+public class ByteArrayInvalidLengthException extends IllegalArgumentException{
 
   /** Serial Version UID */
-  private static final long serialVersionUID = 4677582783801854786L; // TODO change to IllegalArgumentException when done
+  private static final long serialVersionUID = 4677582783801854786L;
 
   /**
    * Constructor

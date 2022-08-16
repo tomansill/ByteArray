@@ -10,7 +10,10 @@ import java.util.Map;
 import java.util.NavigableMap;
 import java.util.TreeMap;
 
-import static com.ansill.arrays.IndexingUtility.*;
+import static com.ansill.arrays.IndexingUtility.checkRead;
+import static com.ansill.arrays.IndexingUtility.checkReadWriteByte;
+import static com.ansill.arrays.IndexingUtility.checkSubsetOf;
+import static com.ansill.arrays.IndexingUtility.checkWrite;
 
 /** ReadableWritableByteArray implementation that supports multiple byte arrays */
 final class ReadableWritableMultipleByteArray implements ReadableWritableByteArray{
@@ -167,11 +170,7 @@ final class ReadableWritableMultipleByteArray implements ReadableWritableByteArr
     checkWrite(byteIndex, source, size);
 
     // Pass it over
-    try{
-      innerWrite(byteIndex, source);
-    }catch(ByteArrayInvalidLengthException e){
-      throw new RuntimeException(e); // TODO remove me when it becomes runtime exception
-    }
+    innerWrite(byteIndex, source);
   }
 
   /**
