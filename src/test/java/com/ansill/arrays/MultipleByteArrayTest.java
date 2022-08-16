@@ -206,6 +206,10 @@ public interface MultipleByteArrayTest extends ByteArrayTest{
 
           // Add to the list
           if(random.nextBoolean()) bytearrays.add(createTestReadOnlyByteArray(innerSize, random.nextInt()));
+          else if(random.nextBoolean()) bytearrays.add(createTestReadableWritableByteArray(
+            innerSize,
+            random.nextInt()
+          ).toReadOnly());
           else bytearrays.add(createTestReadableWritableByteArray(innerSize, random.nextInt()));
 
         }else{
