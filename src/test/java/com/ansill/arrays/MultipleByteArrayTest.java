@@ -1,5 +1,6 @@
 package com.ansill.arrays;
 
+import jdk.internal.misc.Unsafe;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import test.ByteArrayTest;
@@ -11,6 +12,7 @@ import test.WriteOnlyByteArrayWithOtherByteArrayTest;
 import test.arrays.TestOnlyByteArray;
 
 import javax.annotation.Nonnull;
+import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -24,11 +26,40 @@ public interface MultipleByteArrayTest extends ByteArrayTest{
     return true;
   }
 
+  static void clean(@Nonnull Unsafe unsafe, @Nonnull ByteArray byteArray){
+
+    // Detect and cast it to appropriate class
+    if(byteArray instanceof ReadableWritableMultipleByteArray){
+      ReadableWritableMultipleByteArray rwmba = (ReadableWritableMultipleByteArray) byteArray;
+      for(ReadableWritableByteArray inner : rwmba.indexMap.values()) clean(unsafe, inner);
+    }else if(byteArray instanceof ReadOnlyMultipleByteArray){
+      ReadOnlyMultipleByteArray romba = (ReadOnlyMultipleByteArray) byteArray;
+      for(ReadOnlyByteArray inner : romba.indexMap.values()) clean(unsafe, inner);
+    }else if(byteArray instanceof TestOnlyByteArray.ReadOnly){
+      TestOnlyByteArray.ReadOnly tobaro = (TestOnlyByteArray.ReadOnly) byteArray;
+      clean(unsafe, tobaro.original);
+    }else if(byteArray instanceof TestOnlyByteArray){
+      TestOnlyByteArray toba = (TestOnlyByteArray) byteArray;
+      for(ByteBuffer buffer : toba.data) unsafe.invokeCleaner(buffer);
+    }else System.err.println("Unhandled class " + byteArray.getClass());
+  }
+
+  @Override
+  default void cleanTestByteArray(@Nonnull ByteArray byteArray){
+    Unsafe u = Unsafe.getUnsafe();
+    clean(u, byteArray);
+    System.gc();
+  }
+
   @Nonnull
   default ReadableWritableByteArray createTestReadableWritableByteArray(long size, int seed){
 
-    // Seed RNG using size
+    // Seed RNG
     Random random = new Random(seed);
+
+    // We want around 5 chunks if possible
+    int chunkSize = (int) (size / 5);
+    if(chunkSize < 2) chunkSize = (int) size;
 
     // Build the list
     List<ReadableWritableByteArray> bytearrays = new ArrayList<>();
@@ -36,7 +67,7 @@ public interface MultipleByteArrayTest extends ByteArrayTest{
     while(runningSize > 0){
 
       // Set up size
-      long innerSize = Long.min(random.nextInt(20) + 1, runningSize);
+      long innerSize = Long.min(random.nextInt(chunkSize) + 1, runningSize);
 
       // 25% chance that it'll be inner multiplebytearray
       if(random.nextFloat() <= 0.25){
@@ -158,13 +189,17 @@ public interface MultipleByteArrayTest extends ByteArrayTest{
       // Seed RNG using size
       Random random = new Random(seed);
 
+      // We want around 5 chunks if possible
+      int chunkSize = (int) (size / 5);
+      if(chunkSize < 2) chunkSize = (int) size;
+
       // Build the list
       List<ReadOnlyByteArray> bytearrays = new ArrayList<>();
       long runningSize = size;
       while(runningSize > 0){
 
         // Set up size
-        long innerSize = Long.min(random.nextInt(20) + 1, runningSize);
+        long innerSize = Long.min(random.nextInt(chunkSize) + 1, runningSize);
 
         // 25% chance of inner multiplebytearray
         if(innerSize != 1 && random.nextFloat() <= 0.25){
@@ -211,24 +246,26 @@ public interface MultipleByteArrayTest extends ByteArrayTest{
 
         // ByteArray should be TestOnlyByteArray and variants
         if(byteArray instanceof TestOnlyByteArray){
-          byte[][] data = ((TestOnlyByteArray) byteArray).data;
+          ByteBuffer[] data = ((TestOnlyByteArray) byteArray).data;
           long startba = ((TestOnlyByteArray) byteArray).start;
           byteIndex += startba;
-          for(byte[] ba : data){
-            if(byteIndex >= ba.length) byteIndex -= ba.length;
+          for(ByteBuffer bb : data){
+            int len = bb.limit() - bb.position();
+            if(byteIndex >= len) byteIndex -= len;
             else{
-              ba[(int) byteIndex] = value;
+              bb.put((int) byteIndex, value);
               return;
             }
           }
         }else if(byteArray instanceof TestOnlyByteArray.ReadOnly){
-          byte[][] data = ((TestOnlyByteArray.ReadOnly) byteArray).original.data;
+          ByteBuffer[] data = ((TestOnlyByteArray.ReadOnly) byteArray).original.data;
           long startba = ((TestOnlyByteArray.ReadOnly) byteArray).original.start;
           byteIndex += startba;
-          for(byte[] ba : data){
-            if(byteIndex >= ba.length) byteIndex -= ba.length;
+          for(ByteBuffer bb : data){
+            int len = bb.limit() - bb.position();
+            if(byteIndex >= len) byteIndex -= len;
             else{
-              ba[(int) byteIndex] = value;
+              bb.put((int) byteIndex, value);
               return;
             }
           }
@@ -266,7 +303,7 @@ public interface MultipleByteArrayTest extends ByteArrayTest{
     @Nonnull
     @Override
     public WriteOnlyByteArray createTestWriteOnlyByteArray(long size){
-      return createTestWriteOnlyByteArray(size, 3232);
+      return createTestWriteOnlyByteArray(size, (int) (3232 + size));
     }
 
     @Nonnull
@@ -275,13 +312,17 @@ public interface MultipleByteArrayTest extends ByteArrayTest{
       // Seed RNG using size
       Random random = new Random(seed);
 
+      // We want around 5 chunks if possible
+      int chunkSize = (int) (size / 5);
+      if(chunkSize < 2) chunkSize = (int) size;
+
       // Build the list
       List<ReadableWritableByteArray> bytearrays = new ArrayList<>();
       long runningSize = size;
       while(runningSize > 0){
 
         // Set up size
-        long innerSize = Long.min(random.nextInt(20) + 1, runningSize);
+        long innerSize = Long.min(random.nextInt(chunkSize) + 1, runningSize);
 
         // 25% chance of creating multiplebytearray
         if(random.nextFloat() <= 0.25f){

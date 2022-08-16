@@ -9,6 +9,7 @@ import com.ansill.arrays.ReadableWritableByteArray;
 import com.ansill.arrays.WriteOnlyByteArray;
 
 import javax.annotation.Nonnull;
+import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -20,30 +21,23 @@ public class TestOnlyByteArray implements ReadableWritableByteArray{
 
   public final long size;
 
-  public final byte[][] data;
+  public final ByteBuffer[] data;
 
   public TestOnlyByteArray(long size){
     if(size == 0) throw new IllegalArgumentException();
     start = 0;
     this.size = size;
     int amountOfByteAs = (int) Math.ceil((size * 1.0) / Integer.MAX_VALUE);
-    this.data = new byte[amountOfByteAs][];
+    this.data = new ByteBuffer[amountOfByteAs];
     int index = 0;
     while(size > 0){
       int amount = (int) Long.min(size, Integer.MAX_VALUE);
-      data[index++] = new byte[amount];
+      data[index++] = ByteBuffer.allocateDirect(amount);
       size -= amount;
     }
   }
 
-  public TestOnlyByteArray(byte[] bytea){
-    start = 0;
-    size = bytea.length;
-    data = new byte[1][];
-    data[0] = bytea;
-  }
-
-  protected TestOnlyByteArray(long start, long size, byte[][] data){
+  protected TestOnlyByteArray(long start, long size, ByteBuffer[] data){
     this.start = start;
     this.size = size;
     this.data = data;
@@ -70,9 +64,10 @@ public class TestOnlyByteArray implements ReadableWritableByteArray{
   public byte readByte(long byteIndex) throws ByteArrayIndexOutOfBoundsException{
     checkReadWriteByte(byteIndex, size);
     byteIndex += start;
-    for(byte[] byteArray : data){
-      if(byteIndex >= byteArray.length) byteIndex -= byteArray.length;
-      else return byteArray[(int) byteIndex];
+    for(ByteBuffer bb : data){
+      int len = bb.limit() - bb.position();
+      if(byteIndex >= len) byteIndex -= len;
+      else return bb.get((int) byteIndex);
     }
     throw new RuntimeException();
   }
@@ -81,10 +76,11 @@ public class TestOnlyByteArray implements ReadableWritableByteArray{
   public void writeByte(long byteIndex, byte value) throws ByteArrayIndexOutOfBoundsException{
     checkReadWriteByte(byteIndex, size);
     byteIndex += start;
-    for(byte[] byteArray : data){
-      if(byteIndex >= byteArray.length) byteIndex -= byteArray.length;
+    for(ByteBuffer bb : data){
+      int len = bb.limit() - bb.position();
+      if(byteIndex >= len) byteIndex -= len;
       else{
-        byteArray[(int) byteIndex] = value;
+        bb.put((int) byteIndex, value);
         return;
       }
     }
@@ -113,12 +109,7 @@ public class TestOnlyByteArray implements ReadableWritableByteArray{
     for(int index = 0; index < size; index++){
 
       // Read
-      byte value;
-      try{
-        value = this.readByte(index);
-      }catch(ByteArrayIndexOutOfBoundsException e){
-        throw new RuntimeException(e); // TODO remove when runtimeexcepton
-      }
+      byte value = this.readByte(index);
 
       // Convert to hex
       String hexValue = Long.toHexString(value & 0xffL);
@@ -147,7 +138,7 @@ public class TestOnlyByteArray implements ReadableWritableByteArray{
     @Nonnull
     public final TestOnlyByteArray original;
 
-    protected ReadOnly(long start, long size, byte[][] data){
+    protected ReadOnly(long start, long size, ByteBuffer[] data){
       this.original = new TestOnlyByteArray(start, size, data);
     }
 
@@ -178,7 +169,8 @@ public class TestOnlyByteArray implements ReadableWritableByteArray{
   }
 
   public static class WriteOnly extends TestOnlyByteArray implements WriteOnlyByteArray{
-    protected WriteOnly(long start, long size, byte[][] data){
+
+    protected WriteOnly(long start, long size, ByteBuffer[] data){
       super(start, size, data);
     }
   }

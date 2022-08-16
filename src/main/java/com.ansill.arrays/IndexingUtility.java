@@ -15,6 +15,15 @@ public final class IndexingUtility{
     throw new AssertionError("Utility class");
   }
 
+  /**
+   * Combines variadic arguments into a list. Requires at least one argument.
+   *
+   * @param first first element
+   * @param rest  rest of variadic elements
+   * @param <T>   type of return list
+   * @return a list containing the elements present in variadic arguments
+   * @throws IllegalArgumentException thrown if any of the elements are null
+   */
   @SafeVarargs
   @Nonnull
   static <T> List<T> combineVariadic(@Nonnull T first, @Nonnull T... rest) throws IllegalArgumentException{
@@ -37,6 +46,17 @@ public final class IndexingUtility{
     return list;
   }
 
+
+  /**
+   * Combines variadic arguments into a list. Requires at least two arguments.
+   *
+   * @param first  first element
+   * @param second second element
+   * @param rest   rest of variadic elements
+   * @param <T>    type of return list
+   * @return a list containing the elements present in variadic arguments
+   * @throws IllegalArgumentException thrown if any of the elements are null
+   */
   @SafeVarargs
   @Nonnull
   static <T> List<T> combineVariadic(@Nonnull T first, @Nonnull T second, @Nonnull T... rest)
@@ -66,6 +86,13 @@ public final class IndexingUtility{
 
   }
 
+  /**
+   * Checks read/write byte call and throw any exception if anything is wrong with arguments or exit if all arguments are valid
+   *
+   * @param byteIndex       byte index
+   * @param sizeOfByteArray size of byte array
+   * @throws ByteArrayIndexOutOfBoundsException thrown if the index is out of bounds
+   */
   public static void checkReadWriteByte(long byteIndex, @Nonnegative long sizeOfByteArray)
   throws ByteArrayIndexOutOfBoundsException{
     if(byteIndex < 0){
@@ -81,6 +108,15 @@ public final class IndexingUtility{
     }
   }
 
+  /**
+   * Checks read call and throw any exception if anything is wrong with arguments. Or exit if all arguments are valid
+   *
+   * @param byteIndex       byte index
+   * @param destination     destination byte array
+   * @param sizeOfByteArray size of current byte array
+   * @throws ByteArrayIndexOutOfBoundsException thrown if index out of bounds
+   * @throws ByteArrayLengthOverBoundsException thrown if size of byte array exceeds
+   */
   public static void checkRead(
     long byteIndex,
     @Nullable WriteOnlyByteArray destination,
@@ -109,6 +145,16 @@ public final class IndexingUtility{
     }
   }
 
+  /**
+   * Checks subsetof call. Throws exceptions if there's any errors with arguments. Exits if all is correct.
+   *
+   * @param start      starting index
+   * @param length     length of new subset
+   * @param actualSize actual size of byte array
+   * @throws ByteArrayIndexOutOfBoundsException thrown if index is invalid
+   * @throws ByteArrayInvalidLengthException    thrown if length is invalid
+   * @throws ByteArrayLengthOverBoundsException thrown if length is over the bounds
+   */
   public static void checkSubsetOf(long start, long length, @Nonnegative long actualSize)
   throws ByteArrayIndexOutOfBoundsException, ByteArrayInvalidLengthException, ByteArrayLengthOverBoundsException{
     if(start < 0){
@@ -135,6 +181,15 @@ public final class IndexingUtility{
     }
   }
 
+  /**
+   * Checks write call. Throws exception on any errors. Exits if all arguments are correct.
+   *
+   * @param byteIndex       index
+   * @param source          source array
+   * @param sizeOfByteArray size of actual byte array
+   * @throws ByteArrayIndexOutOfBoundsException thrown if index is out of bounds
+   * @throws ByteArrayLengthOverBoundsException thrown if the length is overlapping.
+   */
   public static void checkWrite(
     long byteIndex,
     @Nullable ReadOnlyByteArray source,

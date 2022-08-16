@@ -1,6 +1,7 @@
 package test;
 
 import com.ansill.arrays.ByteArray;
+import com.ansill.arrays.IndexingUtility;
 import com.ansill.arrays.ReadOnlyByteArray;
 import com.ansill.arrays.ReadableWritableByteArray;
 import org.junit.jupiter.api.DisplayName;
@@ -8,6 +9,8 @@ import org.junit.jupiter.api.DynamicTest;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestFactory;
 
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 import java.nio.ByteBuffer;
 import java.util.Arrays;
 import java.util.Collections;
@@ -19,6 +22,26 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.DynamicTest.dynamicTest;
 
 class UtilityTest{
+
+  @DisplayName("Test instantiation of IndexingUtility (code coverage)")
+  @Test
+  void testInstantiateIndexingUtility() throws NoSuchMethodException{
+
+    // Since constructor is private, use reflection to grab it
+    Constructor<IndexingUtility> constructor = IndexingUtility.class.getDeclaredConstructor();
+
+    // Constructor is private, make it public and run it
+    constructor.setAccessible(true);
+
+    // Instantiate it
+    assertThrows(AssertionError.class, () -> {
+      try{
+        constructor.newInstance();
+      }catch(InvocationTargetException ite){
+        throw ite.getCause();
+      }
+    });
+  }
 
   @DisplayName("Test Wrapping for Primitive Byte Arrays")
   @Test
