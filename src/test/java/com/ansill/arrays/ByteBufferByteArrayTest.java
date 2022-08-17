@@ -15,11 +15,6 @@ import java.nio.ByteBuffer;
 @DisplayName("ByteBufferByteArray tests")
 public interface ByteBufferByteArrayTest extends ByteArrayTest{
 
-  @Override
-  default boolean is64BitAddressingSupported(){
-    return false;
-  }
-
   @DisplayName("ByteBufferByteArray - ReadableWritable test")
   class ReadableWritableTest implements ReadableWritableByteArrayTest, ByteBufferByteArrayTest{
 

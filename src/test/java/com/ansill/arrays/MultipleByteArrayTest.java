@@ -4,10 +4,10 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import sun.misc.Unsafe;
 import test.ByteArrayTest;
-import test.ReadOnlyByteArrayTest;
+import test.ReadOnlyByteArray64BitTest;
 import test.ReadOnlyByteArrayWithOtherByteArrayTest;
-import test.ReadableWritableByteArrayTest;
-import test.WriteOnlyByteArrayTest;
+import test.ReadableWritableByteArray64BitTest;
+import test.WriteOnlyByteArray64BitTest;
 import test.WriteOnlyByteArrayWithOtherByteArrayTest;
 import test.arrays.TestOnlyByteArray;
 
@@ -22,11 +22,12 @@ import java.util.Random;
 @DisplayName("MultipleByteArray tests")
 public interface MultipleByteArrayTest extends ByteArrayTest{
 
-  @Override
-  default boolean is64BitAddressingSupported(){
-    return true;
-  }
-
+  /**
+   * Recursively cleans ByteArrays by looking for TestOnlyByteArrays and invoke Unsafe::invokeCleaner to clean up DirectByteBuffers
+   *
+   * @param unsafe    unsafe object
+   * @param byteArray byte array to be cleaned
+   */
   static void clean(@Nonnull Unsafe unsafe, @Nonnull ByteArray byteArray){
 
     // Detect and cast it to appropriate class
@@ -39,14 +40,26 @@ public interface MultipleByteArrayTest extends ByteArrayTest{
     }else if(byteArray instanceof TestOnlyByteArray.ReadOnly){
       TestOnlyByteArray.ReadOnly tobaro = (TestOnlyByteArray.ReadOnly) byteArray;
       clean(unsafe, tobaro.original);
+    }else if(byteArray instanceof WriteOnlyByteArrayWrapper){
+      WriteOnlyByteArrayWrapper wobaw = (WriteOnlyByteArrayWrapper) byteArray;
+      clean(unsafe, wobaw.original);
+    }else if(byteArray instanceof ReadOnlyByteArrayWrapper){
+      ReadOnlyByteArrayWrapper robaw = (ReadOnlyByteArrayWrapper) byteArray;
+      clean(unsafe, robaw.original);
     }else if(byteArray instanceof TestOnlyByteArray){
       TestOnlyByteArray toba = (TestOnlyByteArray) byteArray;
       for(ByteBuffer buffer : toba.data) unsafe.invokeCleaner(buffer);
-    }else System.err.println("Unhandled class " + byteArray.getClass());
+    }else System.err.println("Unhandled class: " + byteArray.getClass().getName());
   }
 
   @Override
   default void cleanTestByteArray(@Nonnull ByteArray byteArray){
+
+    // Save size
+    long size = byteArray.size();
+
+    // Unsafe is needed to clear away DirectByteBuffers used in TestOnlyByteArray
+    // System.gc() alone won't work that well with DirectByteBuffers. Unsafe is needed to fully clear away buffers.
     Unsafe u;
     try{
       Field f = Unsafe.class.getDeclaredField("theUnsafe");
@@ -55,8 +68,15 @@ public interface MultipleByteArrayTest extends ByteArrayTest{
     }catch(NoSuchFieldException | IllegalAccessException nsfe){
       throw new RuntimeException(nsfe);
     }
+
+    // Do a recursive clean
     clean(u, byteArray);
+
+    // Trigger a GC to blast away any unused stuff
     System.gc();
+
+    // Log it if actually big
+    if(size >= (Integer.MAX_VALUE * 0.5)) System.out.println("Cleared away " + size + "B");
   }
 
   @Nonnull
@@ -98,7 +118,7 @@ public interface MultipleByteArrayTest extends ByteArrayTest{
   }
 
   @DisplayName("MultipleByteArray - ReadableWritable test")
-  class ReadableWritableTest implements ReadableWritableByteArrayTest, MultipleByteArrayTest{
+  class ReadableWritableTest implements ReadableWritableByteArray64BitTest, MultipleByteArrayTest{
 
     @Override
     public byte readTestWriteOnlyByteArray(@Nonnull WriteOnlyByteArray testByteArray, long byteIndex){
@@ -183,7 +203,7 @@ public interface MultipleByteArrayTest extends ByteArrayTest{
   }
 
   @DisplayName("MultipleByteArray - ReadOnly test")
-  class ReadOnlyTest implements ReadOnlyByteArrayTest, MultipleByteArrayTest{
+  class ReadOnlyTest implements ReadOnlyByteArray64BitTest, MultipleByteArrayTest{
 
     @Nonnull
     @Override
@@ -308,7 +328,7 @@ public interface MultipleByteArrayTest extends ByteArrayTest{
   }
 
   @DisplayName("MultipleByteArray - WriteOnly test")
-  class WriteOnlyTest implements WriteOnlyByteArrayTest, MultipleByteArrayTest{
+  class WriteOnlyTest implements WriteOnlyByteArray64BitTest, MultipleByteArrayTest{
 
     @Nonnull
     @Override
@@ -383,7 +403,7 @@ public interface MultipleByteArrayTest extends ByteArrayTest{
     @Test
     @Override
     public void testToString(){
-      WriteOnlyByteArrayTest.super.testToString();
+      WriteOnlyByteArray64BitTest.super.testToString();
     }
   }
 

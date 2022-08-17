@@ -15,11 +15,6 @@ import java.nio.ByteBuffer;
 @DisplayName("PrimitiveByteArray tests")
 public interface PrimitiveByteArrayTest extends ByteArrayTest{
 
-  @Override
-  default boolean is64BitAddressingSupported(){
-    return false;
-  }
-
   @DisplayName("PrimitiveByteArray - ReadableWritable test")
   class ReadableWritableTest implements ReadableWritableByteArrayTest, PrimitiveByteArrayTest{
 

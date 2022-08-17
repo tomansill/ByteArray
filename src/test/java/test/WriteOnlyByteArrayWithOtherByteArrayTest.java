@@ -19,7 +19,7 @@ import java.util.function.Function;
 import java.util.function.Supplier;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assumptions.assumeTrue;
+import static org.junit.jupiter.api.Assertions.fail;
 import static org.junit.jupiter.api.DynamicTest.dynamicTest;
 import static test.TestUtility.f;
 
@@ -43,9 +43,9 @@ public interface WriteOnlyByteArrayWithOtherByteArrayTest extends WriteOnlyByteA
     // Self sizes to test
     Set<Long> selfSizesToTest = new HashSet<>();
     selfSizesToTest.add(1L); // Test size of one
-    selfSizesToTest.add((long) Short.MAX_VALUE); // Big enough
+    //selfSizesToTest.add((long) Short.MAX_VALUE); // Big enough
     for(int trial = 0; trial < TRIALS; trial++){ // Add random sizes to try
-      if(selfSizesToTest.add((long) rng.nextInt(500) + 5)) continue;
+      if(selfSizesToTest.add((long) rng.nextInt(955) + 5)) continue;
       trial--; // Existing number, try again
     }
 
@@ -54,18 +54,18 @@ public interface WriteOnlyByteArrayWithOtherByteArrayTest extends WriteOnlyByteA
 
       // Build set of source bytearray sizes to try
       Set<Long> sourceSizesToTest = new HashSet<>();
-      if(selfSize < 2_000)
-        sourceSizesToTest.add(1L); // Smallest possible - only if source is small enough, don't do it if it's too big
+      // Smallest possible - only if source is small enough, don't do it if it's too big
+      if(selfSize < 100) sourceSizesToTest.add(1L);
       sourceSizesToTest.add(selfSize); // Maximum
 
       // Set up RNG for float, we may need to make RNG more biased for very large source size (to reduce the
       // number of tests because a small source bytearray on a very large bytearray can generate a lot of test and
       // takes a while to complete)
       Supplier<Float> nextFloat = rng::nextFloat;
-      if(selfSize >= 1_000) nextFloat = () -> (rng.nextFloat() / 2) + 0.5f; // Biased rng, 0.5 - 1.0
-      if(selfSize >= 5_000) nextFloat = () -> (rng.nextFloat() / 4) + 0.75f; // Biased rng, 0.75 - 1.0
-      if(selfSize >= 10_000) nextFloat = () -> (rng.nextFloat() / 10) + 0.90f; // Biased rng, 0.9 - 1.0
-      if(selfSize >= 50_000) nextFloat = () -> (rng.nextFloat() / 20) + 0.95f; // Biased rng, 0.95 - 1.0
+      if(selfSize >= 100) nextFloat = () -> (rng.nextFloat() / 2) + 0.5f; // Biased rng, 0.5 - 1.0
+      if(selfSize >= 250) nextFloat = () -> (rng.nextFloat() / 4) + 0.75f; // Biased rng, 0.75 - 1.0
+      if(selfSize >= 500) nextFloat = () -> (rng.nextFloat() / 10) + 0.90f; // Biased rng, 0.9 - 1.0
+      if(selfSize >= 750) nextFloat = () -> (rng.nextFloat() / 20) + 0.95f; // Biased rng, 0.95 - 1.0
 
       // Come up random source sizes to try
       int lastSize = sourceSizesToTest.size();
@@ -179,8 +179,7 @@ public interface WriteOnlyByteArrayWithOtherByteArrayTest extends WriteOnlyByteA
               }catch(OutOfMemoryError oom){
                 System.gc();
                 oom.printStackTrace();
-                System.out.println("Out of memory. Cannot perform this test due to insufficient memory space");
-                assumeTrue(false, "Cannot perform test due to insufficient memory space");
+                fail("Cannot perform test due to insufficient memory space");
               }
             }
           ));

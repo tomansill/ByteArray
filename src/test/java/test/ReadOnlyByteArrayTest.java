@@ -24,8 +24,11 @@ import java.util.Set;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
-import static org.junit.jupiter.api.Assertions.*;
-import static org.junit.jupiter.api.Assumptions.assumeTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.fail;
 import static org.junit.jupiter.api.DynamicTest.dynamicTest;
 import static test.TestUtility.f;
 
@@ -117,8 +120,7 @@ public interface ReadOnlyByteArrayTest extends ByteArrayTest{
           }catch(OutOfMemoryError oom){
             System.gc();
             oom.printStackTrace();
-            System.out.println("Out of memory. Cannot perform this test due to insufficient memory space");
-            assumeTrue(false, "Cannot perform test due to insufficient memory space");
+            fail("Cannot perform test due to insufficient memory space");
           }
 
           // Clean up
@@ -192,8 +194,7 @@ public interface ReadOnlyByteArrayTest extends ByteArrayTest{
           }catch(OutOfMemoryError oom){
             System.gc();
             oom.printStackTrace();
-            System.out.println("Out of memory. Cannot perform this test due to insufficient memory space");
-            assumeTrue(false, "Cannot perform test due to insufficient memory space");
+            fail("Cannot perform test due to insufficient memory space");
           }
 
           // Clean up
@@ -268,8 +269,7 @@ public interface ReadOnlyByteArrayTest extends ByteArrayTest{
           }catch(OutOfMemoryError oom){
             System.gc();
             oom.printStackTrace();
-            System.out.println("Out of memory. Cannot perform this test due to insufficient memory space");
-            assumeTrue(false, "Cannot perform test due to insufficient memory space");
+            fail("Cannot perform test due to insufficient memory space");
           }
 
           // Clean up
@@ -348,7 +348,7 @@ public interface ReadOnlyByteArrayTest extends ByteArrayTest{
     // Sizes to test
     Set<Long> sizesToTest = new HashSet<>();
     sizesToTest.add(1L); // Test size of one
-    sizesToTest.add((long) (Short.MAX_VALUE * 4)); // Silly big
+    //sizesToTest.add((long) (Short.MAX_VALUE * 4)); // Silly big
     for(int trial = 0; trial < TRIALS; trial++){ // Add random sizes to try
       if(sizesToTest.add((long) rng.nextInt(500) + 5)) continue;
       trial--; // Existing number, try again
@@ -400,7 +400,7 @@ public interface ReadOnlyByteArrayTest extends ByteArrayTest{
           System.gc();
           oom.printStackTrace();
           System.out.println("Out of memory. Cannot perform this test due to insufficient memory space");
-          assumeTrue(false, "Cannot perform test due to insufficient memory space");
+          fail("Cannot perform test due to insufficient memory space");
         }
 
         // Clean up
@@ -519,7 +519,7 @@ public interface ReadOnlyByteArrayTest extends ByteArrayTest{
           System.gc();
           oom.printStackTrace();
           System.out.println("Out of memory. Cannot perform this test due to insufficient memory space");
-          assumeTrue(false, "Cannot perform test due to insufficient memory space");
+          fail("Cannot perform test due to insufficient memory space");
         }
 
         // Clean up
@@ -668,8 +668,7 @@ public interface ReadOnlyByteArrayTest extends ByteArrayTest{
           }catch(OutOfMemoryError oom){
             System.gc();
             oom.printStackTrace();
-            System.out.println("Out of memory. Cannot perform this test due to insufficient memory space");
-            assumeTrue(false, "Cannot perform test due to insufficient memory space");
+            fail("Cannot perform test due to insufficient memory space");
           }
 
           // Clean up
@@ -681,79 +680,6 @@ public interface ReadOnlyByteArrayTest extends ByteArrayTest{
     // Return tests
     return tests;
   }
-
-  @DisplayName("Test readByte(long) on 64-bit addressable data")
-  @Test
-  default void testReadByteOn64BitData(){
-
-    // Skip if not supported
-    assumeTrue(is64BitAddressingSupported(), "64 bit addressing is not supported, skipping test");
-
-    // Get RNG
-    Random rng = getRNG();
-
-    // Set up size that is beyond i32
-    long size = ((long) Integer.MAX_VALUE) + rng.nextInt(9_000) + 1_000;
-
-    try{
-
-      // Allocate it
-      ReadOnlyByteArray testByteArray = createTestReadOnlyByteArray(size);
-
-      // Assert readonly if applicable
-      assertEquals(isReadableWritableOK(), testByteArray instanceof ReadableWritableByteArray);
-
-      try{
-
-        // Check size
-        assertEquals(size, testByteArray.size());
-
-        // Repeat many times to sparsely read across huge i64 address space (randomly choose positions)
-        int repetitions = 1_000_000;
-        Set<Long> visited = new HashSet<>(repetitions);
-        boolean visitedBeyondI32 = false;
-        for(int repetition = 0; repetition < repetitions; repetition++){
-
-          // Choose an byteIndex
-          long byteIndex;
-
-          // Make sure we do visit beyond i32 land
-          if((repetition <= repetitions / 2) || visitedBeyondI32) byteIndex = (long) (size * rng.nextFloat());
-          else{
-            long range = size - Integer.MAX_VALUE - 20;
-            byteIndex = ((long) (range * rng.nextDouble())) + Integer.MAX_VALUE + 20;
-          }
-
-          // Check if beyond i32
-          if(byteIndex > Integer.MAX_VALUE) visitedBeyondI32 = true;
-
-          // Add to visited - loop if already in the visited
-          if(!visited.add(byteIndex)){
-            repetition--;
-            continue;
-          }
-
-          // Get random byte
-          byte value = (byte) rng.nextInt();
-
-          // Write
-          writeTestReadOnlyByteArray(testByteArray, byteIndex, value);
-
-          // Check it
-          assertEquals(value, assertDoesNotThrow(() -> testByteArray.readByte(byteIndex)), "Index: " + byteIndex);
-        }
-      }finally{
-        cleanTestByteArray(testByteArray);
-      }
-    }catch(OutOfMemoryError oom){
-      assumeTrue(false, "Not enough memory to continue this test");
-      System.gc();
-    }
-  }
-
-  // TODO add test to read(long, WriteOnlyByteArray) on 64-bit addressable data
-
-  // TODO add test to subset(long, long) on 64-bit addressable data
 
   @DisplayName("Test bad readByte(long) calls")
   @TestFactory
@@ -816,7 +742,7 @@ public interface ReadOnlyByteArrayTest extends ByteArrayTest{
           System.gc();
           oom.printStackTrace();
           System.out.println("Out of memory. Cannot perform this test due to insufficient memory space");
-          assumeTrue(false, "Cannot perform test due to insufficient memory space");
+          fail("Cannot perform test due to insufficient memory space");
         }
 
         // Clean up
@@ -864,8 +790,7 @@ public interface ReadOnlyByteArrayTest extends ByteArrayTest{
           }catch(OutOfMemoryError oom){
             System.gc();
             oom.printStackTrace();
-            System.out.println("Out of memory. Cannot perform this test due to insufficient memory space");
-            assumeTrue(false, "Cannot perform test due to insufficient memory space");
+            fail("Cannot perform test due to insufficient memory space");
           }
 
           // Clean up
@@ -913,7 +838,7 @@ public interface ReadOnlyByteArrayTest extends ByteArrayTest{
           System.gc();
           oom.printStackTrace();
           System.out.println("Out of memory. Cannot perform this test due to insufficient memory space");
-          assumeTrue(false, "Cannot perform test due to insufficient memory space");
+          fail("Cannot perform test due to insufficient memory space");
         }
 
         // Clean up
@@ -961,8 +886,7 @@ public interface ReadOnlyByteArrayTest extends ByteArrayTest{
           }catch(OutOfMemoryError oom){
             System.gc();
             oom.printStackTrace();
-            System.out.println("Out of memory. Cannot perform this test due to insufficient memory space");
-            assumeTrue(false, "Cannot perform test due to insufficient memory space");
+            fail("Cannot perform test due to insufficient memory space");
           }
 
           // Clean up

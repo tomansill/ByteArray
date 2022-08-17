@@ -19,7 +19,7 @@ import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assumptions.assumeTrue;
+import static org.junit.jupiter.api.Assertions.fail;
 import static org.junit.jupiter.api.DynamicTest.dynamicTest;
 import static test.TestUtility.f;
 
@@ -45,8 +45,6 @@ public interface ByteArrayTest{
   default Random getRNG(){
     return new Random(SEED.hashCode() + this.getClass().getName().hashCode());
   }
-
-  boolean is64BitAddressingSupported();
 
   /**
    * Returns whether if test byte array must be ReadOnly/WriteOnly or it can be ReadableWritable
@@ -116,7 +114,7 @@ public interface ByteArrayTest{
           System.gc();
           oom.printStackTrace();
           System.out.println("Out of memory. Cannot perform this test due to insufficient memory space");
-          assumeTrue(false, "Cannot perform test due to insufficient memory space");
+          fail("Cannot perform test due to insufficient memory space");
         }
 
         // Clean up
@@ -161,8 +159,7 @@ public interface ByteArrayTest{
           }catch(OutOfMemoryError oom){
             System.gc();
             oom.printStackTrace();
-            System.out.println("Out of memory. Cannot perform this test due to insufficient memory space");
-            assumeTrue(false, "Cannot perform test due to insufficient memory space");
+            fail("Cannot perform test due to insufficient memory space");
           }
 
           // Clean up
@@ -207,7 +204,7 @@ public interface ByteArrayTest{
           System.gc();
           oom.printStackTrace();
           System.out.println("Out of memory. Cannot perform this test due to insufficient memory space");
-          assumeTrue(false, "Cannot perform test due to insufficient memory space");
+          fail("Cannot perform test due to insufficient memory space");
         }
 
         // Clean up
@@ -252,8 +249,7 @@ public interface ByteArrayTest{
           }catch(OutOfMemoryError oom){
             System.gc();
             oom.printStackTrace();
-            System.out.println("Out of memory. Cannot perform this test due to insufficient memory space");
-            assumeTrue(false, "Cannot perform test due to insufficient memory space");
+            fail("Cannot perform test due to insufficient memory space");
           }
 
           // Clean up
@@ -298,7 +294,7 @@ public interface ByteArrayTest{
           System.gc();
           oom.printStackTrace();
           System.out.println("Out of memory. Cannot perform this test due to insufficient memory space");
-          assumeTrue(false, "Cannot perform test due to insufficient memory space");
+          fail("Cannot perform test due to insufficient memory space");
         }
 
         // Clean up
@@ -342,7 +338,7 @@ public interface ByteArrayTest{
           System.gc();
           oom.printStackTrace();
           System.out.println("Out of memory. Cannot perform this test due to insufficient memory space");
-          assumeTrue(false, "Cannot perform test due to insufficient memory space");
+          fail("Cannot perform test due to insufficient memory space");
         }
 
         // Clean up
@@ -387,8 +383,7 @@ public interface ByteArrayTest{
           }catch(OutOfMemoryError oom){
             System.gc();
             oom.printStackTrace();
-            System.out.println("Out of memory. Cannot perform this test due to insufficient memory space");
-            assumeTrue(false, "Cannot perform test due to insufficient memory space");
+            fail("Cannot perform test due to insufficient memory space");
           }
 
           // Clean up
