@@ -610,7 +610,8 @@ class UtilityTest{
     tests.add(dynamicTest("byte array variadic with some nulls variant 3", () -> {
       IllegalArgumentException iae = assertThrows(
         IllegalArgumentException.class,
-        () -> ByteArray.combine(ByteArray.wrap(new byte[1]),
+        () -> ByteArray.combine(
+          ByteArray.wrap(new byte[1]),
           ByteArray.wrap(new byte[1]),
           null,
           ByteArray.wrap(new byte[1])
@@ -621,7 +622,8 @@ class UtilityTest{
     tests.add(dynamicTest("byte array variadic with some nulls variant 4", () -> {
       IllegalArgumentException iae = assertThrows(
         IllegalArgumentException.class,
-        () -> ByteArray.combine(ByteArray.wrap(new byte[1]),
+        () -> ByteArray.combine(
+          ByteArray.wrap(new byte[1]),
           ByteArray.wrap(new byte[1]),
           (ReadableWritableByteArray[]) null
         )
@@ -645,7 +647,8 @@ class UtilityTest{
     tests.add(dynamicTest("readonly byte array variadic with some nulls variant 3", () -> {
       IllegalArgumentException iae = assertThrows(
         IllegalArgumentException.class,
-        () -> ByteArray.combineReadOnly(ByteArray.wrap(new byte[1]),
+        () -> ByteArray.combineReadOnly(
+          ByteArray.wrap(new byte[1]),
           ByteArray.wrap(new byte[1]).toReadOnly(),
           null,
           ByteArray.wrap(new byte[1])
@@ -656,7 +659,8 @@ class UtilityTest{
     tests.add(dynamicTest("readonly byte array variadic with some nulls variant 4", () -> {
       IllegalArgumentException iae = assertThrows(
         IllegalArgumentException.class,
-        () -> ByteArray.combineReadOnly(ByteArray.wrap(new byte[1]).toReadOnly(),
+        () -> ByteArray.combineReadOnly(
+          ByteArray.wrap(new byte[1]).toReadOnly(),
           ByteArray.wrap(new byte[1]),
           (ReadableWritableByteArray[]) null
         )
