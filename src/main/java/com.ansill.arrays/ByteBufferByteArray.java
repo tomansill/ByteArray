@@ -60,6 +60,12 @@ class ByteBufferByteArray implements ReadableWritableByteArray{
     destCopy.put(view);
   }
 
+  /**
+   * Converts {@link PrimitiveByteArray} to {@link ByteBufferByteArray}
+   *
+   * @param primitiveByteArray {@link PrimitiveByteArray} to be converted
+   * @return resulting {@link ByteBufferByteArray}
+   */
   @Nonnull
   private static ByteBufferByteArray convert(@Nonnull PrimitiveByteArray primitiveByteArray){
 
