@@ -1,8 +1,8 @@
 package com.ansill.arrays;
 
-import jdk.internal.misc.Unsafe;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import sun.misc.Unsafe;
 import test.ByteArrayTest;
 import test.ReadOnlyByteArrayTest;
 import test.ReadOnlyByteArrayWithOtherByteArrayTest;
@@ -12,6 +12,7 @@ import test.WriteOnlyByteArrayWithOtherByteArrayTest;
 import test.arrays.TestOnlyByteArray;
 
 import javax.annotation.Nonnull;
+import java.lang.reflect.Field;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.List;
@@ -46,7 +47,14 @@ public interface MultipleByteArrayTest extends ByteArrayTest{
 
   @Override
   default void cleanTestByteArray(@Nonnull ByteArray byteArray){
-    Unsafe u = Unsafe.getUnsafe();
+    Unsafe u;
+    try{
+      Field f = Unsafe.class.getDeclaredField("theUnsafe");
+      f.setAccessible(true);
+      u = (Unsafe) f.get(null);
+    }catch(NoSuchFieldException | IllegalAccessException nsfe){
+      throw new RuntimeException(nsfe);
+    }
     clean(u, byteArray);
     System.gc();
   }
