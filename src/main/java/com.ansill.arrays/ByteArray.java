@@ -9,17 +9,22 @@ import java.util.stream.Collectors;
 import static com.ansill.arrays.IndexingUtility.combineVariadic;
 
 /**
- * ByteArray interface
+ * {@link ByteArray} interface with utility functions for creating {@link ByteArray}s
  * <p>
- * This interface provides the base implementation for handling ByteArrays and static methods for creating ByteArrays
+ * This interface provides the base implementation for handling {@link ByteArray}s and static methods for creating {@link ByteArray}s
  */
 public interface ByteArray{
 
   /**
-   * Combines multiple ByteArrays into a single ReadOnlyByteArray
+   * Combines multiple {@link ReadOnlyByteArray}s into a single {@link ReadOnlyByteArray}
+   * <p>
+   * If a list containing a single {@link ReadOnlyByteArray} is passed in, then that same {@link ReadOnlyByteArray} will be returned.
+   * <p>
+   * If there's any {@link ReadableWritableByteArray}s in the input list, it will be converted to {@link ReadOnlyByteArray} using {@link ReadableWritableByteArray}::toReadOnly method.
+   * <p>
    *
-   * @param byteArrays byte arrays to be combined
-   * @return a single ReadOnlyByteArray
+   * @param byteArrays a list of {@link ReadOnlyByteArray} to be combined
+   * @return a single {@link ReadOnlyByteArray}
    */
   @Nonnull
   static ReadOnlyByteArray combineReadOnly(@Nonnull List<ReadOnlyByteArray> byteArrays){
@@ -28,7 +33,7 @@ public interface ByteArray{
     //noinspection ConstantConditions
     if(byteArrays == null) throw new IllegalArgumentException("ByteArrays list is null");
     if(byteArrays.isEmpty()) throw new IllegalArgumentException("ByteArrays list is empty");
-    for(ReadOnlyByteArray byteArray : byteArrays){
+    for(var byteArray : byteArrays){
       if(byteArray == null) throw new IllegalArgumentException("There is a null element in the ByteArray list");
     }
 
@@ -46,26 +51,28 @@ public interface ByteArray{
   }
 
   /**
-   * Combines multiple ByteArrays into a single ReadOnlyByteArray
+   * Combines multiple {@link ReadOnlyByteArray}s into a single {@link ReadOnlyByteArray}
+   * <p>
+   * If there's any {@link ReadableWritableByteArray}s in the input list, it will be converted to {@link ReadOnlyByteArray} using {@link ReadableWritableByteArray}::toReadOnly method.
    *
    * @param firstByteArray  first byte array to be combined
    * @param secondByteArray second byte array to be combined
-   * @param restByteArrays  rest of byte arrays to be combined
-   * @return a single ReadOnlyByteArray
+   * @param restByteArrays  rest of byte arrays to be combined. <i>(Optional. Can be blank.)</i>
+   * @return a single {@link ReadOnlyByteArray}
    */
   @Nonnull
-  static ReadOnlyByteArray combineReadOnly(
+  static ReadOnlyByteArray combine(
     @Nonnull ReadOnlyByteArray firstByteArray,
     @Nonnull ReadOnlyByteArray secondByteArray,
     @Nonnull ReadOnlyByteArray... restByteArrays
   ){
 
     // Combine parameters
-    List<ReadOnlyByteArray> byteArrays = combineVariadic(firstByteArray, secondByteArray, restByteArrays);
+    var byteArrays = combineVariadic(firstByteArray, secondByteArray, restByteArrays);
 
     // Make sure all are readonly. Convert if any of them is not
     for(int index = 0; index < byteArrays.size(); index++){
-      ReadOnlyByteArray byteArray = byteArrays.get(index);
+      var byteArray = byteArrays.get(index);
       if(byteArray instanceof ReadableWritableByteArray){
         byteArray = ((ReadableWritableByteArray) byteArray).toReadOnly();
         byteArrays.set(index, byteArray);
@@ -77,19 +84,21 @@ public interface ByteArray{
   }
 
   /**
-   * Combines multiple ByteArrays into a single ReadableWritableByteArray
-   *
-   * @param byteArrays byte arrays to be combined
-   * @return a single ReadableWritableByteArray
+   * Combines multiple {@link ReadableWritableByteArray}s into a single {@link ReadableWritableByteArray}
+   * <p>
+   *   If a list containing a single {@link ReadableWritableByteArray} is passed in, then that same {@link ReadableWritableByteArray} will be returned.
+   * <p>
+   * @param byteArrays a list of {@link ReadableWritableByteArray}s to be combined
+   * @return a single {@link ReadableWritableByteArray}
    */
   @Nonnull
-  static ReadableWritableByteArray combine(@Nonnull List<ReadableWritableByteArray> byteArrays){
+  static ReadableWritableByteArray combineReadableWritable(@Nonnull List<ReadableWritableByteArray> byteArrays){
 
     // Assert non-empty
     //noinspection ConstantConditions
     if(byteArrays == null) throw new IllegalArgumentException("ByteArrays list is null");
     if(byteArrays.isEmpty()) throw new IllegalArgumentException("ByteArrays list is empty");
-    for(ReadableWritableByteArray byteArray : byteArrays){
+    for(var byteArray : byteArrays){
       if(byteArray == null) throw new IllegalArgumentException("There is a null element in the ByteArray list");
     }
 
@@ -100,14 +109,13 @@ public interface ByteArray{
     return new ReadableWritableMultipleByteArray(byteArrays);
   }
 
-
   /**
-   * Combines multiple ByteArrays into a single ReadableWritableByteArray
+   * Combines multiple {@link ReadableWritableByteArray}s into a single {@link ReadableWritableByteArray}
    *
    * @param firstByteArray  first byte array to be combined
    * @param secondByteArray second byte array to be combined
-   * @param restByteArrays  rest of byte arrays to be combined
-   * @return a single ReadableWritableByteArray
+   * @param restByteArrays  rest of byte arrays to be combined. <i>(Optional. Can be blank.)</i>
+   * @return a single {@link ReadableWritableByteArray}
    */
   @Nonnull
   static ReadableWritableByteArray combine(
@@ -117,22 +125,22 @@ public interface ByteArray{
   ){
 
     // Combine parameters
-    List<ReadableWritableByteArray> byteArrays = combineVariadic(firstByteArray, secondByteArray, restByteArrays);
+    var byteArrays = combineVariadic(firstByteArray, secondByteArray, restByteArrays);
 
     // Return
     return new ReadableWritableMultipleByteArray(byteArrays);
   }
 
   /**
-   * Wraps one or more primitive byte arrays into ReadableWritableByteArray
+   * Wraps one or more primitive byte arrays into {@link ReadableWritableByteArray}
    *
    * @param firstByteArray first primitive byte array to be wrapped
-   * @param restByteArrays more primitive byte arrays to be wrapped
-   * @return ReadableWritableByteArray
+   * @param restByteArrays more primitive byte arrays to be wrapped. <i>(Optional. Can be blank.)</i>
+   * @return a single {@link ReadableWritableByteArray} containing all byte arrays that has been passed in.
    */
   @Nonnull
   static ReadableWritableByteArray wrap(@Nonnull byte[] firstByteArray, @Nonnull byte[]... restByteArrays){
-    List<byte[]> bytesList = combineVariadic(firstByteArray, restByteArrays);
+    var bytesList = combineVariadic(firstByteArray, restByteArrays);
     if(bytesList.size() == 1) return new PrimitiveByteArray(bytesList.get(0));
     return new ReadableWritableMultipleByteArray(bytesList.stream()
                                                           .map(PrimitiveByteArray::new)
@@ -140,20 +148,20 @@ public interface ByteArray{
   }
 
   /**
-   * Wraps one or more ByteBuffers into ReadableWritableByteArray
+   * Wraps one or more {@link ByteBuffer}s into {@link ReadableWritableByteArray}
    *
-   * @param firstByteBuffer first ByteBuffer to be wrapped
-   * @param restByteBuffers more ByteBuffers to be wrapped
-   * @return ReadableWritableByteArray
+   * @param firstByteBuffer first {@link ByteBuffer} to be wrapped
+   * @param restByteBuffers more {@link ByteBuffer}s to be wrapped. <i>(Optional. Can be blank.)</i>
+   * @return a single {@link ReadableWritableByteArray} containing all {@link ByteBuffer}s that has been passed in.
    */
   @Nonnull
   static ReadableWritableByteArray wrap(@Nonnull ByteBuffer firstByteBuffer, @Nonnull ByteBuffer... restByteBuffers){
 
     // Combine
-    List<ByteBuffer> byteBuffers = combineVariadic(firstByteBuffer, restByteBuffers);
+    var byteBuffers = combineVariadic(firstByteBuffer, restByteBuffers);
 
     // Make sure all buffers are NOT readonly
-    for(ByteBuffer byteBuffer : byteBuffers){
+    for(var byteBuffer : byteBuffers){
       if(byteBuffer.isReadOnly()) throw new IllegalArgumentException("ReadOnly ByteBuffer was passed in");
     }
 
@@ -167,7 +175,7 @@ public interface ByteArray{
   }
 
   /**
-   * Returns the size of bytes in this ByteArray
+   * Returns the size of bytes in this {@link ByteArray}
    *
    * @return the size of bytes as non-negative long value
    */
@@ -175,14 +183,16 @@ public interface ByteArray{
   long size();
 
   /**
-   * Creates a subset of this ByteArray with defined start and length.
+   * Creates a subset of this {@link ByteArray} with defined start and length.
+   * <p>
+   * The resulting subset {@link ByteArray} is a view of the original {@link ByteArray}. Any changes to either subset or original {@link ByteArray} will propagate to each other.
    *
-   * @param start  the starting point on this ByteArray to start the subset range
+   * @param start  the starting point on this {@link ByteArray} to start the subset range
    * @param length the length of new subset after the start point
-   * @return Subset as ByteArray
+   * @return new {@link ByteArray} as a subset or same {@link ByteArray} if start is 0 and length is equal to current {@link ByteArray}'s size
    * @throws ByteArrayIndexOutOfBoundsException thrown if start or length is out of the bounds
    * @throws ByteArrayInvalidLengthException    thrown if the length is negative
-   * @throws ByteArrayLengthOverBoundsException thrown if length goes over the bounds
+   * @throws ByteArrayLengthOverBoundsException thrown if length of new subset {@link ByteArray} goes over the bounds
    */
   @Nonnull
   ByteArray subsetOf(@Nonnegative long start, @Nonnegative long length)

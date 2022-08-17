@@ -7,7 +7,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-/** Utility to provide convenient Indexing checks */
+/** Utility to provide convenient indexing checks functions */
 public final class IndexingUtility{
 
   /** Private constructor that will throw AssertionError */
@@ -90,7 +90,7 @@ public final class IndexingUtility{
    * Checks read/write byte call and throw any exception if anything is wrong with arguments or exit if all arguments are valid
    *
    * @param byteIndex       byte index
-   * @param sizeOfByteArray size of byte array
+   * @param sizeOfByteArray size of byte array. <i>Note that this is a trusted parameter. The function will not check if this is valid or not. This parameter should not come directly from user's input.</i>
    * @throws ByteArrayIndexOutOfBoundsException thrown if the index is out of bounds
    */
   public static void checkReadWriteByte(long byteIndex, @Nonnegative long sizeOfByteArray)
@@ -113,7 +113,7 @@ public final class IndexingUtility{
    *
    * @param byteIndex       byte index
    * @param destination     destination byte array
-   * @param sizeOfByteArray size of current byte array
+   * @param sizeOfByteArray size of current byte array <i>Note that this is a trusted parameter. The function will not check if this is valid or not. This parameter should not come directly from user's input.</i>
    * @throws ByteArrayIndexOutOfBoundsException thrown if index out of bounds
    * @throws ByteArrayLengthOverBoundsException thrown if size of byte array exceeds
    */
@@ -150,7 +150,7 @@ public final class IndexingUtility{
    *
    * @param start      starting index
    * @param length     length of new subset
-   * @param actualSize actual size of byte array
+   * @param actualSize actual size of byte array <i>Note that this is a trusted parameter. The function will not check if this is valid or not. This parameter should not come directly from user's input.</i>
    * @throws ByteArrayIndexOutOfBoundsException thrown if index is invalid
    * @throws ByteArrayInvalidLengthException    thrown if length is invalid
    * @throws ByteArrayLengthOverBoundsException thrown if length is over the bounds
@@ -186,7 +186,7 @@ public final class IndexingUtility{
    *
    * @param byteIndex       index
    * @param source          source array
-   * @param sizeOfByteArray size of actual byte array
+   * @param sizeOfByteArray size of actual byte array <i>Note that this is a trusted parameter. The function will not check if this is valid or not. This parameter should not come directly from user's input.</i>
    * @throws ByteArrayIndexOutOfBoundsException thrown if index is out of bounds
    * @throws ByteArrayLengthOverBoundsException thrown if the length is overlapping.
    */

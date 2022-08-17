@@ -9,7 +9,7 @@ import static com.ansill.arrays.IndexingUtility.checkReadWriteByte;
 import static com.ansill.arrays.IndexingUtility.checkSubsetOf;
 import static com.ansill.arrays.IndexingUtility.checkWrite;
 
-/** ReadableWritableByteArray implementation using primitive byte array as backing data */
+/** {@link ReadableWritableByteArray} implementation using primitive byte array as backing data */
 final class PrimitiveByteArray implements ReadableWritableByteArray, ReadOnlyByteArray{
 
   /** Starting index of byte array */
@@ -25,19 +25,22 @@ final class PrimitiveByteArray implements ReadableWritableByteArray, ReadOnlyByt
   final int size;
 
   /**
-   * Constructor to use input byte array as full ByteArray
+   * Constructor to use input byte array as full {@link ReadableWritableByteArray}
    *
    * @param data byte array data
+   * @throws IllegalArgumentException thrown if the length of data array is zero
    */
-  PrimitiveByteArray(@Nonnull byte[] data){
-    // TODO check against zero-sized bytearray?
+  PrimitiveByteArray(@Nonnull byte[] data) throws IllegalArgumentException{
+    if(data.length == 0) throw new IllegalArgumentException("The length of data is zero");
     this.data = data;
     this.start = 0;
     this.size = data.length;
   }
 
   /**
-   * Constructor to use input byte array as subset ByteArray
+   * Constructor to use input byte array as subset {@link ReadableWritableByteArray}
+   * <p>
+   * <i>Note: All of the input parameters are trusted. The constructor will not perform any checks on the parameter values.</i>
    *
    * @param data   byte array data
    * @param start  starting index of byte array
@@ -50,7 +53,7 @@ final class PrimitiveByteArray implements ReadableWritableByteArray, ReadOnlyByt
   }
 
   /**
-   * Directly copies byte arrays inside of byte arrays
+   * Directly copies byte arrays inside of {@link PrimitiveByteArray}s for maximum performance.
    *
    * @param source           source ByteArray to copy from
    * @param sourceStart      starting index on source byte array to start copying from
@@ -74,17 +77,26 @@ final class PrimitiveByteArray implements ReadableWritableByteArray, ReadOnlyByt
     );
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
   public long size(){
     return size;
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
   public byte readByte(long byteIndex) throws ByteArrayIndexOutOfBoundsException{
     checkReadWriteByte(byteIndex, size);
     return data[(int) (start + byteIndex)];
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
   public void read(
     @Nonnegative long byteIndex,
@@ -95,11 +107,11 @@ final class PrimitiveByteArray implements ReadableWritableByteArray, ReadOnlyByt
     checkRead(byteIndex, destination, this.size());
 
     // Check if destination is a wrapper, if it is a wrapper, unwrap it
-    if(destination instanceof WriteOnlyByteArrayWrapper){
+    while(destination instanceof WriteOnlyByteArrayWrapper){
       destination = ((WriteOnlyByteArrayWrapper) destination).original;
     }
 
-    // Check if destination is indeed PrimitiveByteArray, then we can access directly for faster copying
+    // Check if destination is indeed a PrimitiveByteArray, then we can access directly for faster copying
     if(destination instanceof PrimitiveByteArray){
 
       // Cast
@@ -112,7 +124,7 @@ final class PrimitiveByteArray implements ReadableWritableByteArray, ReadOnlyByt
       return;
     }
 
-    // Check if destination is indeed ByteBufferByteArray, then we can access directly for faster copying
+    // Check if destination is indeed a ByteBufferByteArray, then we can access directly for faster copying
     if(destination instanceof ByteBufferByteArray){
 
       // Cast
@@ -128,18 +140,31 @@ final class PrimitiveByteArray implements ReadableWritableByteArray, ReadOnlyByt
       return;
     }
 
+    // Check if destination is indeed a ReadableWritableMultipleByteArray, then we can access directly for faster copying
+    if(destination instanceof ReadableWritableMultipleByteArray){
+
+      // TODO
+    }
+
     // Otherwise, use manual Copy
+    // TODO should log that we're doing a manual copy
     for(long index = 0; index < destination.size(); index++){
       destination.writeByte(index, this.readByte(byteIndex + index));
     }
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
   public void writeByte(long byteIndex, byte value) throws ByteArrayIndexOutOfBoundsException{
     checkReadWriteByte(byteIndex, size);
     data[(int) (start + byteIndex)] = value;
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
   public void write(long byteIndex, @Nonnull ReadOnlyByteArray source)
   throws ByteArrayIndexOutOfBoundsException, ByteArrayLengthOverBoundsException{
@@ -148,16 +173,16 @@ final class PrimitiveByteArray implements ReadableWritableByteArray, ReadOnlyByt
     checkWrite(byteIndex, source, size);
 
     // Check if source is a wrapper, if it is, unwrap it
-    if(source instanceof ReadOnlyByteArrayWrapper) source = ((ReadOnlyByteArrayWrapper) source).original;
+    while(source instanceof ReadOnlyByteArrayWrapper) source = ((ReadOnlyByteArrayWrapper) source).original;
 
-    // Check if source is indeed PrimitiveByteArray, then we can access directly for faster copying
+    // Check if source is indeed a PrimitiveByteArray, then we can access directly for faster copying
     if(source instanceof PrimitiveByteArray){
       PrimitiveByteArray direct = (PrimitiveByteArray) source;
       copy(direct, 0, this, byteIndex, source.size());
       return;
     }
 
-    // Check if source is indeed ByteBufferByteArray, then we can access directly for faster copying
+    // Check if source is indeed a ByteBufferByteArray, then we can access directly for faster copying
     if(source instanceof ByteBufferByteArray){
 
       // Cast
@@ -173,12 +198,28 @@ final class PrimitiveByteArray implements ReadableWritableByteArray, ReadOnlyByt
       return;
     }
 
+    // Check if source is indeed a ReadOnlyMultipleByteArray, then we can access directly for faster copying
+    if(source instanceof ReadOnlyMultipleByteArray){
+
+      // TODO
+    }
+
+    // Check if source is indeed a ReadableWritableMultipleByteArray, then we can access directly for faster copying
+    if(source instanceof ReadableWritableMultipleByteArray){
+
+      // TODO
+    }
+
     // Manual copy as default
+    // TODO should log that we're doing a manual copy
     for(long index = 0; index < source.size(); index++){
       this.writeByte(byteIndex + index, source.readByte(index));
     }
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Nonnull
   @Override
   public ReadableWritableByteArray subsetOf(long start, long length)
@@ -188,6 +229,9 @@ final class PrimitiveByteArray implements ReadableWritableByteArray, ReadOnlyByt
     return new PrimitiveByteArray(data, (int) (this.start + start), (int) length);
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
   public String toString(){
 
