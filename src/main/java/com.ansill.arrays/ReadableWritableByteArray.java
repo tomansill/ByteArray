@@ -5,7 +5,7 @@ import javax.annotation.Nonnull;
 /**
  * Fully Readable and Writable interface of ByteArray
  */
-public interface ReadableWritableByteArray extends ReadOnlyByteArray, WriteOnlyByteArray{
+public interface ReadableWritableByteArray extends ReadOnlyByteArray, WriteOnlyByteArray, ByteArray{
 
   /**
    * Converts this ReadableWritableByteArray to ReadOnlyByteArray

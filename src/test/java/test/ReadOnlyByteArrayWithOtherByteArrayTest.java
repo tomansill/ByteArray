@@ -17,10 +17,10 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
+import static com.ansill.arrays.TestUtility.f;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.fail;
 import static org.junit.jupiter.api.DynamicTest.dynamicTest;
-import static test.TestUtility.f;
 
 public interface ReadOnlyByteArrayWithOtherByteArrayTest extends ReadOnlyByteArrayTest, OtherByteArrayTest{
 

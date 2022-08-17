@@ -76,6 +76,7 @@ final class ReadableWritableMultipleByteArray implements ReadableWritableByteArr
    * @throws ByteArrayLengthOverBoundsException thrown if the length is over the bounds
    * @throws ByteArrayInvalidLengthException    thrown if the length is invalid
    */
+  @SuppressWarnings("unchecked")
   @Nonnull
   static <T extends ByteArray> List<T> innerSubsetOf(
     @Nonnull TreeMap<Long,T> indexMap,
@@ -90,20 +91,20 @@ final class ReadableWritableMultipleByteArray implements ReadableWritableByteArr
     long floorKey = indexMap.floorKey(start);
 
     // Get submap
-    NavigableMap<Long,T> submap = indexMap.subMap(floorKey, true, start + length, false);
+    var submap = indexMap.subMap(floorKey, true, start + length, false);
 
     // Adjust the start to be relative to submap
     long relativeStart = start - floorKey;
 
     // Process all
     long remainingLength = length;
-    for(T byteArray : submap.values()){
+    for(var byteArray : submap.values()){
 
       // Figure out the length needed to subset
       long len = Long.min(byteArray.size() - relativeStart, remainingLength);
 
       // Subset and add
-      list.add(byteArray.subsetOf(relativeStart, len));
+      list.add((T) byteArray.subsetOf(relativeStart, len));
 
       // Adjust start and length
       relativeStart = Long.max(0, relativeStart - byteArray.size() - len);

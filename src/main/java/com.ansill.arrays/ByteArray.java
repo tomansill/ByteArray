@@ -179,14 +179,13 @@ public interface ByteArray{
    *
    * @param start  the starting point on this ByteArray to start the subset range
    * @param length the length of new subset after the start point
-   * @param <T>    Type that extends ByteArray. Such as ReadOnlyByteArray, WriteOnlyByteArray, or ReadableWritableByteArray
    * @return Subset as ByteArray
    * @throws ByteArrayIndexOutOfBoundsException thrown if start or length is out of the bounds
    * @throws ByteArrayInvalidLengthException    thrown if the length is negative
    * @throws ByteArrayLengthOverBoundsException thrown if length goes over the bounds
    */
   @Nonnull
-  <T extends ByteArray> T subsetOf(@Nonnegative long start, @Nonnegative long length)
+  ByteArray subsetOf(@Nonnegative long start, @Nonnegative long length)
   throws ByteArrayIndexOutOfBoundsException, ByteArrayLengthOverBoundsException, ByteArrayInvalidLengthException;
 
 }

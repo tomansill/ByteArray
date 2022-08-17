@@ -51,7 +51,6 @@ public interface ReadOnlyByteArray extends ByteArray{
    * @throws ByteArrayInvalidLengthException    thrown if the length is negative
    * @throws ByteArrayLengthOverBoundsException thrown if length goes over the bounds
    */
-  @SuppressWarnings("unchecked")
   @Nonnull
   @Override
   ReadOnlyByteArray subsetOf(@Nonnegative long start, @Nonnegative long length)
