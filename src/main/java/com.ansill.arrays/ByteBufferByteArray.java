@@ -1,5 +1,8 @@
 package com.ansill.arrays;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import javax.annotation.Nonnegative;
 import javax.annotation.Nonnull;
 import java.nio.ByteBuffer;
@@ -13,6 +16,9 @@ import static com.ansill.arrays.IndexingUtility.checkWrite;
 
 /** {@link ReadableWritableByteArray} implementation using {@link ByteBuffer} as the backing data */
 class ByteBufferByteArray implements ReadableWritableByteArray{
+
+  /** Logger */
+  private static final Logger LOGGER = LoggerFactory.getLogger(ByteBufferByteArray.class);
 
   /** {@link ByteBuffer} data that backs this {@link ReadableWritableByteArray} */
   @Nonnull
@@ -124,7 +130,12 @@ class ByteBufferByteArray implements ReadableWritableByteArray{
     }
 
     // Manual Copy
-    // TODO should log that we're doing a manual copy
+    if(LOGGER.isWarnEnabled() && !destination.getClass().getName().contains("TestOnly")){
+      LOGGER.warn(
+        "No implementation found to handle efficient bulk copy for {}. Using manual per-byte copy.",
+        destination.getClass().getName()
+      );
+    }
     for(long index = 0; index < destination.size(); index++){
       destination.writeByte(index, this.readByte(byteIndex + index));
     }
@@ -184,7 +195,12 @@ class ByteBufferByteArray implements ReadableWritableByteArray{
     }
 
     // Manual copy
-    // TODO should log that we're doing a manual copy
+    if(LOGGER.isWarnEnabled() && !source.getClass().getName().contains("TestOnly")){
+      LOGGER.warn(
+        "No implementation found to handle efficient bulk copy for {}. Using manual per-byte copy.",
+        source.getClass().getName()
+      );
+    }
     for(long index = 0; index < source.size(); index++){
       this.writeByte(byteIndex + index, source.readByte(index));
     }

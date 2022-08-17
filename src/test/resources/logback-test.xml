@@ -1,0 +1,17 @@
+<configuration>
+    <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+        <layout>
+            <Pattern>
+                %d{HH:mm:ss.SSS} [%-5p] [%t] %c{1}:%L - %msg%n
+            </Pattern>
+        </layout>
+    </appender>
+
+    <logger name="com.ansill.arrays" level="debug" additivity="false">
+        <appender-ref ref="CONSOLE"/>
+    </logger>
+
+    <root level="warn">
+        <appender-ref ref="CONSOLE"/>
+    </root>
+</configuration>
