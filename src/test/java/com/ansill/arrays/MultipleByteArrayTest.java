@@ -29,7 +29,7 @@ public interface MultipleByteArrayTest extends ByteArrayTest{
   }
 
   @Nonnull
-  default ReadableWritableByteArray createTestReadableWritableByteArray(long size, int seed){
+  static ReadableWritableByteArray createReadableWritableByteArray(long size, int seed){
 
     // Seed RNG
     Random random = new Random(seed);
@@ -50,7 +50,7 @@ public interface MultipleByteArrayTest extends ByteArrayTest{
       if(random.nextFloat() <= 0.25){
 
         // Add to the list
-        bytearrays.add(createTestReadableWritableByteArray(innerSize, random.nextInt()));
+        bytearrays.add(createReadableWritableByteArray(innerSize, random.nextInt()));
 
       }else{
 
@@ -64,6 +64,11 @@ public interface MultipleByteArrayTest extends ByteArrayTest{
     }
 
     return new ReadableWritableMultipleByteArray(bytearrays);
+  }
+
+  @Nonnull
+  default ReadableWritableByteArray createTestReadableWritableByteArray(long size, int seed){
+    return createReadableWritableByteArray(size, seed);
   }
 
 }
