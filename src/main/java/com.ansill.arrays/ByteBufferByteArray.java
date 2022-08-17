@@ -188,15 +188,14 @@ class ByteBufferByteArray implements ReadableWritableByteArray{
       return;
     }
 
-    // Check if source is indeed a ReadOnlyMultipleByteArray, then we can access directly for faster copying
-    if(source instanceof ReadOnlyMultipleByteArray){
-
-      // TODO
-    }
-
     // Check if source is indeed a ReadableWritableMultipleByteArray, then we can access directly for faster copying
     if(source instanceof ReadableWritableMultipleByteArray){
+      // Just convert it to ReadOnlyMultipleByteArray then the next if-statement will pick it up and handle it
+      source = ((ReadableWritableMultipleByteArray) source).toReadOnly(); // TODO is this good idea? - toReadOnly() is a bit expensive call
+    }
 
+    // Check if source is indeed a ReadOnlyMultipleByteArray, then we can access directly for faster copying
+    if(source instanceof ReadOnlyMultipleByteArray){
       // TODO
     }
 
