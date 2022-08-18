@@ -86,14 +86,53 @@ public class MultipleByteArrayNestedTest{
   }
 
   @Nested
-  @DisplayName("MultipleByteArray - WriteOnly test with control ByteArray implementation")
+  @DisplayName("WriteOnly test with control ByteArray implementation")
   public class WriteOnlyMultipleByteArrayWithControlByteArrayTest extends WriteOnlyMultipleByteArrayTest implements
     WriteOnlyByteArrayWithOtherByteArrayTest{
 
   }
 
   @Nested
-  @DisplayName("MultipleByteArray - WriteOnly test")
+  @DisplayName("WriteOnly test with ByteBufferByteArray implementation")
+  public class WriteOnlyMultipleByteArrayWithByteBufferByteArrayTest extends WriteOnlyMultipleByteArrayTest implements
+    WriteOnlyByteArrayWithOtherByteArrayTest{
+
+    @Nonnull
+    @Override
+    public ReadableWritableByteArray createControlReadableWritable(long size){
+      return new ByteBufferByteArray(ByteBuffer.allocate((int) size));
+    }
+  }
+
+  @Nested
+  @DisplayName("WriteOnly test with PrimitiveByteArray implementation")
+  public class WriteOnlyMultipleByteArrayWithPrimitiveByteArrayTest extends WriteOnlyMultipleByteArrayTest implements
+    WriteOnlyByteArrayWithOtherByteArrayTest{
+
+    @Nonnull
+    @Override
+    public ReadableWritableByteArray createControlReadableWritable(long size){
+      return new PrimitiveByteArray(new byte[(int) size]);
+    }
+  }
+
+  @Nested
+  @DisplayName("WriteOnly test with self implementation")
+  public class WriteOnlyMultipleByteArrayWithSelfTest extends WriteOnlyMultipleByteArrayTest implements
+    WriteOnlyByteArrayWithOtherByteArrayTest{
+
+    @Nonnull
+    @Override
+    public ReadableWritableByteArray createControlReadableWritable(long size){
+      return MultipleByteArrayNestedTest.MultipleByteArrayTest.createReadableWritableByteArray(
+        size,
+        (int) (size + 232)
+      );
+    }
+  }
+
+  @Nested
+  @DisplayName("WriteOnly test")
   public class WriteOnlyMultipleByteArrayTest implements WriteOnlyByteArray64BitTest, MultipleByteArrayTest{
 
     @Nonnull
@@ -174,14 +213,54 @@ public class MultipleByteArrayNestedTest{
   }
 
   @Nested
-  @DisplayName("MultipleByteArray - ReadOnly test with control ByteArray implementation")
+  @DisplayName("ReadOnly test with control ByteArray implementation")
   public class ReadOnlyMultipleByteArrayWithControlByteArrayTest extends ReadOnlyMultipleByteArrayTest implements
     ReadOnlyByteArrayWithOtherByteArrayTest{
 
   }
 
   @Nested
-  @DisplayName("MultipleByteArray - ReadOnly test")
+  @DisplayName("ReadOnly test with ByteBufferByteArray implementation")
+  public class ReadOnlyMultipleByteArrayWithByteBufferByteArrayTest extends ReadOnlyMultipleByteArrayTest implements
+    ReadOnlyByteArrayWithOtherByteArrayTest{
+
+    @Nonnull
+    @Override
+    public ReadableWritableByteArray createControlReadableWritable(long size){
+      return new ByteBufferByteArray(ByteBuffer.allocate((int) size));
+    }
+
+  }
+
+  @Nested
+  @DisplayName("ReadOnly test with PrimitiveByteArray implementation")
+  public class ReadOnlyMultipleByteArrayWithPrimitiveByteArrayTest extends ReadOnlyMultipleByteArrayTest implements
+    ReadOnlyByteArrayWithOtherByteArrayTest{
+
+    @Nonnull
+    @Override
+    public ReadableWritableByteArray createControlReadableWritable(long size){
+      return new PrimitiveByteArray(new byte[(int) size]);
+    }
+  }
+
+  @Nested
+  @DisplayName("ReadOnly test with self implementation")
+  public class ReadOnlyMultipleByteArrayWithSelfTest extends ReadOnlyMultipleByteArrayTest implements
+    ReadOnlyByteArrayWithOtherByteArrayTest{
+
+    @Nonnull
+    @Override
+    public ReadableWritableByteArray createControlReadableWritable(long size){
+      return MultipleByteArrayNestedTest.MultipleByteArrayTest.createReadableWritableByteArray(
+        size,
+        (int) (size + 232)
+      );
+    }
+  }
+
+  @Nested
+  @DisplayName("ReadOnly test")
   public class ReadOnlyMultipleByteArrayTest implements ReadOnlyByteArray64BitTest, MultipleByteArrayTest{
 
     @Nonnull
@@ -307,7 +386,7 @@ public class MultipleByteArrayNestedTest{
   }
 
   @Nested
-  @DisplayName("MultipleByteArray - ReadableWritable test")
+  @DisplayName("ReadableWritable test")
   public class ReadableWritableMultipleByteArrayTest
     implements ReadableWritableByteArray64BitTest, MultipleByteArrayTest{
 

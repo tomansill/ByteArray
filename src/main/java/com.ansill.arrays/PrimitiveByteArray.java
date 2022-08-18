@@ -5,7 +5,6 @@ import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nonnegative;
 import javax.annotation.Nonnull;
-import java.nio.ByteBuffer;
 
 import static com.ansill.arrays.IndexingUtility.checkRead;
 import static com.ansill.arrays.IndexingUtility.checkReadWriteByte;
@@ -121,46 +120,43 @@ final class PrimitiveByteArray implements ReadableWritableByteArray, ReadOnlyByt
     if(destination instanceof PrimitiveByteArray){
 
       // Cast
-      PrimitiveByteArray direct = (PrimitiveByteArray) destination;
+      var direct = (PrimitiveByteArray) destination;
 
       // Copy
       copy(this, byteIndex, direct, 0, destination.size());
-
-      // Exit
-      return;
     }
 
     // Check if destination is indeed a ByteBufferByteArray, then we can access directly for faster copying
-    if(destination instanceof ByteBufferByteArray){
+    else if(destination instanceof ByteBufferByteArray){
 
       // Cast
-      ByteBufferByteArray bbbaDestination = (ByteBufferByteArray) destination;
+      var bbbaDestination = (ByteBufferByteArray) destination;
 
       // Get bytebuffer
-      ByteBuffer bbDestination = bbbaDestination.data.duplicate();
+      var bbDestination = bbbaDestination.data.duplicate();
 
       // Read
       bbDestination.put(this.data, (int) (this.start + byteIndex), (int) bbbaDestination.size());
-
-      // Exit
-      return;
     }
 
     // Check if destination is indeed a ReadableWritableMultipleByteArray, then we can access directly for faster copying
-    if(destination instanceof ReadableWritableMultipleByteArray){
+    else if(destination instanceof ReadableWritableMultipleByteArray){
 
-      // TODO
-    }
+      // Subset this bytearray
+      var subsetted = this.subsetOf(byteIndex, destination.size());
 
-    // Otherwise, use manual Copy
-    if(LOGGER.isWarnEnabled() && !destination.getClass().getName().contains("TestOnly")){
+      // use MBA's write function
+      destination.write(0, subsetted);
+    }else{
+
+      // Otherwise, use manual copy. Warn about it through logger
       LOGGER.warn(
         "No implementation found to handle efficient bulk copy for {}. Using manual per-byte copy.",
         destination.getClass().getName()
       );
-    }
-    for(long index = 0; index < destination.size(); index++){
-      destination.writeByte(index, this.readByte(byteIndex + index));
+      for(long index = 0; index < destination.size(); index++){
+        destination.writeByte(index, data[(int) (start + byteIndex + index)]);
+      }
     }
   }
 
@@ -177,7 +173,7 @@ final class PrimitiveByteArray implements ReadableWritableByteArray, ReadOnlyByt
    * {@inheritDoc}
    */
   @Override
-  public void write(long byteIndex, @Nonnull ReadOnlyByteArray source)
+  public void write(@Nonnegative long byteIndex, @Nonnull ReadOnlyByteArray source)
   throws ByteArrayIndexOutOfBoundsException, ByteArrayLengthOverBoundsException{
 
     // Check parameters
@@ -188,48 +184,41 @@ final class PrimitiveByteArray implements ReadableWritableByteArray, ReadOnlyByt
 
     // Check if source is indeed a PrimitiveByteArray, then we can access directly for faster copying
     if(source instanceof PrimitiveByteArray){
-      PrimitiveByteArray direct = (PrimitiveByteArray) source;
+      var direct = (PrimitiveByteArray) source;
       copy(direct, 0, this, byteIndex, source.size());
-      return;
     }
 
     // Check if source is indeed a ByteBufferByteArray, then we can access directly for faster copying
-    if(source instanceof ByteBufferByteArray){
+    else if(source instanceof ByteBufferByteArray){
 
       // Cast
-      ByteBufferByteArray bbbaSource = (ByteBufferByteArray) source;
+      var bbbaSource = (ByteBufferByteArray) source;
 
       // Get bytebuffer
-      ByteBuffer bbSource = bbbaSource.data.duplicate();
+      var bbSource = bbbaSource.data.duplicate();
 
       // Write
       bbSource.get(this.data, (int) byteIndex, (int) bbbaSource.size());
-
-      // Exit
-      return;
     }
 
-    // Check if source is indeed a ReadOnlyMultipleByteArray, then we can access directly for faster copying
-    if(source instanceof ReadOnlyMultipleByteArray){
+    // Check if source is indeed a ReadableWritableMultipleByteArray or ReadOnlyMultipleByteArray, then we can access directly for faster copying
+    else if(source instanceof ReadableWritableMultipleByteArray || source instanceof ReadOnlyMultipleByteArray){
 
-      // TODO
-    }
+      // Subset this bytearray
+      var subsetted = this.subsetOf(byteIndex, source.size());
 
-    // Check if source is indeed a ReadableWritableMultipleByteArray, then we can access directly for faster copying
-    if(source instanceof ReadableWritableMultipleByteArray){
+      // use MBA's read function
+      source.read(0, subsetted);
+    }else{
 
-      // TODO
-    }
-
-    // Manual copy as default
-    if(LOGGER.isWarnEnabled() && !source.getClass().getName().contains("TestOnly")){
+      // Otherwise, use manual copy. Warn about it through logger
       LOGGER.warn(
         "No implementation found to handle efficient bulk copy for {}. Using manual per-byte copy.",
         source.getClass().getName()
       );
-    }
-    for(long index = 0; index < source.size(); index++){
-      this.writeByte(byteIndex + index, source.readByte(index));
+      for(long index = 0; index < source.size(); index++){
+        data[(int) (start + byteIndex + index)] = source.readByte(index);
+      }
     }
   }
 
@@ -255,7 +244,7 @@ final class PrimitiveByteArray implements ReadableWritableByteArray, ReadOnlyByt
     int size = (int) Long.min(128, this.size());
 
     // Stringbuilder
-    StringBuilder sb = new StringBuilder();
+    var sb = new StringBuilder();
     sb.append(this.getClass().getSimpleName())
       .append("(size=")
       .append(this.size())
@@ -268,7 +257,7 @@ final class PrimitiveByteArray implements ReadableWritableByteArray, ReadOnlyByt
       byte value = data[start + index];
 
       // Convert to hex
-      String hexValue = Long.toHexString(value & 0xffL);
+      var hexValue = Long.toHexString(value & 0xffL);
 
       // Prefix if one char
       if(hexValue.length() == 1) hexValue = "0" + hexValue;

@@ -2,10 +2,7 @@ package com.ansill.arrays;
 
 import javax.annotation.Nonnegative;
 import javax.annotation.Nonnull;
-import java.util.Collection;
 import java.util.List;
-import java.util.Map;
-import java.util.NavigableMap;
 import java.util.TreeMap;
 
 import static com.ansill.arrays.IndexingUtility.checkRead;
@@ -35,16 +32,16 @@ final class ReadOnlyMultipleByteArray implements ReadOnlyByteArray{
     long size = 0;
 
     // Iterate over byte arrays
-    for(ReadOnlyByteArray byteArray : byteArrays){
+    for(var byteArray : byteArrays){
       if(byteArray instanceof ReadableWritableMultipleByteArray){
-        Collection<ReadableWritableByteArray> innerByteArrays = ((ReadableWritableMultipleByteArray) byteArray).indexMap.values();
-        for(ReadableWritableByteArray innerByteArray : innerByteArrays){
+        var innerByteArrays = ((ReadableWritableMultipleByteArray) byteArray).indexMap.values();
+        for(var innerByteArray : innerByteArrays){
           indexMap.put(size, innerByteArray.toReadOnly());
           size += innerByteArray.size();
         }
       }else if(byteArray instanceof com.ansill.arrays.ReadOnlyMultipleByteArray){
-        Collection<ReadOnlyByteArray> innerByteArrays = ((com.ansill.arrays.ReadOnlyMultipleByteArray) byteArray).indexMap.values();
-        for(ReadOnlyByteArray innerByteArray : innerByteArrays){
+        var innerByteArrays = ((com.ansill.arrays.ReadOnlyMultipleByteArray) byteArray).indexMap.values();
+        for(var innerByteArray : innerByteArrays){
           indexMap.put(size, innerByteArray);
           size += innerByteArray.size();
         }
@@ -70,7 +67,7 @@ final class ReadOnlyMultipleByteArray implements ReadOnlyByteArray{
     long index = byteIndex;
     T byteArray = indexMap.get(index);
     if(byteArray == null){
-      Map.Entry<Long,T> entry = indexMap.floorEntry(index);
+      var entry = indexMap.floorEntry(index);
       index = entry.getKey();
       byteArray = entry.getValue();
     }
@@ -92,14 +89,14 @@ final class ReadOnlyMultipleByteArray implements ReadOnlyByteArray{
     long floorIndex = indexMap.floorKey(byteIndex);
 
     // Get submap
-    NavigableMap<Long,T> submap = indexMap.subMap(floorIndex, true, byteIndex + destination.size(), false);
+    var submap = indexMap.subMap(floorIndex, true, byteIndex + destination.size(), false);
 
     // Adjust the byteIndex to match submap
     long relativeByteIndex = byteIndex - floorIndex;
 
     // Loop through the submap
     long remainingLength = destination.size();
-    for(T byteArray : submap.values()){
+    for(var byteArray : submap.values()){
 
       // Determine the amount of bytes to copy
       long lenToCopy = Long.min(byteArray.size() - relativeByteIndex, remainingLength);
@@ -151,7 +148,7 @@ final class ReadOnlyMultipleByteArray implements ReadOnlyByteArray{
     checkSubsetOf(start, length, size);
 
     // Calculate and subset
-    List<ReadOnlyByteArray> resultingArray = innerSubsetOf(this.indexMap, start, length);
+    var resultingArray = innerSubsetOf(this.indexMap, start, length);
 
     // If only one element, just use that element
     if(resultingArray.size() == 1) return resultingArray.get(0);
@@ -167,7 +164,7 @@ final class ReadOnlyMultipleByteArray implements ReadOnlyByteArray{
     final int length = (int) Long.min(128, this.size);
 
     // Set up stringbuilder
-    StringBuilder sb = new StringBuilder();
+    var sb = new StringBuilder();
     sb.append(this.getClass().getSimpleName()).append("(size=").append(size).append(", content=[");
 
     // Count down
@@ -175,10 +172,10 @@ final class ReadOnlyMultipleByteArray implements ReadOnlyByteArray{
     while(byteIndex < length){
 
       // Get bytearray
-      Map.Entry<Long,ReadOnlyByteArray> entry = indexMap.floorEntry(byteIndex);
+      var entry = indexMap.floorEntry(byteIndex);
 
       // Get bytearray
-      ReadOnlyByteArray byteArray = entry.getValue();
+      var byteArray = entry.getValue();
 
       // Determine the limits
       int limit = (int) Long.min(byteArray.size(), length - byteIndex);
@@ -193,7 +190,7 @@ final class ReadOnlyMultipleByteArray implements ReadOnlyByteArray{
         byte value = byteArray.readByte(i);
 
         // Convert to hex
-        String hexValue = Long.toHexString(value & 0xffL);
+        var hexValue = Long.toHexString(value & 0xffL);
 
         // Prefix if one char
         if(hexValue.length() == 1) hexValue = "0" + hexValue;
@@ -212,6 +209,5 @@ final class ReadOnlyMultipleByteArray implements ReadOnlyByteArray{
     // Add cap and return
     sb.append("])");
     return sb.toString();
-
   }
 }

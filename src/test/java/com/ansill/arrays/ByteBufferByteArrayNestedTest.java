@@ -104,7 +104,7 @@ public class ByteBufferByteArrayNestedTest{
 
   @Nested
   @DisplayName("ReadOnly test with ByteBufferByteArray implementation")
-  public class ReadOnlyByteBufferByteArrayWithByteBufferByteArrayTest
+  public class ReadOnlyByteBufferByteArrayWithSelfByteArrayTest
     extends ReadOnlyByteBufferByteArrayWithControlByteArrayTest{
 
     @Nonnull
@@ -124,12 +124,28 @@ public class ByteBufferByteArrayNestedTest{
 
   @Nested
   @DisplayName("ReadOnly test with PrimitiveByteArray implementation")
-  public class ReadOnlyByteBufferByteArrayWithSelfTest extends ReadOnlyByteBufferByteArrayWithControlByteArrayTest{
+  public class ReadOnlyByteBufferByteArrayWithPrimitiveByteArrayTest
+    extends ReadOnlyByteBufferByteArrayWithControlByteArrayTest{
 
     @Nonnull
     @Override
     public ReadableWritableByteArray createControlReadableWritable(long size){
       return new PrimitiveByteArray(new byte[(int) size]);
+    }
+  }
+
+  @Nested
+  @DisplayName("ReadOnly test with MultipleByteArray implementation")
+  public class ReadOnlyByteBufferByteArrayWithMultipleByteArrayTest
+    extends ReadOnlyByteBufferByteArrayWithControlByteArrayTest{
+
+    @Nonnull
+    @Override
+    public ReadableWritableByteArray createControlReadableWritable(long size){
+      return MultipleByteArrayNestedTest.MultipleByteArrayTest.createReadableWritableByteArray(
+        size,
+        (int) (size + 232)
+      );
     }
   }
 
@@ -173,13 +189,28 @@ public class ByteBufferByteArrayNestedTest{
 
   @Nested
   @DisplayName("WriteOnly test with PrimitiveByteArray implementation")
-  public class WriteOnlyByteBufferByteArrayWithByteBufferByteArrayTest
+  public class WriteOnlyByteBufferByteArrayWithPrimitiveByteArrayTest
     extends WriteOnlyByteBufferByteArrayWithControlByteArrayTest{
 
     @Nonnull
     @Override
     public ReadableWritableByteArray createControlReadableWritable(long size){
       return new PrimitiveByteArray(new byte[(int) size]);
+    }
+  }
+
+  @Nested
+  @DisplayName("WriteOnly test with MultipleByteArray implementation")
+  public class WriteOnlyByteBufferByteArrayWithMultipleByteArrayTest
+    extends WriteOnlyByteBufferByteArrayWithControlByteArrayTest{
+
+    @Nonnull
+    @Override
+    public ReadableWritableByteArray createControlReadableWritable(long size){
+      return MultipleByteArrayNestedTest.MultipleByteArrayTest.createReadableWritableByteArray(
+        size,
+        (int) (size + 232)
+      );
     }
   }
 

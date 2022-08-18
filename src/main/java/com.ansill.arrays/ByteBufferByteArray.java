@@ -6,8 +6,6 @@ import org.slf4j.LoggerFactory;
 import javax.annotation.Nonnegative;
 import javax.annotation.Nonnull;
 import java.nio.ByteBuffer;
-import java.util.ArrayList;
-import java.util.List;
 
 import static com.ansill.arrays.IndexingUtility.checkRead;
 import static com.ansill.arrays.IndexingUtility.checkReadWriteByte;
@@ -52,10 +50,10 @@ class ByteBufferByteArray implements ReadableWritableByteArray{
     @Nonnegative long offset,
     @Nonnegative long length
   ){
-    ByteBuffer view = source.data.asReadOnlyBuffer();
+    var view = source.data.asReadOnlyBuffer();
     view.position((int) (view.position() + byteIndex));
     view.limit((int) (view.position() + length));
-    ByteBuffer destCopy = destination.data.duplicate();
+    var destCopy = destination.data.duplicate();
     destCopy.position((int) (destCopy.position() + offset));
     destCopy.put(view);
   }
@@ -116,34 +114,33 @@ class ByteBufferByteArray implements ReadableWritableByteArray{
     if(destination instanceof ByteBufferByteArray){
       var direct = (ByteBufferByteArray) destination;
       copy(this, byteIndex, direct, 0, destination.size());
-      return;
     }
 
     // Check if destination is indeed a PrimitiveByteArray, then we can access directly for faster copying
-    if(destination instanceof PrimitiveByteArray){
+    else if(destination instanceof PrimitiveByteArray){
 
       // Copy it
       copy(this, byteIndex, convert((PrimitiveByteArray) destination), 0, destination.size());
-
-      // Exit
-      return;
     }
 
     // Check if destination is indeed a ReadableWritableMultipleByteArray, then we can access directly for faster copying
-    if(destination instanceof ReadableWritableMultipleByteArray){
+    else if(destination instanceof ReadableWritableMultipleByteArray){
 
-      // TODO
-    }
+      // Subset this bytearray
+      var subsetted = this.subsetOf(byteIndex, destination.size());
 
-    // Manual Copy
-    if(LOGGER.isWarnEnabled() && !destination.getClass().getName().contains("TestOnly")){
+      // use MBA's write function
+      destination.write(0, subsetted);
+    }else{
+
+      // Manual Copy (And warn about it)
       LOGGER.warn(
         "No implementation found to handle efficient bulk copy for {}. Using manual per-byte copy.",
         destination.getClass().getName()
       );
-    }
-    for(long index = 0; index < destination.size(); index++){
-      destination.writeByte(index, this.readByte(byteIndex + index));
+      for(long index = 0; index < destination.size(); index++){
+        destination.writeByte(index, this.data.get((int) (this.data.position() + byteIndex + index)));
+      }
     }
   }
 
@@ -175,39 +172,33 @@ class ByteBufferByteArray implements ReadableWritableByteArray{
     if(source instanceof ByteBufferByteArray){
       var direct = (ByteBufferByteArray) source;
       copy(direct, 0, this, byteIndex, source.size());
-      return;
     }
 
     // Check if source is indeed a PrimitiveByteArray, then we can access directly for faster copying
-    if(source instanceof PrimitiveByteArray){
+    else if(source instanceof PrimitiveByteArray){
 
       // Copy it
       copy(convert((PrimitiveByteArray) source), 0, this, byteIndex, source.size());
-
-      // Exit
-      return;
     }
 
-    // Check if source is indeed a ReadableWritableMultipleByteArray, then we can access directly for faster copying
-    if(source instanceof ReadableWritableMultipleByteArray){
-      // Just convert it to ReadOnlyMultipleByteArray then the next if-statement will pick it up and handle it
-      source = ((ReadableWritableMultipleByteArray) source).toReadOnly(); // TODO is this good idea? - toReadOnly() is a bit expensive call
-    }
+    // Check if source is indeed a ReadableWritableMultipleByteArray or ReadOnlyMultipleByteArray, then we can access directly for faster copying
+    else if(source instanceof ReadableWritableMultipleByteArray || source instanceof ReadOnlyMultipleByteArray){
 
-    // Check if source is indeed a ReadOnlyMultipleByteArray, then we can access directly for faster copying
-    if(source instanceof ReadOnlyMultipleByteArray){
-      // TODO
-    }
+      // Subset this bytearray
+      var subsetted = this.subsetOf(byteIndex, source.size());
 
-    // Manual copy
-    if(LOGGER.isWarnEnabled() && !source.getClass().getName().contains("TestOnly")){
+      // use MBA's read function
+      source.read(0, subsetted);
+    }else{
+
+      // Manual Copy (And warn about it)
       LOGGER.warn(
         "No implementation found to handle efficient bulk copy for {}. Using manual per-byte copy.",
         source.getClass().getName()
       );
-    }
-    for(long index = 0; index < source.size(); index++){
-      this.writeByte(byteIndex + index, source.readByte(index));
+      for(long index = 0; index < source.size(); index++){
+        this.data.put((int) (this.data.position() + byteIndex + index), source.readByte(index));
+      }
     }
   }
 
@@ -220,7 +211,7 @@ class ByteBufferByteArray implements ReadableWritableByteArray{
   throws ByteArrayIndexOutOfBoundsException, ByteArrayLengthOverBoundsException, ByteArrayInvalidLengthException{
     if(this.data.position() == start && this.size() == length) return this;
     checkSubsetOf(start, length, this.size());
-    ByteBuffer newByteBuffer = this.data.duplicate();
+    var newByteBuffer = this.data.duplicate();
     int localPosition = (int) (this.data.position() + start);
     newByteBuffer.position(localPosition);
     newByteBuffer.limit((int) (localPosition + length));
@@ -236,8 +227,12 @@ class ByteBufferByteArray implements ReadableWritableByteArray{
     // Size
     int size = (int) Long.min(128, this.size());
 
-    // List of bytes as hex
-    List<String> bytes = new ArrayList<>(size);
+    // Stringbuilder
+    var sb = new StringBuilder();
+    sb.append(this.getClass().getSimpleName())
+      .append("(size=")
+      .append(this.size())
+      .append(", content=[");
 
     // Go over the bytes
     for(int index = 0; index < size; index++){
@@ -246,19 +241,25 @@ class ByteBufferByteArray implements ReadableWritableByteArray{
       byte value = this.data.get(this.data.position() + index);
 
       // Convert to hex
-      String hexValue = Long.toHexString(value & 0xffL);
+      var hexValue = Long.toHexString(value & 0xffL);
 
       // Prefix if one char
       if(hexValue.length() == 1) hexValue = "0" + hexValue;
 
-      // Add to list
-      bytes.add(hexValue);
+      // Append hex
+      sb.append(hexValue);
+
+      // Append underscore
+      if(index != size - 1) sb.append("_");
     }
 
     // If truncated, then add ellipsis
-    if(size != this.size()) bytes.add("...");
+    if(size != this.size()) sb.append("...");
+
+    // Close it
+    sb.append("])");
 
     // Build string and return
-    return this.getClass().getSimpleName() + "(size=" + this.size() + ", content=[" + String.join("_", bytes) + "])";
+    return sb.toString();
   }
 }

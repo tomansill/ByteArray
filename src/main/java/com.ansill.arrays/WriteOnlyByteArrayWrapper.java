@@ -44,4 +44,9 @@ class WriteOnlyByteArrayWrapper implements WriteOnlyByteArray{
     if(start == 0 && length == size()) return this;
     return new WriteOnlyByteArrayWrapper(original.subsetOf(start, length));
   }
+
+  @Override
+  public String toString(){
+    return original.toString();
+  }
 }

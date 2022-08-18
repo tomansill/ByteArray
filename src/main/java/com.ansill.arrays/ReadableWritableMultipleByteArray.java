@@ -3,11 +3,8 @@ package com.ansill.arrays;
 import javax.annotation.Nonnegative;
 import javax.annotation.Nonnull;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
-import java.util.Map;
-import java.util.NavigableMap;
 import java.util.TreeMap;
 
 import static com.ansill.arrays.IndexingUtility.checkRead;
@@ -41,11 +38,11 @@ final class ReadableWritableMultipleByteArray implements ReadableWritableByteArr
     long size = 0;
 
     // Iterate over byte arrays
-    List<ReadOnlyByteArray> ro = new ArrayList<>();
-    for(ReadableWritableByteArray byteArray : byteArrays){
+    var ro = new ArrayList<ReadOnlyByteArray>();
+    for(var byteArray : byteArrays){
       if(byteArray instanceof com.ansill.arrays.ReadableWritableMultipleByteArray){
-        Collection<ReadableWritableByteArray> innerByteArrays = ((com.ansill.arrays.ReadableWritableMultipleByteArray) byteArray).indexMap.values();
-        for(ReadableWritableByteArray innerByteArray : innerByteArrays){
+        var innerByteArrays = ((com.ansill.arrays.ReadableWritableMultipleByteArray) byteArray).indexMap.values();
+        for(var innerByteArray : innerByteArrays){
           ro.add(innerByteArray.toReadOnly());
           indexMap.put(size, innerByteArray);
           size += innerByteArray.size();
@@ -138,9 +135,9 @@ final class ReadableWritableMultipleByteArray implements ReadableWritableByteArr
 
     // Get ByteArray
     long index = byteIndex;
-    ReadableWritableByteArray byteArray = indexMap.get(index);
+    var byteArray = indexMap.get(index);
     if(byteArray == null){
-      Map.Entry<Long,ReadableWritableByteArray> entry = indexMap.floorEntry(index);
+      var entry = indexMap.floorEntry(index);
       index = entry.getKey();
       byteArray = entry.getValue();
     }
@@ -189,19 +186,14 @@ final class ReadableWritableMultipleByteArray implements ReadableWritableByteArr
     long floorIndex = indexMap.floorKey(byteIndex);
 
     // Get submap
-    NavigableMap<Long,ReadableWritableByteArray> submap = indexMap.subMap(
-      floorIndex,
-      true,
-      byteIndex + source.size(),
-      false
-    );
+    var submap = indexMap.subMap(floorIndex, true, byteIndex + source.size(), false);
 
     // Adjust the byteIndex to match submap
     long relativeByteIndex = byteIndex - floorIndex;
 
     // Loop through the submap
     long remainingLength = source.size();
-    for(ReadableWritableByteArray byteArray : submap.values()){
+    for(var byteArray : submap.values()){
 
       // Determine the amount of bytes to copy
       long lenToCopy = Long.min(byteArray.size() - relativeByteIndex, remainingLength);
@@ -227,7 +219,7 @@ final class ReadableWritableMultipleByteArray implements ReadableWritableByteArr
     checkSubsetOf(start, length, size);
 
     // Calculate and subset
-    List<ReadableWritableByteArray> resultingArray = innerSubsetOf(this.indexMap, start, length);
+    var resultingArray = innerSubsetOf(this.indexMap, start, length);
 
     // If only one element, just use that element
     if(resultingArray.size() == 1) return resultingArray.get(0);
@@ -240,5 +232,59 @@ final class ReadableWritableMultipleByteArray implements ReadableWritableByteArr
   @Override
   public ReadOnlyByteArray toReadOnly(){
     return new ReadOnlyMultipleByteArray(readOnlyByteArrays);
+  }
+
+  @Override
+  public String toString(){
+
+    // Determine the length needed to render (limit to 128 for performance reasons)
+    final int length = (int) Long.min(128, this.size);
+
+    // Set up stringbuilder
+    var sb = new StringBuilder();
+    sb.append(this.getClass().getSimpleName()).append("(size=").append(size).append(", content=[");
+
+    // Count down
+    long byteIndex = 0;
+    while(byteIndex < length){
+
+      // Get bytearray
+      var entry = indexMap.floorEntry(byteIndex);
+
+      // Get bytearray
+      var byteArray = entry.getValue();
+
+      // Determine the limits
+      int limit = (int) Long.min(byteArray.size(), length - byteIndex);
+
+      // Write to sb
+      for(int i = 0; i < limit; i++){
+
+        // Append slash
+        if(byteIndex != 0) sb.append("_");
+
+        // Get data
+        byte value = byteArray.readByte(i);
+
+        // Convert to hex
+        var hexValue = Long.toHexString(value & 0xffL);
+
+        // Prefix if one char
+        if(hexValue.length() == 1) hexValue = "0" + hexValue;
+
+        // Write
+        sb.append(hexValue);
+
+        // Increment
+        byteIndex++;
+      }
+    }
+
+    // Add ellipsis if truncated
+    if(length != this.size) sb.append("...");
+
+    // Add cap and return
+    sb.append("])");
+    return sb.toString();
   }
 }
