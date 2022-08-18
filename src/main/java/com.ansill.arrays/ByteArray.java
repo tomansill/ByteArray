@@ -169,6 +169,10 @@ public interface ByteArray{
   /**
    * Wraps one or more {@link ByteBuffer}s into {@link ReadableWritableByteArray}
    * <p>
+   *   Note that {@link ByteBuffer}'s position() and limit() markers will be respected. The {@link ByteBuffer} will
+   *   be duplicated using duplicate() method so any changes to position() and limit() markers on the original
+   *   {@link ByteBuffer} will not affect the wrapped {@link ByteBuffer}.
+   * <p>
    *   Example:
    * <pre>{@code
    * var byteArrayOfOneByteArray = ByteArray.wrap(ByteBuffer.allocate(100));
