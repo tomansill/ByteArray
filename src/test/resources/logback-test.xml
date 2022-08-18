@@ -1,10 +1,10 @@
 <configuration>
     <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
-        <layout>
-            <Pattern>
+        <encoder>
+            <pattern>
                 %d{HH:mm:ss.SSS} [%-5p] [%t] %c{1}:%L - %msg%n
-            </Pattern>
-        </layout>
+            </pattern>
+        </encoder>
     </appender>
 
     <logger name="com.ansill.arrays" level="debug" additivity="false">
