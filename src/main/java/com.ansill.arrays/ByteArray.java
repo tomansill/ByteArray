@@ -53,7 +53,13 @@ public interface ByteArray{
   /**
    * Combines multiple {@link ReadOnlyByteArray}s into a single {@link ReadOnlyByteArray}
    * <p>
-   * If there's any {@link ReadableWritableByteArray}s in the input list, it will be converted to {@link ReadOnlyByteArray} using {@link ReadableWritableByteArray}::toReadOnly method.
+   * If there's any {@link ReadableWritableByteArray}s in the input arguments, it will be converted to {@link ReadOnlyByteArray} using {@link ReadableWritableByteArray}::toReadOnly method.
+   * <p>
+   * Example:
+   * <pre>{@code
+   * var twoCombo = ByteArray.combine(ByteArray.wrap(new byte[25]).toReadOnly(), ByteArray.wrap(ByteBuffer.allocate(25)).toReadOnly());
+   * var moreCombo = ByteArray.combine(ByteArray.wrap(new byte[25]).toReadOnly(), ByteArray.wrap(ByteBuffer.allocate(25)).toReadOnly(), twoCombo);
+   * }</pre>
    *
    * @param firstByteArray  first byte array to be combined
    * @param secondByteArray second byte array to be combined
@@ -111,6 +117,12 @@ public interface ByteArray{
 
   /**
    * Combines multiple {@link ReadableWritableByteArray}s into a single {@link ReadableWritableByteArray}
+   * <p>
+   *   Example:
+   * <pre>{@code
+   * var twoCombo = ByteArray.combine(ByteArray.wrap(new byte[25]), ByteArray.wrap(ByteBuffer.allocate(25)));
+   * var moreCombo = ByteArray.combine(ByteArray.wrap(new byte[25]), ByteArray.wrap(ByteBuffer.allocate(25)), twoCombo);
+   * }</pre>
    *
    * @param firstByteArray  first byte array to be combined
    * @param secondByteArray second byte array to be combined
@@ -133,6 +145,13 @@ public interface ByteArray{
 
   /**
    * Wraps one or more primitive byte arrays into {@link ReadableWritableByteArray}
+   * <p>
+   *   Example:
+   * <pre>{@code
+   * var byteArrayOfOneByteArray = ByteArray.wrap(new byte[100]);
+   * var byteArrayOfTwoByteArrays = ByteArray.wrap(new byte[25], new byte[75]);
+   * var byteArrayOfMoreByteArrays = ByteArray.wrap(new byte[25], new byte[23], new byte[33], new byte[10]);
+   * }</pre>
    *
    * @param firstByteArray first primitive byte array to be wrapped
    * @param restByteArrays more primitive byte arrays to be wrapped. <i>(Optional. Can be blank.)</i>
@@ -149,6 +168,13 @@ public interface ByteArray{
 
   /**
    * Wraps one or more {@link ByteBuffer}s into {@link ReadableWritableByteArray}
+   * <p>
+   *   Example:
+   * <pre>{@code
+   * var byteArrayOfOneByteArray = ByteArray.wrap(ByteBuffer.allocate(100));
+   * var byteArrayOfTwoByteArrays = ByteArray.wrap(ByteBuffer.allocate(25), ByteBuffer.allocate(75));
+   * var byteArrayOfMoreByteArrays = ByteArray.wrap(ByteBuffer.allocate(25), ByteBuffer.allocate(23), ByteBuffer.allocate(33), ByteBuffer.allocate(10));
+   * }</pre>
    *
    * @param firstByteBuffer first {@link ByteBuffer} to be wrapped
    * @param restByteBuffers more {@link ByteBuffer}s to be wrapped. <i>(Optional. Can be blank.)</i>
