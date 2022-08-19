@@ -80,7 +80,7 @@ assert byteArray.readByte(1) == 5;
 assert bytes[1] == 5;
 ```
 
-### Wrapping and join multiple `ByteBuffer`s
+### Wrapping and join multiple `ByteBuffer`s and using `subsetOf(long,long)` to get a view of desired data portion in the data
 
 ```
 // Create large bytebuffers
@@ -106,4 +106,69 @@ var rowData1 = largeByteArray.subsetOf(999_000, 2_000); // 2,000 bytes long Byte
 
 // Another quicker way of same example:
 var rowData2 = ByteArray.wrap(byteBuffer1, byteBuffer2).subset(999_000, 2_000); // wrap method is a variadic method, can accept as many `ByteBuffer`s as you can fit.
+```
+
+### Access Control Demonstration
+
+```
+// Create example byte arrays
+var bytes1 = new byte[]{1, 2, 3, 4};
+var bytes2 = new byte[]{5, 6, 7, 8};
+
+// Create ReadableWritableByteArray
+var rwByteArray = ByteArray.wrap(bytes1, bytes2); // wrap method is a variadic method, can accept as many `byte[]`s as you can fit.
+
+// ReadableWritableByteArray is fully readable-writable so you can read and write whatever you want
+assert rwByteArray.readByte(5) == 6;
+rwByteArray.writeByte(5, -6); // This updates 2nd element in bytes2 because bytes2 is the backing data of this ReadableWritableByteArray
+assert rwByteArray.readByte(5) == -6;
+assert bytes2[1] == -6;
+
+// Create read-only view
+var readonly = rwByteArray.toReadOnly();
+assert readonly.readByte(5) == -6;
+// readonly.writeByte(5, 12); // Compile error because writeByte(long,byte) does not exist in ReadOnlyByteArray
+
+// Create write-only view
+var writeonly = rwByteArray.toWriteOnly();
+writeonly.writeByte(2, 30); // This updates to rwByteArray's 3rd element and also updates to bytes1 arrays' 3rd element.
+// writeonly.readByte(2); // Compile error because readByte(long) does not exist in WriteOnlyByteArray
+
+// Assertions to prove that writes to write-only ByteArray will update to all related data
+assert readonly.readByte(2) == 30;
+assert rwByteArray.readByte(2) == 30;
+assert bytes1[2] == 30;
+```
+
+### Copying ByteArrays
+
+```
+// Create example byte arrays
+var bytes = new byte[]{1, 2, 3, 4, 5, 6, 7, 8};
+
+// Create ByteArray
+var largeByteArray = ByteArray.wrap(bytes);
+
+// Create destination ByteBuffer to fill data while reading largeByteArray
+var smallerBB = ByteBuffer.allocate(3);
+var destination = ByteArray.wrap(smallerBB);
+
+// Read bytes from largeByteArray into destination byte array
+largeByteArray.read(2, destination);
+
+// Both smallerBB and destination should have 3, 4, 5 in them after that read call
+
+// Create source ByteBuffer to write data to largeByteArray
+var smallerBytes = new byte[]{4, 3, 2, 1};
+var source = ByteArray.wrap(smallerBytes);
+
+// Write bytes from source byte array into largeByteArray
+largeByteArray.write(4, source);
+
+// bytes and largeByteArray should have 1, 2, 3, 4, 4, 3, 2, 1 after that write call
+
+// Have largeByteArray to subset and read its contents to source bytearray
+largeByteArray.subsetOf(2, 4).read(0, source);
+
+// source and smallerBytes should now have 3, 4, 4, 3 fater that read call
 ```
