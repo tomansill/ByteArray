@@ -190,7 +190,9 @@ largeByteArray.subsetOf(2, 4).read(0, source);
   - `writeDouble(long,double)`
 - Endian-ness support?
   - Use `java.nio.ByteOrder`?
-  - `reverse()` method or `to(java.nio.ByteOrder)` method?
-  - Overloaded read/write methods to include `java.nio.ByteOrder` *(more work)*?
+  - `reverse()` method or `to(java.nio.ByteOrder)` method? *(less work as all read/writes shall obey one endianness
+    setting)*
+  - Overloaded read/write methods to include `java.nio.ByteOrder` to enable individual read/writes with endianness
+    control? *(more work)*
   - `getByteOrder()` method?
 - Support more backing data types?
