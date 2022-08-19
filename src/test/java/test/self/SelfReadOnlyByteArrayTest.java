@@ -1,6 +1,5 @@
-package test;
+package test.self;
 
-import com.ansill.arrays.ByteArray;
 import com.ansill.arrays.ByteArrayIndexOutOfBoundsException;
 import com.ansill.arrays.ByteArrayLengthOverBoundsException;
 import com.ansill.arrays.IndexingUtility;
@@ -11,10 +10,10 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.DynamicTest;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestFactory;
+import test.BaseReadOnlyByteArrayTest;
+import test.TriConsumer;
 import test.arrays.DoNotTouchMeByteArray;
-import test.arrays.TestOnlyByteArray;
 
-import javax.annotation.Nonnegative;
 import javax.annotation.Nonnull;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -26,13 +25,14 @@ import java.util.function.Function;
 
 import static com.ansill.arrays.TestUtility.f;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.fail;
 import static org.junit.jupiter.api.DynamicTest.dynamicTest;
 
-public interface ReadOnlyByteArrayTest extends ByteArrayTest{
+public interface SelfReadOnlyByteArrayTest extends BaseReadOnlyByteArrayTest, SelfByteArrayTest{
 
   @Nonnull
   static Iterable<DynamicTest> generateTestsInvalidReadCallsByteArray(
@@ -74,7 +74,7 @@ public interface ReadOnlyByteArrayTest extends ByteArrayTest{
             ReadOnlyByteArray testArray = testROBAAllocator.apply(selfSize);
 
             // Assert readonly if applicable
-            assertEquals(isReadableWritableOk, testArray instanceof ReadableWritableByteArray);
+            if(!isReadableWritableOk) assertFalse(testArray instanceof ReadableWritableByteArray);
 
             // Try and finally to clean up test array
             try{
@@ -147,7 +147,7 @@ public interface ReadOnlyByteArrayTest extends ByteArrayTest{
             ReadOnlyByteArray testArray = testROBAAllocator.apply(selfSize);
 
             // Assert readonly if applicable
-            assertEquals(isReadableWritableOk, testArray instanceof ReadableWritableByteArray);
+            if(!isReadableWritableOk) assertFalse(testArray instanceof ReadableWritableByteArray);
 
             // Try and finally to clean up test array
             try{
@@ -222,7 +222,7 @@ public interface ReadOnlyByteArrayTest extends ByteArrayTest{
             ReadOnlyByteArray testArray = testROBAAllocator.apply(selfSize);
 
             // Assert readonly if applicable
-            assertEquals(isReadableWritableOk, testArray instanceof ReadableWritableByteArray);
+            if(!isReadableWritableOk) assertFalse(testArray instanceof ReadableWritableByteArray);
 
             // Try and finally to clean up test array
             try{
@@ -283,17 +283,6 @@ public interface ReadOnlyByteArrayTest extends ByteArrayTest{
     return tests;
   }
 
-  @Nonnull
-  @Override
-  default ByteArray createTestByteArray(long size){
-    return createTestReadOnlyByteArray(size);
-  }
-
-  @Nonnull
-  ReadOnlyByteArray createTestReadOnlyByteArray(@Nonnegative long size);
-
-  void writeTestReadOnlyByteArray(@Nonnull ReadOnlyByteArray testByteArray, @Nonnegative long byteIndex, byte value);
-
   @DisplayName("Test toString()")
   @Test
   default void testToString(){
@@ -302,7 +291,7 @@ public interface ReadOnlyByteArrayTest extends ByteArrayTest{
     ReadOnlyByteArray testByteArray = createTestReadOnlyByteArray(1);
 
     // Assert readonly if applicable
-    assertEquals(isReadableWritableOK(), testByteArray instanceof ReadableWritableByteArray);
+    if(!isReadableWritableOK()) assertFalse(testByteArray instanceof ReadableWritableByteArray);
 
     // ToString it
     assertNotNull(testByteArray.toString());
@@ -370,7 +359,7 @@ public interface ReadOnlyByteArrayTest extends ByteArrayTest{
           ReadOnlyByteArray testByteArray = createTestReadOnlyByteArray(size);
 
           // Assert readonly if applicable
-          assertEquals(isReadableWritableOK(), testByteArray instanceof ReadableWritableByteArray);
+          if(!isReadableWritableOK()) assertFalse(testByteArray instanceof ReadableWritableByteArray);
 
           try{
 
@@ -412,9 +401,9 @@ public interface ReadOnlyByteArrayTest extends ByteArrayTest{
     return tests;
   }
 
-  @DisplayName("Test valid subsetOf(long,long) calls")
+  @DisplayName("Test valid subsetOf(long,long) calls with readByte(long) calls")
   @TestFactory
-  default Iterable<DynamicTest> testValidSubsetOfCalls(){
+  default Iterable<DynamicTest> testValidSubsetOfCallsWithReadCalls(){
 
     // Set up test container
     List<DynamicTest> tests = new LinkedList<>();
@@ -447,7 +436,7 @@ public interface ReadOnlyByteArrayTest extends ByteArrayTest{
           ReadOnlyByteArray testByteArray = createTestReadOnlyByteArray(size);
 
           // Assert readonly if applicable
-          assertEquals(isReadableWritableOK(), testByteArray instanceof ReadableWritableByteArray);
+          if(!isReadableWritableOK()) assertFalse(testByteArray instanceof ReadableWritableByteArray);
 
           try{
 
@@ -466,7 +455,7 @@ public interface ReadOnlyByteArrayTest extends ByteArrayTest{
             ReadOnlyByteArray subset = testByteArray.subsetOf(0, size);
 
             // Assert readonly if applicable
-            assertEquals(isReadableWritableOK(), subset instanceof ReadableWritableByteArray);
+            if(!isReadableWritableOK()) assertFalse(subset instanceof ReadableWritableByteArray);
 
             // Assert size
             assertEquals(size, subset.size());
@@ -481,32 +470,6 @@ public interface ReadOnlyByteArrayTest extends ByteArrayTest{
               for(long index = 0; index < size; index++){
                 byte expected = (byte) testRNG.nextInt();
                 assertEquals(expected, subset.readByte(innerByteIndex), "Index: " + innerByteIndex);
-                innerByteIndex++;
-              }
-            }
-
-            // Check using read call
-            {
-              ReadableWritableByteArray control = new TestOnlyByteArray(size);
-              subset.read(0, control);
-              Random testRNG = new Random(testLocalSeed);
-              long innerByteIndex = 0;
-              for(long index = 0; index < size; index++){
-                byte expected = (byte) testRNG.nextInt();
-                assertEquals(expected, control.readByte(innerByteIndex), "Index: " + innerByteIndex);
-                innerByteIndex++;
-              }
-            }
-
-            // Check using aggressive read call
-            {
-              ReadableWritableByteArray control = new TestOnlyByteArray(1);
-              Random testRNG = new Random(testLocalSeed);
-              long innerByteIndex = 0;
-              for(long index = 0; index < size; index++){
-                byte expected = (byte) testRNG.nextInt();
-                subset.read(innerByteIndex, control);
-                assertEquals(expected, control.readByte(0), "Index: " + innerByteIndex);
                 innerByteIndex++;
               }
             }
@@ -548,7 +511,7 @@ public interface ReadOnlyByteArrayTest extends ByteArrayTest{
             ReadOnlyByteArray testByteArray = createTestReadOnlyByteArray(size);
 
             // Assert readonly if applicable
-            assertEquals(isReadableWritableOK(), testByteArray instanceof ReadableWritableByteArray);
+            if(!isReadableWritableOK()) assertFalse(testByteArray instanceof ReadableWritableByteArray);
 
             try{
 
@@ -567,7 +530,7 @@ public interface ReadOnlyByteArrayTest extends ByteArrayTest{
               ReadOnlyByteArray subset = testByteArray.subsetOf(byteIndex, subSize);
 
               // Assert readonly if applicable
-              assertEquals(isReadableWritableOK(), subset instanceof ReadableWritableByteArray);
+              if(!isReadableWritableOK()) assertFalse(subset instanceof ReadableWritableByteArray);
 
               // Assert size
               assertEquals(subSize, subset.size());
@@ -580,34 +543,6 @@ public interface ReadOnlyByteArrayTest extends ByteArrayTest{
                   byte expected = (byte) testRNG.nextInt();
                   if(index < byteIndex || index >= byteIndex + subSize) continue;
                   assertEquals(expected, subset.readByte(innerByteIndex), "Index: " + innerByteIndex);
-                  innerByteIndex++;
-                }
-              }
-
-              // Check using read call
-              {
-                ReadableWritableByteArray control = new TestOnlyByteArray(subSize);
-                subset.read(0, control);
-                Random testRNG = new Random(testLocalSeed);
-                long innerByteIndex = 0;
-                for(long index = 0; index < size; index++){
-                  byte expected = (byte) testRNG.nextInt();
-                  if(index < byteIndex || index >= byteIndex + subSize) continue;
-                  assertEquals(expected, control.readByte(innerByteIndex), "Index: " + innerByteIndex);
-                  innerByteIndex++;
-                }
-              }
-
-              // Check using aggressive read call
-              {
-                ReadableWritableByteArray control = new TestOnlyByteArray(1);
-                Random testRNG = new Random(testLocalSeed);
-                long innerByteIndex = 0;
-                for(long index = 0; index < size; index++){
-                  byte expected = (byte) testRNG.nextInt();
-                  if(index < byteIndex || index >= byteIndex + subSize) continue;
-                  subset.read(innerByteIndex, control);
-                  assertEquals(expected, control.readByte(0), "Index: " + innerByteIndex);
                   innerByteIndex++;
                 }
               }
@@ -629,34 +564,6 @@ public interface ReadOnlyByteArrayTest extends ByteArrayTest{
                   byte expected = (byte) testRNG.nextInt();
                   if(index < byteIndex || index >= byteIndex + subSize) continue;
                   assertEquals(expected, subset.readByte(innerByteIndex), "Index: " + innerByteIndex);
-                  innerByteIndex++;
-                }
-              }
-
-              // Check using read call
-              {
-                ReadableWritableByteArray control = new TestOnlyByteArray(subSize);
-                subset.read(0, control);
-                Random testRNG = new Random(diffTestLocalSeed);
-                long innerByteIndex = 0;
-                for(long index = 0; index < size; index++){
-                  byte expected = (byte) testRNG.nextInt();
-                  if(index < byteIndex || index >= byteIndex + subSize) continue;
-                  assertEquals(expected, control.readByte(innerByteIndex), "Index: " + innerByteIndex);
-                  innerByteIndex++;
-                }
-              }
-
-              // Check using aggressive read call
-              {
-                ReadableWritableByteArray control = new TestOnlyByteArray(1);
-                Random testRNG = new Random(diffTestLocalSeed);
-                long innerByteIndex = 0;
-                for(long index = 0; index < size; index++){
-                  byte expected = (byte) testRNG.nextInt();
-                  if(index < byteIndex || index >= byteIndex + subSize) continue;
-                  subset.read(innerByteIndex, control);
-                  assertEquals(expected, control.readByte(0), "Index: " + innerByteIndex);
                   innerByteIndex++;
                 }
               }
@@ -712,7 +619,7 @@ public interface ReadOnlyByteArrayTest extends ByteArrayTest{
           ReadOnlyByteArray testByteArray = createTestReadOnlyByteArray(size);
 
           // Assert readonly if applicable
-          assertEquals(isReadableWritableOK(), testByteArray instanceof ReadableWritableByteArray);
+          if(!isReadableWritableOK()) assertFalse(testByteArray instanceof ReadableWritableByteArray);
 
           try{
 
@@ -761,7 +668,7 @@ public interface ReadOnlyByteArrayTest extends ByteArrayTest{
             ReadOnlyByteArray testByteArray = createTestReadOnlyByteArray(size);
 
             // Assert readonly if applicable
-            assertEquals(isReadableWritableOK(), testByteArray instanceof ReadableWritableByteArray);
+            if(!isReadableWritableOK()) assertFalse(testByteArray instanceof ReadableWritableByteArray);
 
             try{
 
@@ -808,7 +715,7 @@ public interface ReadOnlyByteArrayTest extends ByteArrayTest{
           ReadOnlyByteArray testByteArray = createTestReadOnlyByteArray(size);
 
           // Assert readonly if applicable
-          assertEquals(isReadableWritableOK(), testByteArray instanceof ReadableWritableByteArray);
+          if(!isReadableWritableOK()) assertFalse(testByteArray instanceof ReadableWritableByteArray);
 
           try{
 
@@ -857,7 +764,7 @@ public interface ReadOnlyByteArrayTest extends ByteArrayTest{
             ReadOnlyByteArray testByteArray = createTestReadOnlyByteArray(size);
 
             // Assert readonly if applicable
-            assertEquals(isReadableWritableOK(), testByteArray instanceof ReadableWritableByteArray);
+            if(!isReadableWritableOK()) assertFalse(testByteArray instanceof ReadableWritableByteArray);
 
             try{
 

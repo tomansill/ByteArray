@@ -8,20 +8,20 @@ import com.ansill.arrays.TestUtility;
 import com.ansill.arrays.WriteOnlyByteArray;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
-import test.ByteArrayTest;
-import test.ReadOnlyByteArray64BitTest;
-import test.ReadOnlyByteArrayWithOtherByteArrayTest;
-import test.ReadableWritableByteArray64BitTest;
-import test.ReadableWritableByteArrayWithOtherByteArrayTest;
-import test.WriteOnlyByteArray64BitTest;
-import test.WriteOnlyByteArrayWithOtherByteArrayTest;
+import test.BaseByteArrayTest;
+import test.BaseReadableWritableByteArrayTest;
+import test.other.ReadOnlyByteArrayWithOtherByteArrayTest;
+import test.other.ReadableWritableByteArrayWithOtherByteArrayTest;
+import test.other.WriteOnlyByteArrayWithOtherByteArrayTest;
+import test.self.SelfReadOnlyByteArray64BitTest;
+import test.self.SelfWriteOnlyByteArray64BitTest;
 
 import javax.annotation.Nonnull;
 
 @DisplayName("TestOnlyByteArray Test Suite")
 public class TestOnlyByteArrayNestedTest{
 
-  public interface TestOnlyByteArrayTest extends ByteArrayTest{
+  public interface TestOnlyByteArrayTest extends BaseByteArrayTest{
 
     @Override
     default void cleanTestByteArray(@Nonnull ByteArray byteArray){
@@ -44,7 +44,7 @@ public class TestOnlyByteArrayNestedTest{
   @Nested
   @DisplayName("ReadOnly test")
   public class ReadOnlyTestOnlyByteArrayTest
-    implements ReadOnlyByteArray64BitTest, TestOnlyByteArrayTest, ReadOnlyByteArrayWithOtherByteArrayTest{
+    implements SelfReadOnlyByteArray64BitTest, TestOnlyByteArrayTest, ReadOnlyByteArrayWithOtherByteArrayTest{
 
     @Nonnull
     @Override
@@ -75,7 +75,7 @@ public class TestOnlyByteArrayNestedTest{
   @Nested
   @DisplayName("WriteOnly test")
   public class WriteOnlyTestOnlyByteArrayTest
-    implements WriteOnlyByteArray64BitTest, TestOnlyByteArrayTest, WriteOnlyByteArrayWithOtherByteArrayTest{
+    implements SelfWriteOnlyByteArray64BitTest, TestOnlyByteArrayTest, WriteOnlyByteArrayWithOtherByteArrayTest{
 
     @Override
     public boolean isReadableWritableOK(){
@@ -106,8 +106,9 @@ public class TestOnlyByteArrayNestedTest{
   @Nested
   @DisplayName("ReadableWritable test")
   public class ReadableWritableByteArrayTest
-    implements ReadableWritableByteArray64BitTest, TestOnlyByteArrayTest,
-    ReadableWritableByteArrayWithOtherByteArrayTest{
+    implements TestOnlyByteArrayTest,
+    ReadableWritableByteArrayWithOtherByteArrayTest, BaseReadableWritableByteArrayTest, SelfWriteOnlyByteArray64BitTest,
+    SelfReadOnlyByteArray64BitTest{
 
     @Override
     public boolean isReadableWritableOK(){

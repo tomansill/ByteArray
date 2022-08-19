@@ -2,13 +2,13 @@ package com.ansill.arrays;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
-import org.junit.jupiter.api.Test;
-import test.ByteArrayTest;
-import test.ReadOnlyByteArrayTest;
-import test.ReadOnlyByteArrayWithOtherByteArrayTest;
-import test.ReadableWritableByteArrayTest;
-import test.WriteOnlyByteArrayTest;
-import test.WriteOnlyByteArrayWithOtherByteArrayTest;
+import test.BaseByteArrayTest;
+import test.other.ReadOnlyByteArrayWithOtherByteArrayTest;
+import test.other.ReadableWritableByteArrayWithOtherByteArrayTest;
+import test.other.WriteOnlyByteArrayWithOtherByteArrayTest;
+import test.self.SelfReadOnlyByteArrayTest;
+import test.self.SelfReadableWritableByteArrayTest;
+import test.self.SelfWriteOnlyByteArrayTest;
 
 import javax.annotation.Nonnull;
 import java.nio.ByteBuffer;
@@ -16,30 +16,8 @@ import java.nio.ByteBuffer;
 @DisplayName("PrimitiveByteArray Test Suite")
 public class PrimitiveByteArrayNestedTest{
 
-  public interface PrimitiveByteArrayTest extends ByteArrayTest{
+  public abstract static class PrimitiveByteArrayTest implements BaseByteArrayTest{
 
-  }
-
-  @Nested
-  @DisplayName("ReadableWritable test")
-  public class ReadableWritablePrimitiveByteArrayTest implements ReadableWritableByteArrayTest, PrimitiveByteArrayTest{
-
-    @Override
-    public byte readTestWriteOnlyByteArray(@Nonnull WriteOnlyByteArray testByteArray, long byteIndex){
-
-      // Check if wrapper, unwrap it
-      if(testByteArray instanceof ReadOnlyByteArrayWrapper){
-        testByteArray = ((ReadOnlyByteArrayWrapper) testByteArray).original;
-      }
-
-      // Check if it's ours
-      if(!(testByteArray instanceof PrimitiveByteArray)) throw new IllegalArgumentException("Not primitive byte array");
-
-      // Read
-      return ((PrimitiveByteArray) testByteArray).data[(int) byteIndex];
-    }
-
-    @Override
     public void writeTestReadOnlyByteArray(@Nonnull ReadOnlyByteArray testByteArray, long byteIndex, byte value){
 
       // Check if wrapper, unwrap it
@@ -48,112 +26,28 @@ public class PrimitiveByteArrayNestedTest{
       }
 
       // Check if it's ours
-      if(!(testByteArray instanceof PrimitiveByteArray)) throw new IllegalArgumentException("Not primitive byte array");
+      if(!(testByteArray instanceof PrimitiveByteArray))
+        throw new IllegalArgumentException("Not primitive byte array");
 
       // Update
-      ((PrimitiveByteArray) testByteArray).data[(int) byteIndex] = value;
+      ((PrimitiveByteArray) testByteArray).writeByte(byteIndex, value);
     }
 
     @Nonnull
-    @Override
+    public ReadOnlyByteArray createTestReadOnlyByteArray(long size){
+      return createTestReadableWritableByteArray(size).toReadOnly();
+    }
+
+    @Nonnull
+    public WriteOnlyByteArray createTestWriteOnlyByteArray(long size){
+      return createTestReadableWritableByteArray(size).toWriteOnly();
+    }
+
+    @Nonnull
     public ReadableWritableByteArray createTestReadableWritableByteArray(long size){
       return new PrimitiveByteArray(new byte[(int) size]);
     }
 
-    @Override
-    public boolean isReadableWritableOK(){
-      return true;
-    }
-  }
-
-  @Nested
-  @DisplayName("ReadOnly test")
-  public class ReadOnlyPrimitiveByteArrayTest implements ReadOnlyByteArrayTest, PrimitiveByteArrayTest{
-
-    @Nonnull
-    @Override
-    public ReadOnlyByteArray createTestReadOnlyByteArray(long size){
-      return new PrimitiveByteArray(new byte[(int) size]).toReadOnly();
-    }
-
-    @Override
-    public void writeTestReadOnlyByteArray(@Nonnull ReadOnlyByteArray testByteArray, long byteIndex, byte value){
-
-      // Check if wrapper, unwrap it
-      if(testByteArray instanceof ReadOnlyByteArrayWrapper){
-        testByteArray = ((ReadOnlyByteArrayWrapper) testByteArray).original;
-      }
-
-      // Check if it's ours
-      if(!(testByteArray instanceof PrimitiveByteArray)) throw new IllegalArgumentException("Not primitive byte array");
-
-      // Update
-      ((PrimitiveByteArray) testByteArray).data[(int) byteIndex] = value;
-    }
-
-    @Override
-    public boolean isReadableWritableOK(){
-      return false;
-    }
-  }
-
-  @Nested
-  @DisplayName("ReadOnly test with ByteBufferByteArray implementation")
-  public class ReadOnlyPrimitiveByteArrayWithByteBufferByteArrayTest
-    extends ReadOnlyPrimitiveByteArrayWithControlByteArrayTest{
-
-    @Nonnull
-    @Override
-    public ReadableWritableByteArray createControlReadableWritable(long size){
-      return new ByteBufferByteArray(ByteBuffer.allocate((int) size));
-    }
-  }
-
-  @Nested
-  @DisplayName("ReadOnly test with control ByteArray implementation")
-  public class ReadOnlyPrimitiveByteArrayWithControlByteArrayTest extends ReadOnlyPrimitiveByteArrayTest
-    implements
-    ReadOnlyByteArrayWithOtherByteArrayTest{
-
-  }
-
-  @Nested
-  @DisplayName("ReadOnly test with MultipleByteArray implementation")
-  public
-  class ReadOnlyPrimitiveByteArrayWithMultipleByteArrayTest extends ReadOnlyPrimitiveByteArrayWithControlByteArrayTest{
-
-    @Nonnull
-    @Override
-    public ReadableWritableByteArray createControlReadableWritable(long size){
-      return MultipleByteArrayNestedTest.MultipleByteArrayTest.createReadableWritableByteArray(
-        size,
-        (int) (size + 232)
-      );
-    }
-  }
-
-  @Nested
-  @DisplayName("ReadOnly test with PrimitiveByteArray implementation")
-  public class ReadOnlyPrimitiveByteArrayWithSelfTest extends ReadOnlyPrimitiveByteArrayWithControlByteArrayTest{
-
-    @Nonnull
-    @Override
-    public ReadableWritableByteArray createControlReadableWritable(long size){
-      return new PrimitiveByteArray(new byte[(int) size]);
-    }
-  }
-
-  @Nested
-  @DisplayName("WriteOnly test")
-  public class WriteOnlyPrimitiveByteArrayTest implements WriteOnlyByteArrayTest, PrimitiveByteArrayTest{
-
-    @Nonnull
-    @Override
-    public WriteOnlyByteArray createTestWriteOnlyByteArray(long size){
-      return new PrimitiveByteArray(new byte[(int) size]).toWriteOnly();
-    }
-
-    @Override
     public byte readTestWriteOnlyByteArray(@Nonnull WriteOnlyByteArray testByteArray, long byteIndex){
 
       // Check if writeonly wrapper, unwrap it
@@ -162,67 +56,243 @@ public class PrimitiveByteArrayNestedTest{
       }
 
       // Check if it's ours
-      if(!(testByteArray instanceof PrimitiveByteArray)) throw new IllegalArgumentException("Not primitive byte array");
+      if(!(testByteArray instanceof PrimitiveByteArray))
+        throw new IllegalArgumentException("Not primitive byte array");
 
       // Read
-      return ((PrimitiveByteArray) testByteArray).data[(int) byteIndex];
+      return ((PrimitiveByteArray) testByteArray).readByte(byteIndex);
     }
 
     @Override
     public boolean isReadableWritableOK(){
       return false;
     }
+  }
 
-    @Test
-    @Override
-    public void testToString(){
-      WriteOnlyByteArrayTest.super.testToString();
+  @Nested
+  @DisplayName("ReadOnly tests")
+  public class ReadOnlyTests{
+
+    @Nested
+    @DisplayName("ReadOnly test")
+    public class ReadOnlyPrimitiveByteArrayTest extends PrimitiveByteArrayTest implements SelfReadOnlyByteArrayTest{
+
+    }
+
+    @Nested
+    @DisplayName("ReadOnly test with ByteBufferByteArray implementation")
+    public class ReadOnlyPrimitiveByteArrayWithByteBufferByteArrayTest
+      extends ReadOnlyPrimitiveByteArrayWithControlByteArrayTest{
+
+      @Nonnull
+      @Override
+      public ReadableWritableByteArray createControlReadableWritable(long size){
+        return new ByteBufferByteArray(ByteBuffer.allocate((int) size));
+      }
+    }
+
+    @Nested
+    @DisplayName("ReadOnly test with control ByteArray implementation")
+    public class ReadOnlyPrimitiveByteArrayWithControlByteArrayTest extends PrimitiveByteArrayTest
+      implements ReadOnlyByteArrayWithOtherByteArrayTest{
+
+    }
+
+    @Nested
+    @DisplayName("ReadOnly test with MultipleByteArray implementation")
+    public
+    class ReadOnlyPrimitiveByteArrayWithMultipleByteArrayTest
+      extends ReadOnlyPrimitiveByteArrayWithControlByteArrayTest{
+
+      @Nonnull
+      @Override
+      public ReadableWritableByteArray createControlReadableWritable(long size){
+        return MultipleByteArrayNestedTest.createReadableWritableByteArray(
+          size,
+          (int) (size + 232)
+        );
+      }
+    }
+
+    @Nested
+    @DisplayName("ReadOnly test with PrimitiveByteArray implementation")
+    public class ReadOnlyPrimitiveByteArrayWithSelfTest extends ReadOnlyPrimitiveByteArrayWithControlByteArrayTest{
+
+      @Nonnull
+      @Override
+      public ReadableWritableByteArray createControlReadableWritable(long size){
+        return new PrimitiveByteArray(new byte[(int) size]);
+      }
     }
   }
 
   @Nested
-  @DisplayName("WriteOnly test with ByteBufferByteArray implementation")
-  public class WriteOnlyPrimitiveByteArrayWithByteBufferByteArrayTest
-    extends WriteOnlyPrimitiveByteArrayWithControlByteArrayTest{
+  @DisplayName("WriteOnly tests")
+  public class WriteOnlyTests{
 
-    @Nonnull
-    @Override
-    public ReadableWritableByteArray createControlReadableWritable(long size){
-      return new ByteBufferByteArray(ByteBuffer.allocate((int) size));
+    @Nested
+    @DisplayName("WriteOnly test")
+    public class WriteOnlyPrimitiveByteArrayTest extends PrimitiveByteArrayTest implements SelfWriteOnlyByteArrayTest{
+
+    }
+
+    @Nested
+    @DisplayName("WriteOnly test with ByteBufferByteArray implementation")
+    public class WriteOnlyPrimitiveByteArrayWithByteBufferByteArrayTest
+      extends WriteOnlyPrimitiveByteArrayWithControlByteArrayTest{
+
+      @Nonnull
+      @Override
+      public ReadableWritableByteArray createControlReadableWritable(long size){
+        return new ByteBufferByteArray(ByteBuffer.allocate((int) size));
+      }
+    }
+
+    @Nested
+    @DisplayName("WriteOnly test with control ByteArray implementation")
+    public class WriteOnlyPrimitiveByteArrayWithControlByteArrayTest implements
+      WriteOnlyByteArrayWithOtherByteArrayTest{
+
+      @Nonnull
+      @Override
+      public WriteOnlyByteArray createTestWriteOnlyByteArray(long size){
+        return new PrimitiveByteArray(new byte[(int) size]).toWriteOnly();
+      }
+
+      @Override
+      public byte readTestWriteOnlyByteArray(@Nonnull WriteOnlyByteArray testByteArray, long byteIndex){
+
+        // Check if writeonly wrapper, unwrap it
+        if(testByteArray instanceof WriteOnlyByteArrayWrapper){
+          testByteArray = ((WriteOnlyByteArrayWrapper) testByteArray).original;
+        }
+
+        // Check if it's ours
+        if(!(testByteArray instanceof PrimitiveByteArray))
+          throw new IllegalArgumentException("Not primitive byte array");
+
+        // Read
+        return ((PrimitiveByteArray) testByteArray).data[(int) byteIndex];
+      }
+
+      @Override
+      public boolean isReadableWritableOK(){
+        return false;
+      }
+
+    }
+
+    @Nested
+    @DisplayName("WriteOnly test with MultipleByteArray implementation")
+    public class WriteOnlyPrimitiveByteArrayWithMultipleByteArrayTest
+      extends WriteOnlyPrimitiveByteArrayWithControlByteArrayTest{
+
+      @Nonnull
+      @Override
+      public ReadableWritableByteArray createControlReadableWritable(long size){
+        return MultipleByteArrayNestedTest.createReadableWritableByteArray(
+          size,
+          (int) (size + 232)
+        );
+      }
+    }
+
+    @Nested
+    @DisplayName("WriteOnly test with PrimitiveByteArray implementation")
+    public class WriteOnlyPrimitiveByteArrayWithSelfTest extends WriteOnlyPrimitiveByteArrayWithControlByteArrayTest{
+
+      @Nonnull
+      @Override
+      public ReadableWritableByteArray createControlReadableWritable(long size){
+        return new PrimitiveByteArray(new byte[(int) size]);
+      }
     }
   }
 
   @Nested
-  @DisplayName("WriteOnly test with control ByteArray implementation")
-  public class WriteOnlyPrimitiveByteArrayWithControlByteArrayTest extends WriteOnlyPrimitiveByteArrayTest
-    implements
-    WriteOnlyByteArrayWithOtherByteArrayTest{
+  @DisplayName("ReadableWritable test")
+  public class ReadableWritableTests{
 
-  }
+    @Nested
+    @DisplayName("ReadableWritable test")
+    public class ReadableWritablePrimitiveByteArrayTest extends PrimitiveByteArrayTest
+      implements SelfReadableWritableByteArrayTest{
 
-  @Nested
-  @DisplayName("WriteOnly test with MultipleByteArray implementation")
-  public class WriteOnlyPrimitiveByteArrayWithMultipleByteArrayTest
-    extends WriteOnlyPrimitiveByteArrayWithControlByteArrayTest{
+      @Nonnull
+      public ReadOnlyByteArray createTestReadOnlyByteArray(long size){
+        return createTestReadableWritableByteArray(size);
+      }
 
-    @Nonnull
-    @Override
-    public ReadableWritableByteArray createControlReadableWritable(long size){
-      return MultipleByteArrayNestedTest.MultipleByteArrayTest.createReadableWritableByteArray(
-        size,
-        (int) (size + 232)
-      );
+      @Nonnull
+      public WriteOnlyByteArray createTestWriteOnlyByteArray(long size){
+        return createTestReadableWritableByteArray(size);
+      }
+
+      @Override
+      public boolean isReadableWritableOK(){
+        return true;
+      }
     }
-  }
 
-  @Nested
-  @DisplayName("WriteOnly test with PrimitiveByteArray implementation")
-  public class WriteOnlyPrimitiveByteArrayWithSelfTest extends WriteOnlyPrimitiveByteArrayWithControlByteArrayTest{
+    @Nested
+    @DisplayName("ReadableWritable test with ByteBufferByteArray implementation")
+    public class ReadableWritablePrimitiveByteArrayWithByteBufferByteArrayTest
+      extends ReadableWritableTests.ReadableWritablePrimitiveByteArrayWithControlByteArrayTest{
 
-    @Nonnull
-    @Override
-    public ReadableWritableByteArray createControlReadableWritable(long size){
-      return new PrimitiveByteArray(new byte[(int) size]);
+      @Nonnull
+      @Override
+      public ReadableWritableByteArray createControlReadableWritable(long size){
+        return new ByteBufferByteArray(ByteBuffer.allocate((int) size));
+      }
+    }
+
+    @Nested
+    @DisplayName("ReadableWritable test with control ByteArray implementation")
+    public class ReadableWritablePrimitiveByteArrayWithControlByteArrayTest extends PrimitiveByteArrayTest implements
+      ReadableWritableByteArrayWithOtherByteArrayTest{
+
+      @Nonnull
+      public ReadOnlyByteArray createTestReadOnlyByteArray(long size){
+        return createTestReadableWritableByteArray(size);
+      }
+
+      @Nonnull
+      public WriteOnlyByteArray createTestWriteOnlyByteArray(long size){
+        return createTestReadableWritableByteArray(size);
+      }
+
+      @Override
+      public boolean isReadableWritableOK(){
+        return true;
+      }
+    }
+
+    @Nested
+    @DisplayName("ReadableWritable test with MultipleByteArray implementation")
+    public
+    class ReadableWritablePrimitiveByteArrayWithMultipleByteArrayTest
+      extends ReadableWritableTests.ReadableWritablePrimitiveByteArrayWithControlByteArrayTest{
+
+      @Nonnull
+      @Override
+      public ReadableWritableByteArray createControlReadableWritable(long size){
+        return MultipleByteArrayNestedTest.createReadableWritableByteArray(
+          size,
+          (int) (size + 232)
+        );
+      }
+    }
+
+    @Nested
+    @DisplayName("ReadableWritable test with PrimitiveByteArray implementation")
+    public class ReadableWritablePrimitiveByteArrayWithSelfTest
+      extends ReadableWritableTests.ReadableWritablePrimitiveByteArrayWithControlByteArrayTest{
+
+      @Nonnull
+      @Override
+      public ReadableWritableByteArray createControlReadableWritable(long size){
+        return new PrimitiveByteArray(new byte[(int) size]);
+      }
     }
   }
 }

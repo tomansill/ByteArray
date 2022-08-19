@@ -1,7 +1,9 @@
-package test;
+package test.other;
+
+import test.BaseReadableWritableByteArrayTest;
 
 public interface ReadableWritableByteArrayWithOtherByteArrayTest extends
-  ReadableWritableByteArrayTest,
+  BaseReadableWritableByteArrayTest,
   ReadOnlyByteArrayWithOtherByteArrayTest,
   WriteOnlyByteArrayWithOtherByteArrayTest{
 

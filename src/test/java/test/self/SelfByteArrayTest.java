@@ -1,4 +1,4 @@
-package test;
+package test.self;
 
 import com.ansill.arrays.ByteArray;
 import com.ansill.arrays.ByteArrayIndexOutOfBoundsException;
@@ -8,9 +8,8 @@ import com.ansill.arrays.IndexingUtility;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.DynamicTest;
 import org.junit.jupiter.api.TestFactory;
+import test.BaseByteArrayTest;
 
-import javax.annotation.Nonnegative;
-import javax.annotation.Nonnull;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
@@ -23,38 +22,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.fail;
 import static org.junit.jupiter.api.DynamicTest.dynamicTest;
 
-public interface ByteArrayTest{
-
-  @Nonnull
-  String SEED = "the holy moly seed";
-
-  @Nonnegative
-  int TRIALS = 3;
-
-  /**
-   * Special case where implementing classes may need to clean up their huge ByteArrays when done. In most cases, this
-   * is not necessary as Garbage Collector will just collect it.
-   *
-   * @param byteArray byte array that may be wrapped in ReadOnlyByteArrayWrapper or WriteOnlyByteArrayWrapper
-   */
-  default void cleanTestByteArray(@Nonnull ByteArray byteArray){
-    // Do nothing
-  }
-
-  @Nonnull
-  default Random getRNG(){
-    return new Random(SEED.hashCode() + this.getClass().getName().hashCode());
-  }
-
-  /**
-   * Returns whether if test byte array must be ReadOnly/WriteOnly or it can be ReadableWritable
-   *
-   * @return true if can be readablewritable, false if must readonly
-   */
-  boolean isReadableWritableOK();
-
-  @Nonnull
-  ByteArray createTestByteArray(long size);
+public interface SelfByteArrayTest extends BaseByteArrayTest{
 
   @DisplayName("Test bad subsetOf(long,long) calls")
   @TestFactory
