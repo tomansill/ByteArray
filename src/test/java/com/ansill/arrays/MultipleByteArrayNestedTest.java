@@ -38,22 +38,14 @@ public class MultipleByteArrayNestedTest{
       long innerSize = Long.min(random.nextInt(chunkSize) + 1, runningSize);
 
       // 25% chance that it'll be inner multiplebytearray
-      if(random.nextFloat() <= 0.25){
-
-        // Add to the list
-        bytearrays.add(createReadableWritableByteArray(innerSize, random.nextInt()));
-
-      }else{
-
-        // Add to the list
-        bytearrays.add(new TestOnlyByteArray(innerSize));
-
-      }
+      if(random.nextFloat() <= 0.25) bytearrays.add(createReadableWritableByteArray(innerSize, random.nextInt()));
+      else bytearrays.add(new TestOnlyByteArray(innerSize));
 
       // Update running size
       runningSize -= innerSize;
     }
 
+    // Return as RW
     return new ReadableWritableMultipleByteArray(bytearrays);
   }
 
@@ -103,9 +95,11 @@ public class MultipleByteArrayNestedTest{
         // Set up size
         long innerSize = Long.min(random.nextInt(chunkSize) + 1, runningSize);
 
-        // 25% chance that it'll be inner multiplebytearray
-        if(random.nextFloat() <= 0.25) bytearrays.add(createTestReadOnlyByteArray(innerSize, random.nextInt()));
-        else{
+        // 33% chance that it'll be inner multiplebytearray
+        if(random.nextFloat() <= 0.33){
+          if(random.nextBoolean()) bytearrays.add(createReadableWritableByteArray(innerSize, random.nextInt()));
+          else bytearrays.add(createTestReadOnlyByteArray(innerSize, random.nextInt()));
+        }else{
 
           // Create testonly
           var testOnly = new TestOnlyByteArray(innerSize);
