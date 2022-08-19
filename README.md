@@ -182,7 +182,7 @@ largeByteArray.subsetOf(2, 4).read(0, source);
   - `readInt(long)`
   - `readLong(long)`
   - `readFloat(long)`
-  - `readDouble(long`
+  - `readDouble(long)`
   - `writeShort(long,short)`
   - `writeInt(long,int)`
   - `writeLong(long,long)`
@@ -191,4 +191,6 @@ largeByteArray.subsetOf(2, 4).read(0, source);
 - Endian-ness support?
   - Use `java.nio.ByteOrder`?
   - `reverse()` method or `to(java.nio.ByteOrder)` method?
+  - Overloaded read/write methods to include `java.nio.ByteOrder` *(more work)*?
+  - `getByteOrder()` method?
 - Support more backing data types?
