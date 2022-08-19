@@ -2,14 +2,14 @@ package com.ansill.arrays;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
-import test.ByteArrayTest;
-import test.ReadOnlyByteArray64BitTest;
-import test.ReadOnlyByteArrayWithOtherByteArrayTest;
-import test.ReadableWritableByteArray64BitTest;
-import test.ReadableWritableByteArrayWithOtherByteArrayTest;
-import test.WriteOnlyByteArray64BitTest;
-import test.WriteOnlyByteArrayWithOtherByteArrayTest;
+import test.BaseByteArrayTest;
 import test.arrays.TestOnlyByteArray;
+import test.other.ReadOnlyByteArrayWithOtherByteArray64BitTest;
+import test.other.ReadableWritableByteArrayWithOtherByteArray64BitTest;
+import test.other.WriteOnlyByteArrayWithOtherByteArray64BitTest;
+import test.self.SelfReadOnlyByteArray64BitTest;
+import test.self.SelfReadableWritableByteArray64BitTest;
+import test.self.SelfWriteOnlyByteArray64BitTest;
 
 import javax.annotation.Nonnull;
 import java.nio.ByteBuffer;
@@ -49,7 +49,7 @@ public class MultipleByteArrayNestedTest{
     return new ReadableWritableMultipleByteArray(bytearrays);
   }
 
-  public abstract static class MultipleByteArrayTest implements ByteArrayTest{
+  public abstract static class MultipleByteArrayTest implements BaseByteArrayTest{
 
     @Nonnull
     public ReadableWritableByteArray createTestReadableWritableByteArray(long size){
@@ -219,7 +219,7 @@ public class MultipleByteArrayNestedTest{
     @Nested
     @DisplayName("ReadOnly test with control ByteArray implementation")
     public class ReadOnlyMultipleByteArrayWithControlByteArrayTest extends ReadOnlyMultipleByteArrayTest implements
-      ReadOnlyByteArrayWithOtherByteArrayTest{
+      ReadOnlyByteArrayWithOtherByteArray64BitTest{
 
     }
 
@@ -264,7 +264,7 @@ public class MultipleByteArrayNestedTest{
 
     @Nested
     @DisplayName("ReadOnly test")
-    public class ReadOnlyMultipleByteArrayTest extends MultipleByteArrayTest implements ReadOnlyByteArray64BitTest{
+    public class ReadOnlyMultipleByteArrayTest extends MultipleByteArrayTest implements SelfReadOnlyByteArray64BitTest{
 
     }
   }
@@ -276,7 +276,7 @@ public class MultipleByteArrayNestedTest{
     @Nested
     @DisplayName("WriteOnly test with control ByteArray implementation")
     public class WriteOnlyMultipleByteArrayWithControlByteArrayTest extends WriteOnlyMultipleByteArrayTest implements
-      WriteOnlyByteArrayWithOtherByteArrayTest{
+      WriteOnlyByteArrayWithOtherByteArray64BitTest{
 
     }
 
@@ -320,7 +320,8 @@ public class MultipleByteArrayNestedTest{
 
     @Nested
     @DisplayName("WriteOnly test")
-    public class WriteOnlyMultipleByteArrayTest extends MultipleByteArrayTest implements WriteOnlyByteArray64BitTest{
+    public class WriteOnlyMultipleByteArrayTest extends MultipleByteArrayTest
+      implements SelfWriteOnlyByteArray64BitTest{
 
     }
   }
@@ -333,7 +334,7 @@ public class MultipleByteArrayNestedTest{
     @DisplayName("ReadableWritable test with control ByteArray implementation")
     public class ReadableWritableMultipleByteArrayWithControlByteArrayTest
       extends ReadableWritableTests.ReadableWritableMultipleByteArrayTest
-      implements ReadableWritableByteArrayWithOtherByteArrayTest{
+      implements ReadableWritableByteArrayWithOtherByteArray64BitTest{
 
     }
 
@@ -380,7 +381,7 @@ public class MultipleByteArrayNestedTest{
     @Nested
     @DisplayName("ReadableWritable test")
     public class ReadableWritableMultipleByteArrayTest extends MultipleByteArrayTest
-      implements ReadableWritableByteArray64BitTest{
+      implements SelfReadableWritableByteArray64BitTest{
 
     }
   }

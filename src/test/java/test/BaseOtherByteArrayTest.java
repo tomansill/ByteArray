@@ -7,7 +7,7 @@ import test.arrays.TestOnlyByteArray;
 import javax.annotation.Nonnegative;
 import javax.annotation.Nonnull;
 
-public interface OtherByteArrayTest{
+public interface BaseOtherByteArrayTest{
 
   @Nonnull
   default ReadableWritableByteArray createControlReadableWritable(@Nonnegative long size){

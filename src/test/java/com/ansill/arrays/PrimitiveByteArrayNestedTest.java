@@ -2,13 +2,13 @@ package com.ansill.arrays;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
-import test.ByteArrayTest;
-import test.ReadOnlyByteArrayWithOtherByteArrayTest;
-import test.ReadableWritableByteArrayWithOtherByteArrayTest;
-import test.SimpleReadOnlyByteArrayTest;
-import test.SimpleReadableWritableByteArrayTest;
-import test.SimpleWriteOnlyByteArrayTest;
-import test.WriteOnlyByteArrayWithOtherByteArrayTest;
+import test.BaseByteArrayTest;
+import test.other.ReadOnlyByteArrayWithOtherByteArrayTest;
+import test.other.ReadableWritableByteArrayWithOtherByteArrayTest;
+import test.other.WriteOnlyByteArrayWithOtherByteArrayTest;
+import test.self.SelfReadOnlyByteArrayTest;
+import test.self.SelfReadableWritableByteArrayTest;
+import test.self.SelfWriteOnlyByteArrayTest;
 
 import javax.annotation.Nonnull;
 import java.nio.ByteBuffer;
@@ -16,7 +16,7 @@ import java.nio.ByteBuffer;
 @DisplayName("PrimitiveByteArray Test Suite")
 public class PrimitiveByteArrayNestedTest{
 
-  public abstract static class PrimitiveByteArrayTest implements ByteArrayTest{
+  public abstract static class PrimitiveByteArrayTest implements BaseByteArrayTest{
 
     public void writeTestReadOnlyByteArray(@Nonnull ReadOnlyByteArray testByteArray, long byteIndex, byte value){
 
@@ -75,7 +75,7 @@ public class PrimitiveByteArrayNestedTest{
 
     @Nested
     @DisplayName("ReadOnly test")
-    public class ReadOnlyPrimitiveByteArrayTest extends PrimitiveByteArrayTest implements SimpleReadOnlyByteArrayTest{
+    public class ReadOnlyPrimitiveByteArrayTest extends PrimitiveByteArrayTest implements SelfReadOnlyByteArrayTest{
 
     }
 
@@ -132,7 +132,7 @@ public class PrimitiveByteArrayNestedTest{
 
     @Nested
     @DisplayName("WriteOnly test")
-    public class WriteOnlyPrimitiveByteArrayTest extends PrimitiveByteArrayTest implements SimpleWriteOnlyByteArrayTest{
+    public class WriteOnlyPrimitiveByteArrayTest extends PrimitiveByteArrayTest implements SelfWriteOnlyByteArrayTest{
 
     }
 
@@ -216,7 +216,7 @@ public class PrimitiveByteArrayNestedTest{
     @Nested
     @DisplayName("ReadableWritable test")
     public class ReadableWritablePrimitiveByteArrayTest extends PrimitiveByteArrayTest
-      implements SimpleReadableWritableByteArrayTest{
+      implements SelfReadableWritableByteArrayTest{
 
       @Override
       public boolean isReadableWritableOK(){

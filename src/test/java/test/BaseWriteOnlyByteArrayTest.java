@@ -6,7 +6,7 @@ import com.ansill.arrays.WriteOnlyByteArray;
 import javax.annotation.Nonnegative;
 import javax.annotation.Nonnull;
 
-public interface WriteOnlyByteArrayTest extends ByteArrayTest{
+public interface BaseWriteOnlyByteArrayTest extends BaseByteArrayTest{
 
   @Nonnull
   WriteOnlyByteArray createTestWriteOnlyByteArray(@Nonnegative long size);
@@ -19,5 +19,4 @@ public interface WriteOnlyByteArrayTest extends ByteArrayTest{
     return createTestWriteOnlyByteArray(size);
   }
 
-  // TODO add test to test valid subsetOf calls
 }

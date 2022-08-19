@@ -1,4 +1,4 @@
-package test;
+package test.other;
 
 import com.ansill.arrays.ReadOnlyByteArray;
 import com.ansill.arrays.ReadableWritableByteArray;
@@ -6,6 +6,9 @@ import com.ansill.arrays.WriteOnlyByteArray;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.DynamicTest;
 import org.junit.jupiter.api.TestFactory;
+import test.BaseOtherByteArrayTest;
+import test.BaseReadOnlyByteArrayTest;
+import test.TriConsumer;
 
 import javax.annotation.Nonnull;
 import java.util.HashSet;
@@ -24,7 +27,7 @@ import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.fail;
 import static org.junit.jupiter.api.DynamicTest.dynamicTest;
 
-public interface ReadOnlyByteArrayWithOtherByteArrayTest extends ReadOnlyByteArrayTest, OtherByteArrayTest{
+public interface ReadOnlyByteArrayWithOtherByteArrayTest extends BaseReadOnlyByteArrayTest, BaseOtherByteArrayTest{
 
   @Nonnull
   static <T extends WriteOnlyByteArray> Iterable<DynamicTest> generateValidSubsetOfByteArrayTests(
@@ -92,7 +95,7 @@ public interface ReadOnlyByteArrayWithOtherByteArrayTest extends ReadOnlyByteArr
             var subset = testByteArray.subsetOf(0, size);
 
             // Assert readonly if applicable
-            if(!isReadableWritableOK) assertFalse(testByteArray instanceof ReadableWritableByteArray);
+            if(!isReadableWritableOK) assertFalse(subset instanceof ReadableWritableByteArray);
 
             // Assert size
             assertEquals(size, subset.size());
@@ -180,7 +183,7 @@ public interface ReadOnlyByteArrayWithOtherByteArrayTest extends ReadOnlyByteArr
               ReadOnlyByteArray subset = testByteArray.subsetOf(byteIndex, subSize);
 
               // Assert readonly if applicable
-              if(!isReadableWritableOK) assertFalse(testByteArray instanceof ReadableWritableByteArray);
+              if(!isReadableWritableOK) assertFalse(subset instanceof ReadableWritableByteArray);
 
               // Assert size
               assertEquals(subSize, subset.size());

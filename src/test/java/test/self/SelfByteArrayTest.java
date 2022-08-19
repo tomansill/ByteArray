@@ -1,4 +1,4 @@
-package test;
+package test.self;
 
 import com.ansill.arrays.ByteArray;
 import com.ansill.arrays.ByteArrayIndexOutOfBoundsException;
@@ -8,6 +8,7 @@ import com.ansill.arrays.IndexingUtility;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.DynamicTest;
 import org.junit.jupiter.api.TestFactory;
+import test.BaseByteArrayTest;
 
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -21,7 +22,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.fail;
 import static org.junit.jupiter.api.DynamicTest.dynamicTest;
 
-public interface SimpleByteArrayTest extends ByteArrayTest{
+public interface SelfByteArrayTest extends BaseByteArrayTest{
 
   @DisplayName("Test bad subsetOf(long,long) calls")
   @TestFactory

@@ -1,4 +1,4 @@
-package test;
+package test.self;
 
 import com.ansill.arrays.ByteArrayIndexOutOfBoundsException;
 import com.ansill.arrays.ByteArrayLengthOverBoundsException;
@@ -10,6 +10,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.DynamicTest;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestFactory;
+import test.BaseWriteOnlyByteArrayTest;
 import test.arrays.TestOnlyByteArray;
 
 import javax.annotation.Nonnull;
@@ -32,7 +33,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.fail;
 import static org.junit.jupiter.api.DynamicTest.dynamicTest;
 
-public interface SimpleWriteOnlyByteArrayTest extends WriteOnlyByteArrayTest{
+public interface SelfWriteOnlyByteArrayTest extends BaseWriteOnlyByteArrayTest{
 
   @Nonnull
   static Iterable<DynamicTest> generateTestsInvalidWriteCallsByteArray(

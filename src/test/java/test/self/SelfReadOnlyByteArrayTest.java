@@ -1,4 +1,4 @@
-package test;
+package test.self;
 
 import com.ansill.arrays.ByteArrayIndexOutOfBoundsException;
 import com.ansill.arrays.ByteArrayLengthOverBoundsException;
@@ -10,6 +10,8 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.DynamicTest;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestFactory;
+import test.BaseReadOnlyByteArrayTest;
+import test.TriConsumer;
 import test.arrays.DoNotTouchMeByteArray;
 
 import javax.annotation.Nonnull;
@@ -30,7 +32,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.fail;
 import static org.junit.jupiter.api.DynamicTest.dynamicTest;
 
-public interface SimpleReadOnlyByteArrayTest extends ReadOnlyByteArrayTest, SimpleByteArrayTest{
+public interface SelfReadOnlyByteArrayTest extends BaseReadOnlyByteArrayTest, SelfByteArrayTest{
 
   @Nonnull
   static Iterable<DynamicTest> generateTestsInvalidReadCallsByteArray(

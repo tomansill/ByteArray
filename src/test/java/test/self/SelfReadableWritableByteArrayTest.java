@@ -1,13 +1,14 @@
-package test;
+package test.self;
 
 import com.ansill.arrays.WriteOnlyByteArray;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import test.BaseReadableWritableByteArrayTest;
 
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
-public interface SimpleReadableWritableByteArrayTest
-  extends ReadableWritableByteArrayTest, SimpleReadOnlyByteArrayTest, SimpleWriteOnlyByteArrayTest{
+public interface SelfReadableWritableByteArrayTest
+  extends BaseReadableWritableByteArrayTest, SelfReadOnlyByteArrayTest, SelfWriteOnlyByteArrayTest{
 
   @DisplayName("Test toString()")
   @Test

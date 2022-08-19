@@ -6,7 +6,7 @@ import javax.annotation.Nonnegative;
 import javax.annotation.Nonnull;
 import java.util.Random;
 
-public interface ByteArrayTest{
+public interface BaseByteArrayTest{
 
   @Nonnull
   String SEED = "the holy moly seed";

@@ -1,4 +1,4 @@
-package test;
+package test.other;
 
 import com.ansill.arrays.ReadOnlyByteArray;
 import com.ansill.arrays.ReadableWritableByteArray;
@@ -6,6 +6,8 @@ import com.ansill.arrays.WriteOnlyByteArray;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.DynamicTest;
 import org.junit.jupiter.api.TestFactory;
+import test.BaseOtherByteArrayTest;
+import test.BaseWriteOnlyByteArrayTest;
 
 import javax.annotation.Nonnull;
 import java.util.HashSet;
@@ -24,7 +26,7 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.fail;
 import static org.junit.jupiter.api.DynamicTest.dynamicTest;
 
-public interface WriteOnlyByteArrayWithOtherByteArrayTest extends WriteOnlyByteArrayTest, OtherByteArrayTest{
+public interface WriteOnlyByteArrayWithOtherByteArrayTest extends BaseWriteOnlyByteArrayTest, BaseOtherByteArrayTest{
 
   static <T extends ReadOnlyByteArray> Iterable<DynamicTest> generateWriteByteArrayTests(
     @Nonnull Random rng,

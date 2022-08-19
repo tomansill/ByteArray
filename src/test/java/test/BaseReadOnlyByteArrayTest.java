@@ -6,8 +6,7 @@ import com.ansill.arrays.ReadOnlyByteArray;
 import javax.annotation.Nonnegative;
 import javax.annotation.Nonnull;
 
-public interface ReadOnlyByteArrayTest extends ByteArrayTest{
-
+public interface BaseReadOnlyByteArrayTest extends BaseByteArrayTest{
 
   @Nonnull
   @Override

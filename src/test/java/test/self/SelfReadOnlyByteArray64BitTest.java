@@ -1,4 +1,4 @@
-package test;
+package test.self;
 
 import com.ansill.arrays.ReadOnlyByteArray;
 import com.ansill.arrays.ReadableWritableByteArray;
@@ -14,7 +14,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.fail;
 
-public interface ReadOnlyByteArray64BitTest extends SimpleReadOnlyByteArrayTest{
+public interface SelfReadOnlyByteArray64BitTest extends SelfReadOnlyByteArrayTest{
 
   @DisplayName("Test readByte(long) on 64-bit addressable data")
   @Test
