@@ -4,9 +4,9 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import test.ByteArrayTest;
-import test.ReadOnlyByteArrayTest;
 import test.ReadOnlyByteArrayWithOtherByteArrayTest;
 import test.ReadableWritableByteArrayTest;
+import test.SimpleReadOnlyByteArrayTest;
 import test.WriteOnlyByteArrayTest;
 import test.WriteOnlyByteArrayWithOtherByteArrayTest;
 
@@ -72,7 +72,7 @@ public class ByteBufferByteArrayNestedTest{
 
   @Nested
   @DisplayName("ReadOnly test")
-  public class ReadOnlyByteBufferByteArrayTest implements ReadOnlyByteArrayTest, ByteBufferByteArrayTest{
+  public class ReadOnlyByteBufferByteArrayTest implements SimpleReadOnlyByteArrayTest, ByteBufferByteArrayTest{
 
     @Nonnull
     @Override

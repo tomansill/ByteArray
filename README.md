@@ -20,7 +20,7 @@ default and while you can make it read-only by calling `ByteBuffer::asReadOnlyBu
 of calling any `put` commands and have it throw `ReadOnlyBufferException`. There ought to be some way to enforce the
 read-only property at compile time.
 
-I knew that I needed a new class that starts out as `interface`, so it can be overloaded by anyone else, has read-only,
+I knew that I needed a new class that starts out as `interface`, so it can be extended by anyone else, has read-only,
 write-only, and readable-writable versions of classes so those read-only/write-only properties can be enforced at
 compile time, ability to easily sub-set the data to indicate start/end of the record, and ability to join multiple data
 together and represent it as a single array of data.
@@ -145,7 +145,7 @@ assert rwByteArray.readByte(2) == 30;
 assert bytes1[2] == 30;
 ```
 
-### `Copying ByteArray`s
+### Copying `ByteArray`s
 
 ```
 // Create example byte arrays

@@ -13,7 +13,7 @@ import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.fail;
 
-public interface ReadOnlyByteArray64BitTest extends ReadOnlyByteArrayTest{
+public interface ReadOnlyByteArray64BitTest extends SimpleReadOnlyByteArrayTest{
 
   @DisplayName("Test readByte(long) on 64-bit addressable data")
   @Test

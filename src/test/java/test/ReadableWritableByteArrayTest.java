@@ -11,7 +11,7 @@ import javax.annotation.Nonnull;
 
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
-public interface ReadableWritableByteArrayTest extends ReadOnlyByteArrayTest, WriteOnlyByteArrayTest{
+public interface ReadableWritableByteArrayTest extends SimpleReadOnlyByteArrayTest, WriteOnlyByteArrayTest{
 
   @Nonnull
   ReadableWritableByteArray createTestReadableWritableByteArray(long size);
