@@ -107,7 +107,7 @@ public class PrimitiveByteArrayNestedTest{
       @Nonnull
       @Override
       public ReadableWritableByteArray createControlReadableWritable(long size){
-        return MultipleByteArrayNestedTest.MultipleByteArrayTest.createReadableWritableByteArray(
+        return MultipleByteArrayNestedTest.createReadableWritableByteArray(
           size,
           (int) (size + 232)
         );
@@ -190,7 +190,7 @@ public class PrimitiveByteArrayNestedTest{
       @Nonnull
       @Override
       public ReadableWritableByteArray createControlReadableWritable(long size){
-        return MultipleByteArrayNestedTest.MultipleByteArrayTest.createReadableWritableByteArray(
+        return MultipleByteArrayNestedTest.createReadableWritableByteArray(
           size,
           (int) (size + 232)
         );
@@ -256,7 +256,7 @@ public class PrimitiveByteArrayNestedTest{
       @Nonnull
       @Override
       public ReadableWritableByteArray createControlReadableWritable(long size){
-        return MultipleByteArrayNestedTest.MultipleByteArrayTest.createReadableWritableByteArray(
+        return MultipleByteArrayNestedTest.createReadableWritableByteArray(
           size,
           (int) (size + 232)
         );
