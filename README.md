@@ -9,16 +9,16 @@ array data.
 ## Motivation
 
 The motivation was that I had a large binary data file which contained rows of records and the structure of those
-records
-is not known ahead of the time. And due to performance reasons, I had to rely on reading the data file with large
-`ByteBuffer`s. I often ran into issues of having `ByteBuffer` that reads and stops at the middle of a record, and I
-have to use two `ByteBuffer`s to join and link the split row data which is not easy to do and may require another
-copying of bytes. `ByteBuffer` is an abstract class, so I can't easily extend it to support the transparent joining of
-two `ByteBuffer`s. When I do try to extend it, `ByteBuffer` contains a method that is `package-private` which prevents
-me from properly extending it in my own package. Moving my extended `ByteBuffer` subclass into `java.nio` package is
-not a good option. Another issue is that `ByteBuffer` is readable-writable by default and while you can make it
-read-only by calling `ByteBuffer::asReadOnlyBuffer`, but you can still make a mistake of calling any `put` commands and
-have it throw `ReadOnlyBufferException`. There ought to be some way to enforce the read-only property at compile time.
+records is not known ahead of the time. And due to performance reasons, I had to rely on reading the data file with
+large `ByteBuffer`s. I often ran into issues of having `ByteBuffer` that reads and stops at the middle of a record in
+the data, and I have to use two `ByteBuffer`s to join and link the split row data which is not easy to do and may
+require another copying of bytes. `ByteBuffer` is an abstract class, so I can't easily extend it to support the
+transparent joining of two `ByteBuffer`s. When I do try to extend it, `ByteBuffer` contains a method that is
+`package-private`which prevents me from properly extending it in my own package. Moving my extended `ByteBuffer`
+subclass into `java.nio` package is not a good option. Another issue is that `ByteBuffer` is readable-writable by
+default and while you can make it read-only by calling `ByteBuffer::asReadOnlyBuffer`, but you can still make a mistake
+of calling any `put` commands and have it throw `ReadOnlyBufferException`. There ought to be some way to enforce the
+read-only property at compile time.
 
 I knew that I needed a new class that starts out as `interface`, so it can be overloaded by anyone else, has read-only,
 write-only, and readable-writable versions of classes so those read-only/write-only properties can be enforced at
@@ -41,14 +41,17 @@ together and represent it as a single array of data.
 ## Available classes
 
 - `ByteArray`
-  - Provides the base interface of a byte array
-  - Provides `subsetOf(long,long)` and `size()` methods
-  - `static` methods to create `ByteArray`s using `byte[]` arrays or `ByteBuffer`s and joining of multiple `ByteArray`
-    s
+    - Provides the base interface of a byte array
+    - Provides `subsetOf(long,long)` and `size()` methods
+    - `static` methods to create `ByteArray`s using `byte[]` arrays or `ByteBuffer`s and joining of multiple `ByteArray`
+      s
 - `ReadOnlyByteArray`
-  - Read-only version of `ByteArray`
-  - Provides `readByte(long)` and `read(long, WriteOnlyByteArray)` methods to read the bytes from
-    the `ReadOnlyByteArray`
+    - Read-only version of `ByteArray`
+    - Provides `readByte(long)` and `read(long, WriteOnlyByteArray)` methods to read the bytes from
+      the `ReadOnlyByteArray`
+    - **IMPORTANT:** Not necessarily an immutable version of `ReadableWritableByteArray`, however, it can be made
+      *practically immutable* if the backing data is adequately protected from modifications. Any modifications to the
+      backing data or to its associated `ReadableWritableByteArray`s will propagate the changes to `ReadOnlyByteArray`.
 - `WriteOnlyByteArray`
     - Write-only version of `ByteArray`
     - Provides `writeByte(long, byte)` and `write(long, ReadOnlyByteArray)` methods to write the bytes to
@@ -177,22 +180,22 @@ largeByteArray.subsetOf(2, 4).read(0, source);
 
 ## TO-DOs
 
-- Implement the remaining read/write calls
-  - `readShort(long)`
-  - `readInt(long)`
-  - `readLong(long)`
-  - `readFloat(long)`
-  - `readDouble(long)`
-  - `writeShort(long,short)`
-  - `writeInt(long,int)`
-  - `writeLong(long,long)`
-  - `writeFloat(long,float)`
-  - `writeDouble(long,double)`
+- Implement the remaining read/write calls to match capability of `ByteBuffer`'s reads/writes.
+    - `readShort(long)`
+    - `readInt(long)`
+    - `readLong(long)`
+    - `readFloat(long)`
+    - `readDouble(long)`
+    - `writeShort(long,short)`
+    - `writeInt(long,int)`
+    - `writeLong(long,long)`
+    - `writeFloat(long,float)`
+    - `writeDouble(long,double)`
 - Endian-ness support?
-  - Use `java.nio.ByteOrder`?
-  - `reverse()` method or `to(java.nio.ByteOrder)` method? *(less work as all read/writes shall obey one endianness
-    setting)*
-  - Overloaded read/write methods to include `java.nio.ByteOrder` to enable individual read/writes with endianness
-    control? *(more work)*
-  - `getByteOrder()` method?
+    - Use `java.nio.ByteOrder`?
+    - `reverse()` method or `to(java.nio.ByteOrder)` method? *(less work as all read/writes shall obey one endianness
+      setting)*
+    - Overloaded read/write methods to include `java.nio.ByteOrder` to enable individual read/writes with endianness
+      control? *(more work)*
+    - `getByteOrder()` method?
 - Support more backing data types?
