@@ -19,6 +19,7 @@ import java.util.function.Supplier;
 
 import static com.ansill.arrays.TestUtility.f;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.fail;
 import static org.junit.jupiter.api.DynamicTest.dynamicTest;
@@ -72,7 +73,7 @@ public interface ReadOnlyByteArrayWithOtherByteArrayTest extends ReadOnlyByteArr
           var testByteArray = testROBAAllocator.apply(size);
 
           // Assert readonly if applicable
-          assertEquals(isReadableWritableOK, testByteArray instanceof ReadableWritableByteArray);
+          if(!isReadableWritableOK) assertFalse(testByteArray instanceof ReadableWritableByteArray);
 
           try{
 
@@ -91,7 +92,7 @@ public interface ReadOnlyByteArrayWithOtherByteArrayTest extends ReadOnlyByteArr
             var subset = testByteArray.subsetOf(0, size);
 
             // Assert readonly if applicable
-            assertEquals(isReadableWritableOK, subset instanceof ReadableWritableByteArray);
+            if(!isReadableWritableOK) assertFalse(testByteArray instanceof ReadableWritableByteArray);
 
             // Assert size
             assertEquals(size, subset.size());
@@ -160,7 +161,7 @@ public interface ReadOnlyByteArrayWithOtherByteArrayTest extends ReadOnlyByteArr
             ReadOnlyByteArray testByteArray = testROBAAllocator.apply(size);
 
             // Assert readonly if applicable
-            assertEquals(isReadableWritableOK, testByteArray instanceof ReadableWritableByteArray);
+            if(!isReadableWritableOK) assertFalse(testByteArray instanceof ReadableWritableByteArray);
 
             try{
 
@@ -179,7 +180,7 @@ public interface ReadOnlyByteArrayWithOtherByteArrayTest extends ReadOnlyByteArr
               ReadOnlyByteArray subset = testByteArray.subsetOf(byteIndex, subSize);
 
               // Assert readonly if applicable
-              assertEquals(isReadableWritableOK, subset instanceof ReadableWritableByteArray);
+              if(!isReadableWritableOK) assertFalse(testByteArray instanceof ReadableWritableByteArray);
 
               // Assert size
               assertEquals(subSize, subset.size());
@@ -330,7 +331,7 @@ public interface ReadOnlyByteArrayWithOtherByteArrayTest extends ReadOnlyByteArr
                 ReadOnlyByteArray testByteArray = testROBAAllocator.apply(selfSize);
 
                 // Assert readonly if applicable
-                assertEquals(isReadableWritableOK, testByteArray instanceof ReadableWritableByteArray);
+                if(!isReadableWritableOK) assertFalse(testByteArray instanceof ReadableWritableByteArray);
 
                 try{
 

@@ -2,7 +2,6 @@ package com.ansill.arrays;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
-import org.junit.jupiter.api.Test;
 import test.ByteArrayTest;
 import test.ReadOnlyByteArray64BitTest;
 import test.ReadOnlyByteArrayWithOtherByteArrayTest;
@@ -203,12 +202,6 @@ public class MultipleByteArrayNestedTest{
     @Override
     public boolean isReadableWritableOK(){
       return false;
-    }
-
-    @Test
-    @Override
-    public void testToString(){
-      WriteOnlyByteArray64BitTest.super.testToString();
     }
   }
 

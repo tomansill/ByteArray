@@ -11,6 +11,7 @@ import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.fail;
 
 public interface ReadOnlyByteArray64BitTest extends SimpleReadOnlyByteArrayTest{
@@ -42,7 +43,7 @@ public interface ReadOnlyByteArray64BitTest extends SimpleReadOnlyByteArrayTest{
       ReadOnlyByteArray testByteArray = createTestReadOnlyByteArray(size);
 
       // Assert readonly if applicable
-      assertEquals(isReadableWritableOK(), testByteArray instanceof ReadableWritableByteArray);
+      if(!isReadableWritableOK()) assertFalse(testByteArray instanceof ReadableWritableByteArray);
 
       try{
 

@@ -20,6 +20,7 @@ import java.util.function.Supplier;
 
 import static com.ansill.arrays.TestUtility.f;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.fail;
 import static org.junit.jupiter.api.DynamicTest.dynamicTest;
 
@@ -106,7 +107,7 @@ public interface WriteOnlyByteArrayWithOtherByteArrayTest extends WriteOnlyByteA
                 try{
 
                   // Assert writeonly if applicable
-                  assertEquals(isReadableWritableOK, testByteArray instanceof ReadableWritableByteArray);
+                  if(!isReadableWritableOK) assertFalse(testByteArray instanceof ReadableWritableByteArray);
 
                   // Randomize test bytearray
                   {
