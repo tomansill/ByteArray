@@ -196,6 +196,20 @@ public class ByteBufferByteArrayNestedTest{
     public class ReadableWritableByteBufferByteArrayTest extends ByteBufferByteArrayTest
       implements BaseReadableWritableByteArrayTest{
 
+      @Nonnull
+      public ReadOnlyByteArray createTestReadOnlyByteArray(long size){
+        return createTestReadableWritableByteArray(size);
+      }
+
+      @Nonnull
+      public WriteOnlyByteArray createTestWriteOnlyByteArray(long size){
+        return createTestReadableWritableByteArray(size);
+      }
+
+      @Override
+      public boolean isReadableWritableOK(){
+        return true;
+      }
     }
 
     @Nested
@@ -232,6 +246,20 @@ public class ByteBufferByteArrayNestedTest{
       implements
       ReadableWritableByteArrayWithOtherByteArrayTest{
 
+      @Nonnull
+      public ReadOnlyByteArray createTestReadOnlyByteArray(long size){
+        return createTestReadableWritableByteArray(size);
+      }
+
+      @Nonnull
+      public WriteOnlyByteArray createTestWriteOnlyByteArray(long size){
+        return createTestReadableWritableByteArray(size);
+      }
+
+      @Override
+      public boolean isReadableWritableOK(){
+        return true;
+      }
     }
 
     @Nested

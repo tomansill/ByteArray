@@ -401,9 +401,9 @@ public interface SelfReadOnlyByteArrayTest extends BaseReadOnlyByteArrayTest, Se
     return tests;
   }
 
-  @DisplayName("Test valid subsetOf(long,long) calls")
+  @DisplayName("Test valid subsetOf(long,long) calls with readByte(long) calls")
   @TestFactory
-  default Iterable<DynamicTest> testValidSubsetOfCalls(){
+  default Iterable<DynamicTest> testValidSubsetOfCallsWithReadCalls(){
 
     // Set up test container
     List<DynamicTest> tests = new LinkedList<>();

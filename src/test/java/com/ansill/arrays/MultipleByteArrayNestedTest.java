@@ -336,6 +336,20 @@ public class MultipleByteArrayNestedTest{
       extends ReadableWritableTests.ReadableWritableMultipleByteArrayTest
       implements ReadableWritableByteArrayWithOtherByteArray64BitTest{
 
+      @Nonnull
+      public ReadOnlyByteArray createTestReadOnlyByteArray(long size){
+        return createTestReadableWritableByteArray(size);
+      }
+
+      @Nonnull
+      public WriteOnlyByteArray createTestWriteOnlyByteArray(long size){
+        return createTestReadableWritableByteArray(size);
+      }
+
+      @Override
+      public boolean isReadableWritableOK(){
+        return true;
+      }
     }
 
     @Nested
@@ -383,6 +397,20 @@ public class MultipleByteArrayNestedTest{
     public class ReadableWritableMultipleByteArrayTest extends MultipleByteArrayTest
       implements SelfReadableWritableByteArray64BitTest{
 
+      @Nonnull
+      public ReadOnlyByteArray createTestReadOnlyByteArray(long size){
+        return createTestReadableWritableByteArray(size);
+      }
+
+      @Nonnull
+      public WriteOnlyByteArray createTestWriteOnlyByteArray(long size){
+        return createTestReadableWritableByteArray(size);
+      }
+
+      @Override
+      public boolean isReadableWritableOK(){
+        return true;
+      }
     }
   }
 }

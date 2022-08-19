@@ -29,6 +29,7 @@ import static com.ansill.arrays.TestUtility.f;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.fail;
 import static org.junit.jupiter.api.DynamicTest.dynamicTest;
@@ -696,5 +697,212 @@ public interface SelfWriteOnlyByteArrayTest extends BaseWriteOnlyByteArrayTest{
     return tests;
   }
 
-  // TODO add test to test valid subsetOf calls
+  @DisplayName("Test valid subsetOf(long,long) calls with writeByte(long) calls")
+  @TestFactory
+  default Iterable<DynamicTest> testValidSubsetOfCallsWithWriteCalls(){
+
+    // Set up test container
+    List<DynamicTest> tests = new LinkedList<>();
+
+    // Get RNG
+    Random rng = getRNG();
+
+    // Sizes to test
+    Set<Long> sizesToTest = new HashSet<>();
+    sizesToTest.add(1L); // Test size of one
+    sizesToTest.add((long) (Short.MAX_VALUE * 4)); // Silly big
+    for(int trial = 0; trial < TRIALS; trial++){ // Add random sizes to try
+      if(sizesToTest.add((long) rng.nextInt(500) + 5)) continue;
+      trial--; // Existing number, try again
+    }
+
+    // Run the tests
+    for(long size : sizesToTest){
+
+      // Get test-local RNG seed
+      int testLocalSeed = (int) (rng.nextInt() + size);
+
+      // Self-test
+      tests.add(dynamicTest(f("subset({}, {}) on ByteArray of {}B size", 0, size, size), () -> {
+
+        // Wrap in try and catch for possible OOM if trying to allocate max memory
+        try{
+
+          // Allocate the writeonly bytearray
+          var testByteArray = createTestWriteOnlyByteArray(size);
+
+          // Assert writeonly if applicable
+          if(!isReadableWritableOK()) assertFalse(testByteArray instanceof ReadableWritableByteArray);
+
+          try{
+
+            // Assert size
+            assertEquals(size, testByteArray.size());
+
+            // Write random bytes to test bytearray to initialize it
+            {
+              Random testRNG = new Random(testLocalSeed);
+              for(long index = 0; index < size; index++) testByteArray.writeByte(index, (byte) testRNG.nextInt());
+            }
+
+            // Get subset
+            var subset = testByteArray.subsetOf(0, size);
+
+            // Assert writeonly if applicable
+            if(!isReadableWritableOK()) assertFalse(subset instanceof ReadableWritableByteArray);
+
+            // Assert size
+            assertEquals(size, subset.size());
+
+            // Should be same object
+            assertSame(testByteArray, subset);
+
+            // Check using readByte calls
+            {
+              Random testRNG = new Random(testLocalSeed);
+              long innerByteIndex = 0;
+              for(long index = 0; index < size; index++){
+                byte expected = (byte) testRNG.nextInt();
+                assertEquals(expected, readTestWriteOnlyByteArray(subset, innerByteIndex), "Index: " + innerByteIndex);
+                innerByteIndex++;
+              }
+            }
+
+            // Write stuff to subset
+            int newRNGSeed = testLocalSeed + 22;
+            {
+              Random testRNG = new Random(newRNGSeed);
+              for(long index = 0; index < subset.size(); index++) subset.writeByte(index, (byte) testRNG.nextInt());
+            }
+
+            // Check both and both should equal
+            {
+              Random testRNG = new Random(newRNGSeed);
+              long innerByteIndex = 0;
+              for(long index = 0; index < size; index++){
+                byte expected = (byte) testRNG.nextInt();
+                assertEquals(
+                  expected,
+                  readTestWriteOnlyByteArray(testByteArray, innerByteIndex),
+                  "Index: " + innerByteIndex
+                );
+                assertEquals(expected, readTestWriteOnlyByteArray(subset, innerByteIndex), "Index: " + innerByteIndex);
+                innerByteIndex++;
+              }
+            }
+
+          }finally{
+            cleanTestByteArray(testByteArray);
+          }
+
+        }catch(OutOfMemoryError oom){
+          System.gc();
+          oom.printStackTrace();
+          System.out.println("Out of memory. Cannot perform this test due to insufficient memory space");
+          fail("Cannot perform test due to insufficient memory space");
+        }
+
+        // Clean up
+        System.gc();
+      }));
+
+      // Repeat trials
+      for(int trial = 0; trial < TRIALS; trial++){
+
+        // Choose byteIndex
+        long byteIndex = size == 1 ? 0 : Long.max(0, rng.nextInt((int) size) - 1);
+
+        // Choose size
+        long subSize = size == 1 ? 1 : Long.min(size - byteIndex, rng.nextInt((int) size) + 1);
+
+        // Skip test if size is same
+        if(subSize == size) continue;
+
+        // Write test
+        tests.add(dynamicTest(f("subset({}, {}) on ByteArray of {}B size", byteIndex, subSize, size), () -> {
+
+          // Wrap in try and catch for possible OOM if trying to allocate max memory
+          try{
+
+            // Allocate the writeonly bytearray
+            var testByteArray = createTestWriteOnlyByteArray(size);
+
+            // Assert writeonly if applicable
+            if(!isReadableWritableOK()) assertFalse(testByteArray instanceof ReadableWritableByteArray);
+
+            try{
+
+              // Assert size
+              assertEquals(size, testByteArray.size());
+
+              // Write random bytes to test bytearray to initialize it
+              {
+                Random testRNG = new Random(testLocalSeed);
+                for(long index = 0; index < size; index++) testByteArray.writeByte(index, (byte) testRNG.nextInt());
+              }
+
+              // Get subset
+              var subset = testByteArray.subsetOf(byteIndex, subSize);
+
+              // Assert writeonly if applicable
+              if(!isReadableWritableOK()) assertFalse(subset instanceof ReadableWritableByteArray);
+
+              // Assert size
+              assertEquals(subSize, subset.size());
+
+              // Check if its subsetting properly
+              {
+                Random testRNG = new Random(testLocalSeed);
+                long innerByteIndex = 0;
+                for(long index = 0; index < size; index++){
+                  byte expected = (byte) testRNG.nextInt();
+                  if(index < byteIndex || index >= byteIndex + subSize) continue;
+                  assertEquals(
+                    expected,
+                    readTestWriteOnlyByteArray(subset, innerByteIndex),
+                    "Index: " + innerByteIndex
+                  );
+                  innerByteIndex++;
+                }
+              }
+
+              // Write different random bytes to subset bytearray (to test if changes to subsetted byte array propagates to original bytearray)
+              int diffTestLocalSeed = testLocalSeed + 233432;
+              {
+                Random testRNG = new Random(diffTestLocalSeed);
+                for(long index = 0; index < subset.size(); index++){
+                  subset.writeByte(index, (byte) testRNG.nextInt());
+                }
+              }
+
+              // Check by reading it
+              {
+                Random testRNG = new Random(testLocalSeed);
+                Random altRNG = new Random(diffTestLocalSeed);
+                for(long index = 0; index < size; index++){
+                  byte expected = (byte) testRNG.nextInt();
+                  if(index >= byteIndex && index < byteIndex + subSize) expected = (byte) altRNG.nextInt();
+                  assertEquals(expected, readTestWriteOnlyByteArray(testByteArray, index), "Index: " + index);
+                }
+              }
+
+            }finally{
+              cleanTestByteArray(testByteArray);
+            }
+
+          }catch(OutOfMemoryError oom){
+            System.gc();
+            oom.printStackTrace();
+            fail("Cannot perform test due to insufficient memory space");
+          }
+
+          // Clean up
+          System.gc();
+        }));
+      }
+    }
+
+    // Return tests
+    return tests;
+  }
 }

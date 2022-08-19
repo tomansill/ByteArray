@@ -30,7 +30,7 @@ public class PrimitiveByteArrayNestedTest{
         throw new IllegalArgumentException("Not primitive byte array");
 
       // Update
-      ((PrimitiveByteArray) testByteArray).data[(int) byteIndex] = value;
+      ((PrimitiveByteArray) testByteArray).writeByte(byteIndex, value);
     }
 
     @Nonnull
@@ -60,7 +60,7 @@ public class PrimitiveByteArrayNestedTest{
         throw new IllegalArgumentException("Not primitive byte array");
 
       // Read
-      return ((PrimitiveByteArray) testByteArray).data[(int) byteIndex];
+      return ((PrimitiveByteArray) testByteArray).readByte(byteIndex);
     }
 
     @Override
@@ -218,6 +218,16 @@ public class PrimitiveByteArrayNestedTest{
     public class ReadableWritablePrimitiveByteArrayTest extends PrimitiveByteArrayTest
       implements SelfReadableWritableByteArrayTest{
 
+      @Nonnull
+      public ReadOnlyByteArray createTestReadOnlyByteArray(long size){
+        return createTestReadableWritableByteArray(size);
+      }
+
+      @Nonnull
+      public WriteOnlyByteArray createTestWriteOnlyByteArray(long size){
+        return createTestReadableWritableByteArray(size);
+      }
+
       @Override
       public boolean isReadableWritableOK(){
         return true;
@@ -240,6 +250,16 @@ public class PrimitiveByteArrayNestedTest{
     @DisplayName("ReadableWritable test with control ByteArray implementation")
     public class ReadableWritablePrimitiveByteArrayWithControlByteArrayTest extends PrimitiveByteArrayTest implements
       ReadableWritableByteArrayWithOtherByteArrayTest{
+
+      @Nonnull
+      public ReadOnlyByteArray createTestReadOnlyByteArray(long size){
+        return createTestReadableWritableByteArray(size);
+      }
+
+      @Nonnull
+      public WriteOnlyByteArray createTestWriteOnlyByteArray(long size){
+        return createTestReadableWritableByteArray(size);
+      }
 
       @Override
       public boolean isReadableWritableOK(){
