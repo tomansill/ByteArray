@@ -41,14 +41,14 @@ together and represent it as a single array of data.
 ## Available classes
 
 - `ByteArray`
-    - Provides a base interface of a byte array
-    - `subsetOf(long,long)` method
-    - `static` methods to create `ByteArray`s using `byte[]` arrays or `ByteBuffer`s and joining of multiple `ByteArray`
-      s
+  - Provides the base interface of a byte array
+  - Provides `subsetOf(long,long)` and `size()` methods
+  - `static` methods to create `ByteArray`s using `byte[]` arrays or `ByteBuffer`s and joining of multiple `ByteArray`
+    s
 - `ReadOnlyByteArray`
-    - Read-only version of `ByteArray`
-    - Provides `readByte(long)` and `read(long, WriteOnlyByteArray)` methods to read the bytes from
-      the `ReadOnlyByteArray`
+  - Read-only version of `ByteArray`
+  - Provides `readByte(long)` and `read(long, WriteOnlyByteArray)` methods to read the bytes from
+    the `ReadOnlyByteArray`
 - `WriteOnlyByteArray`
     - Write-only version of `ByteArray`
     - Provides `writeByte(long, byte)` and `write(long, ReadOnlyByteArray)` methods to write the bytes to
@@ -87,7 +87,7 @@ assert bytes[1] == 5;
 var byteBuffer1 = ByteBuffer.allocate(1_000_000);
 var byteBuffer2 = ByteBuffer.allocate(1_000_000);
 
-// Read data into bytebuffers
+// Read 2MB of data data into bytebuffers
 readData(byteBuffer1);
 readData(byteBuffer2);
 
@@ -103,9 +103,11 @@ var largeByteArray = ByteArray.combine(byteArray1, byteArray2);
 
 // Subset the large byte array to get data of our desired row
 var rowData1 = largeByteArray.subsetOf(999_000, 2_000); // 2,000 bytes long ByteArray where 1,000 bytes each from both buffers
+assert rowData1.size() == 2_000;
 
 // Another quicker way of same example:
 var rowData2 = ByteArray.wrap(byteBuffer1, byteBuffer2).subset(999_000, 2_000); // wrap method is a variadic method, can accept as many `ByteBuffer`s as you can fit.
+assert rowData1.size() == 2_000;
 ```
 
 ### Access Control Demonstration
@@ -140,7 +142,7 @@ assert rwByteArray.readByte(2) == 30;
 assert bytes1[2] == 30;
 ```
 
-### Copying ByteArrays
+### `Copying ByteArray`s
 
 ```
 // Create example byte arrays
@@ -170,5 +172,23 @@ largeByteArray.write(4, source);
 // Have largeByteArray to subset and read its contents to source bytearray
 largeByteArray.subsetOf(2, 4).read(0, source);
 
-// source and smallerBytes should now have 3, 4, 4, 3 fater that read call
+// source and smallerBytes should now have 3, 4, 4, 3 after that read call
 ```
+
+## TO-DOs
+
+- Implement the remaining read/write calls
+  - `readShort(long)`
+  - `readInt(long)`
+  - `readLong(long)`
+  - `readFloat(long)`
+  - `readDouble(long`
+  - `writeShort(long,short)`
+  - `writeInt(long,int)`
+  - `writeLong(long,long)`
+  - `writeFloat(long,float)`
+  - `writeDouble(long,double)`
+- Endian-ness support?
+  - Use `java.nio.ByteOrder`?
+  - `reverse()` method or `to(java.nio.ByteOrder)` method?
+- Support more backing data types?
