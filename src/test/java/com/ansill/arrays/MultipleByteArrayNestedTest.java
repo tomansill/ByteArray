@@ -275,7 +275,7 @@ public class MultipleByteArrayNestedTest{
 
     @Nested
     @DisplayName("WriteOnly test with control ByteArray implementation")
-    public class WriteOnlyMultipleByteArrayWithControlByteArrayTest extends WriteOnlyMultipleByteArrayTest implements
+    public class WriteOnlyMultipleByteArrayWithControlByteArrayTest extends MultipleByteArrayTest implements
       WriteOnlyByteArrayWithOtherByteArray64BitTest{
 
     }

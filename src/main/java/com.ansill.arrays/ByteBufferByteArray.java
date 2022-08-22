@@ -8,6 +8,7 @@ import javax.annotation.Nonnull;
 import java.nio.ByteBuffer;
 
 import static com.ansill.arrays.IndexingUtility.checkRead;
+import static com.ansill.arrays.IndexingUtility.checkReadWrite;
 import static com.ansill.arrays.IndexingUtility.checkReadWriteByte;
 import static com.ansill.arrays.IndexingUtility.checkSubsetOf;
 import static com.ansill.arrays.IndexingUtility.checkWrite;
@@ -76,6 +77,102 @@ class ByteBufferByteArray implements ReadableWritableByteArray{
 
     // Wrap in ByteBufferByteArray
     return new ByteBufferByteArray(ba);
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public short readShort(long byteIndex) throws ByteArrayIndexOutOfBoundsException, ByteArrayLengthOverBoundsException{
+    checkReadWrite(byteIndex, 2, this.size());
+    return this.data.getShort((int) (this.data.position() + byteIndex));
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public int readInt(long byteIndex) throws ByteArrayIndexOutOfBoundsException, ByteArrayLengthOverBoundsException{
+    checkReadWrite(byteIndex, 4, this.size());
+    return this.data.getInt((int) (this.data.position() + byteIndex));
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public long readLong(long byteIndex) throws ByteArrayIndexOutOfBoundsException, ByteArrayLengthOverBoundsException{
+    checkReadWrite(byteIndex, 8, this.size());
+    return this.data.getLong((int) (this.data.position() + byteIndex));
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public float readFloat(long byteIndex) throws ByteArrayIndexOutOfBoundsException, ByteArrayLengthOverBoundsException{
+    checkReadWrite(byteIndex, 4, this.size());
+    return this.data.getFloat((int) (this.data.position() + byteIndex));
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public double readDouble(long byteIndex)
+  throws ByteArrayIndexOutOfBoundsException, ByteArrayLengthOverBoundsException{
+    checkReadWrite(byteIndex, 8, this.size());
+    return this.data.getDouble((int) (this.data.position() + byteIndex));
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public void writeShort(long byteIndex, short value)
+  throws ByteArrayIndexOutOfBoundsException, ByteArrayLengthOverBoundsException{
+    checkReadWrite(byteIndex, 2, this.size());
+    this.data.putShort((int) (this.data.position() + byteIndex), value);
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public void writeInt(long byteIndex, int value)
+  throws ByteArrayIndexOutOfBoundsException, ByteArrayLengthOverBoundsException{
+    checkReadWrite(byteIndex, 4, this.size());
+    this.data.putInt((int) (this.data.position() + byteIndex), value);
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public void writeLong(long byteIndex, long value)
+  throws ByteArrayIndexOutOfBoundsException, ByteArrayLengthOverBoundsException{
+    checkReadWrite(byteIndex, 8, this.size());
+    this.data.putLong((int) (this.data.position() + byteIndex), value);
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public void writeFloat(long byteIndex, float value)
+  throws ByteArrayIndexOutOfBoundsException, ByteArrayLengthOverBoundsException{
+    checkReadWrite(byteIndex, 4, this.size());
+    this.data.putFloat((int) (this.data.position() + byteIndex), value);
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public void writeDouble(long byteIndex, double value)
+  throws ByteArrayIndexOutOfBoundsException, ByteArrayLengthOverBoundsException{
+    checkReadWrite(byteIndex, 8, this.size());
+    this.data.putDouble((int) (this.data.position() + byteIndex), value);
   }
 
   /**

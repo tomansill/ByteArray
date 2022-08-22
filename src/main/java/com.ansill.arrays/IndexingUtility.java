@@ -130,9 +130,9 @@ public final class IndexingUtility{
         sizeOfByteArray +
         ".");
     }
-    if(byteIndex + sizeOfValue >= sizeOfByteArray){
+    if(byteIndex + sizeOfValue > sizeOfByteArray){
       throw new ByteArrayLengthOverBoundsException(
-        "The size of value exceeds the size limit of ByteArray. The byte index is" +
+        "The size of value exceeds the size limit of ByteArray. The byte index is " +
         byteIndex +
         ". The size of value is " +
         sizeOfValue +

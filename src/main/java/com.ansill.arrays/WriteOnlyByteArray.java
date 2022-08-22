@@ -37,7 +37,7 @@ public interface WriteOnlyByteArray extends ByteArray{
 
     // Two write calls
     writeByte(byteIndex, (byte) ((0xff00 & value) >> 8));
-    writeByte(byteIndex, (byte) (0xff & value));
+    writeByte(byteIndex + 1, (byte) (0xff & value));
   }
 
   /**
@@ -55,10 +55,10 @@ public interface WriteOnlyByteArray extends ByteArray{
     IndexingUtility.checkReadWrite(byteIndex, 4, this.size());
 
     // Four write calls
-    writeByte(byteIndex, (byte) ((0xff000000 & value) >> 24));
-    writeByte(byteIndex, (byte) ((0xff0000 & value) >> 16));
-    writeByte(byteIndex, (byte) ((0xff00 & value) >> 8));
-    writeByte(byteIndex, (byte) (0xff & value));
+    writeByte(byteIndex, (byte) (value >>> 24));
+    writeByte(byteIndex + 1, (byte) (value >>> 16));
+    writeByte(byteIndex + 2, (byte) (value >>> 8));
+    writeByte(byteIndex + 3, (byte) value);
   }
 
   /**
@@ -76,14 +76,14 @@ public interface WriteOnlyByteArray extends ByteArray{
     IndexingUtility.checkReadWrite(byteIndex, 8, this.size());
 
     // Eight write calls
-    writeByte(byteIndex, (byte) ((0xff00000000000000L & value) >> 56));
-    writeByte(byteIndex, (byte) ((0xff000000000000L & value) >> 48));
-    writeByte(byteIndex, (byte) ((0xff0000000000L & value) >> 40));
-    writeByte(byteIndex, (byte) ((0xff00000000L & value) >> 32));
-    writeByte(byteIndex, (byte) ((0xff000000 & value) >> 24));
-    writeByte(byteIndex, (byte) ((0xff0000 & value) >> 16));
-    writeByte(byteIndex, (byte) ((0xff00 & value) >> 8));
-    writeByte(byteIndex, (byte) (0xff & value));
+    writeByte(byteIndex, (byte) (value >>> 56));
+    writeByte(byteIndex + 1, (byte) (value >>> 48));
+    writeByte(byteIndex + 2, (byte) (value >>> 40));
+    writeByte(byteIndex + 3, (byte) (value >>> 32));
+    writeByte(byteIndex + 4, (byte) (value >>> 24));
+    writeByte(byteIndex + 5, (byte) (value >>> 16));
+    writeByte(byteIndex + 6, (byte) (value >>> 8));
+    writeByte(byteIndex + 7, (byte) value);
   }
 
   /**

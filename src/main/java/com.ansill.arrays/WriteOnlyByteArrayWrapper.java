@@ -29,6 +29,36 @@ class WriteOnlyByteArrayWrapper implements WriteOnlyByteArray{
   }
 
   @Override
+  public void writeShort(long byteIndex, short value)
+  throws ByteArrayIndexOutOfBoundsException, ByteArrayLengthOverBoundsException{
+    original.writeShort(byteIndex, value);
+  }
+
+  @Override
+  public void writeInt(long byteIndex, int value)
+  throws ByteArrayIndexOutOfBoundsException, ByteArrayLengthOverBoundsException{
+    original.writeInt(byteIndex, value);
+  }
+
+  @Override
+  public void writeLong(long byteIndex, long value)
+  throws ByteArrayIndexOutOfBoundsException, ByteArrayLengthOverBoundsException{
+    original.writeLong(byteIndex, value);
+  }
+
+  @Override
+  public void writeFloat(long byteIndex, float value)
+  throws ByteArrayIndexOutOfBoundsException, ByteArrayLengthOverBoundsException{
+    original.writeFloat(byteIndex, value);
+  }
+
+  @Override
+  public void writeDouble(long byteIndex, double value)
+  throws ByteArrayIndexOutOfBoundsException, ByteArrayLengthOverBoundsException{
+    original.writeDouble(byteIndex, value);
+  }
+
+  @Override
   public void write(long byteIndex, @Nonnull ReadOnlyByteArray source)
   throws ByteArrayIndexOutOfBoundsException, ByteArrayLengthOverBoundsException{
     original.write(byteIndex, source);
