@@ -93,8 +93,4 @@ public interface SelfReadOnlyByteArray64BitTest extends SelfReadOnlyByteArrayTes
     }
   }
 
-  // TODO add test to read(long, WriteOnlyByteArray) on 64-bit addressable data
-
-  // TODO add test to subset(long, long) on 64-bit addressable data
-
 }
