@@ -109,6 +109,40 @@ public final class IndexingUtility{
   }
 
   /**
+   * Checks read/write call and throw any exception if anything is wrong with arguments or exit if all arguments are valid
+   *
+   * @param byteIndex       byte index
+   * @param sizeOfValue     size of the value being read/written in bytes
+   * @param sizeOfByteArray size of byte array. <i>Note that this is a trusted parameter. The function will not check if this is valid or not. This parameter should not come directly from user's input.</i>
+   * @throws ByteArrayIndexOutOfBoundsException thrown if the index is out of bounds
+   * @throws ByteArrayLengthOverBoundsException thrown if the value cannot be fully extracted as it goes over the length of the byte array
+   */
+  public static void checkReadWrite(long byteIndex, @Nonnegative int sizeOfValue, @Nonnegative long sizeOfByteArray)
+  throws ByteArrayIndexOutOfBoundsException{
+    if(byteIndex < 0){
+      throw new ByteArrayIndexOutOfBoundsException("Byte index is negative. Byte index is " + byteIndex + ".");
+    }
+    if(byteIndex >= sizeOfByteArray){
+      throw new ByteArrayIndexOutOfBoundsException(
+        "The byte index goes over the size limit of ByteArray. The byte index is " +
+        byteIndex +
+        ". The size of ByteArray is " +
+        sizeOfByteArray +
+        ".");
+    }
+    if(byteIndex + sizeOfValue >= sizeOfByteArray){
+      throw new ByteArrayLengthOverBoundsException(
+        "The size of value exceeds the size limit of ByteArray. The byte index is" +
+        byteIndex +
+        ". The size of value is " +
+        sizeOfValue +
+        ". The size of ByteArray is " +
+        sizeOfByteArray +
+        ".");
+    }
+  }
+
+  /**
    * Checks read call and throw any exception if anything is wrong with arguments. Or exit if all arguments are valid
    *
    * @param byteIndex       byte index
