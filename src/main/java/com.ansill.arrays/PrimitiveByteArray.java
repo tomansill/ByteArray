@@ -207,32 +207,32 @@ final class PrimitiveByteArray implements ReadableWritableByteArray, ReadOnlyByt
   public void writeShort(long byteIndex, short value)
   throws ByteArrayIndexOutOfBoundsException, ByteArrayLengthOverBoundsException{
     checkReadWrite(byteIndex, 2, size);
-    data[(int) (start + byteIndex)] = (byte) ((0xff00 & value) >> 8);
-    data[(int) (start + byteIndex + 1)] = (byte) (0xff & value);
+    data[(int) (start + byteIndex)] = (byte) (value >>> 8);
+    data[(int) (start + byteIndex + 1)] = (byte) value;
   }
 
   @Override
   public void writeInt(long byteIndex, int value)
   throws ByteArrayIndexOutOfBoundsException, ByteArrayLengthOverBoundsException{
     checkReadWrite(byteIndex, 4, size);
-    data[(int) (start + byteIndex)] = (byte) ((0xff000000 & value) >> 24);
-    data[(int) (start + byteIndex + 1)] = (byte) ((0xff0000 & value) >> 16);
-    data[(int) (start + byteIndex + 2)] = (byte) ((0xff00 & value) >> 8);
-    data[(int) (start + byteIndex + 3)] = (byte) (0xff & value);
+    data[(int) (start + byteIndex)] = (byte) (value >>> 24);
+    data[(int) (start + byteIndex + 1)] = (byte) (value >>> 16);
+    data[(int) (start + byteIndex + 2)] = (byte) (value >>> 8);
+    data[(int) (start + byteIndex + 3)] = (byte) value;
   }
 
   @Override
   public void writeLong(long byteIndex, long value)
   throws ByteArrayIndexOutOfBoundsException, ByteArrayLengthOverBoundsException{
     checkReadWrite(byteIndex, 8, size);
-    data[(int) (start + byteIndex)] = (byte) ((0xff00000000000000L & value) >> 56);
-    data[(int) (start + byteIndex + 1)] = (byte) ((0xff000000000000L & value) >> 48);
-    data[(int) (start + byteIndex + 2)] = (byte) ((0xff0000000000L & value) >> 40);
-    data[(int) (start + byteIndex + 3)] = (byte) ((0xff00000000L & value) >> 32);
-    data[(int) (start + byteIndex + 4)] = (byte) ((0xff000000 & value) >> 24);
-    data[(int) (start + byteIndex + 5)] = (byte) ((0xff0000 & value) >> 16);
-    data[(int) (start + byteIndex + 6)] = (byte) ((0xff00 & value) >> 8);
-    data[(int) (start + byteIndex + 7)] = (byte) (0xff & value);
+    data[(int) (start + byteIndex)] = (byte) (value >>> 56);
+    data[(int) (start + byteIndex + 1)] = (byte) (value >>> 48);
+    data[(int) (start + byteIndex + 2)] = (byte) (value >>> 40);
+    data[(int) (start + byteIndex + 3)] = (byte) (value >>> 32);
+    data[(int) (start + byteIndex + 4)] = (byte) (value >>> 24);
+    data[(int) (start + byteIndex + 5)] = (byte) (value >>> 16);
+    data[(int) (start + byteIndex + 6)] = (byte) (value >>> 8);
+    data[(int) (start + byteIndex + 7)] = (byte) value;
   }
 
   /**

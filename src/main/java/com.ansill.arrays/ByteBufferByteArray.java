@@ -83,6 +83,15 @@ class ByteBufferByteArray implements ReadableWritableByteArray{
    * {@inheritDoc}
    */
   @Override
+  public byte readByte(long byteIndex) throws ByteArrayIndexOutOfBoundsException{
+    checkReadWriteByte(byteIndex, this.size());
+    return this.data.get((int) (this.data.position() + byteIndex));
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
   public short readShort(long byteIndex) throws ByteArrayIndexOutOfBoundsException, ByteArrayLengthOverBoundsException{
     checkReadWrite(byteIndex, 2, this.size());
     return this.data.getShort((int) (this.data.position() + byteIndex));
@@ -123,6 +132,15 @@ class ByteBufferByteArray implements ReadableWritableByteArray{
   throws ByteArrayIndexOutOfBoundsException, ByteArrayLengthOverBoundsException{
     checkReadWrite(byteIndex, 8, this.size());
     return this.data.getDouble((int) (this.data.position() + byteIndex));
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public void writeByte(long byteIndex, byte value) throws ByteArrayIndexOutOfBoundsException{
+    checkReadWriteByte(byteIndex, this.size());
+    this.data.put((int) (this.data.position() + byteIndex), value);
   }
 
   /**
@@ -187,15 +205,6 @@ class ByteBufferByteArray implements ReadableWritableByteArray{
    * {@inheritDoc}
    */
   @Override
-  public byte readByte(long byteIndex) throws ByteArrayIndexOutOfBoundsException{
-    checkReadWriteByte(byteIndex, this.size());
-    return this.data.get((int) (this.data.position() + byteIndex));
-  }
-
-  /**
-   * {@inheritDoc}
-   */
-  @Override
   public void read(long byteIndex, @Nonnull WriteOnlyByteArray destination)
   throws ByteArrayIndexOutOfBoundsException, ByteArrayLengthOverBoundsException{
 
@@ -239,15 +248,6 @@ class ByteBufferByteArray implements ReadableWritableByteArray{
         destination.writeByte(index, this.data.get((int) (this.data.position() + byteIndex + index)));
       }
     }
-  }
-
-  /**
-   * {@inheritDoc}
-   */
-  @Override
-  public void writeByte(long byteIndex, byte value) throws ByteArrayIndexOutOfBoundsException{
-    checkReadWriteByte(byteIndex, this.size());
-    this.data.put((int) (this.data.position() + byteIndex), value);
   }
 
   /**

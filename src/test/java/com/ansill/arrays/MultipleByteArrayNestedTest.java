@@ -199,16 +199,25 @@ public class MultipleByteArrayNestedTest{
       }
 
       // Check if it's ours
-      if(!(testByteArray instanceof ReadableWritableMultipleByteArray)){
-        throw new IllegalArgumentException("Not multiplebytearray");
+      if(testByteArray instanceof ReadableWritableMultipleByteArray){
+        try{
+          return ((ReadableWritableMultipleByteArray) testByteArray).readByte(byteIndex);
+        }catch(ByteArrayIndexOutOfBoundsException e){
+          throw new RuntimeException(e);
+        }
       }
 
-      // Read
-      try{
-        return ((ReadableWritableMultipleByteArray) testByteArray).readByte(byteIndex);
-      }catch(ByteArrayIndexOutOfBoundsException e){
-        throw new RuntimeException(e);
+      // TestOnlyByteArray ends up here somehow
+      if(testByteArray instanceof TestOnlyByteArray){
+        try{
+          return ((TestOnlyByteArray) testByteArray).readByte(byteIndex);
+        }catch(ByteArrayIndexOutOfBoundsException e){
+          throw new RuntimeException(e);
+        }
       }
+
+      // Fail
+      throw new IllegalArgumentException("Not multiplebytearray: " + testByteArray.getClass().getName());
     }
   }
 

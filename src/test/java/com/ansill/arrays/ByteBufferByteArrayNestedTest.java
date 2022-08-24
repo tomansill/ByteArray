@@ -31,7 +31,7 @@ public class ByteBufferByteArrayNestedTest{
       }
 
       // Read
-      return ((ByteBufferByteArray) testByteArray).data.get((int) byteIndex);
+      return ((ByteBufferByteArray) testByteArray).readByte(byteIndex);
     }
 
     public void writeTestReadOnlyByteArray(@Nonnull ReadOnlyByteArray testByteArray, long byteIndex, byte value){
@@ -47,7 +47,7 @@ public class ByteBufferByteArrayNestedTest{
       }
 
       // Update
-      ((ByteBufferByteArray) testByteArray).data.put((int) byteIndex, value);
+      ((ByteBufferByteArray) testByteArray).writeByte((int) byteIndex, value);
     }
 
     @Nonnull

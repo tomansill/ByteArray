@@ -579,7 +579,7 @@ public interface SelfWriteOnlyByteArrayTest extends BaseWriteOnlyByteArrayTest{
             {
               indices = new LinkedList<>();
               Random testRNG = new Random(testLocalSeed + 232);
-              IntStream.range(0, Math.toIntExact(size)).forEach(indices::add);
+              IntStream.range(0, Math.toIntExact(size - 1)).forEach(indices::add);
               Collections.shuffle(indices, testRNG);
             }
 
@@ -591,11 +591,688 @@ public interface SelfWriteOnlyByteArrayTest extends BaseWriteOnlyByteArrayTest{
                 // Get index to write
                 int byteIndex = indices.remove(0);
 
+                // Rearrange value
+                int val = (0xff & controlTwo.readByte(byteIndex)) << 8;
+                val |= (0xff & controlTwo.readByte(byteIndex + 1));
+
                 // Write it
-                testByteArray.writeByte(byteIndex, controlTwo.readByte(byteIndex));
+                testByteArray.writeShort(byteIndex, (short) val);
 
                 // Add to written set
                 written.add(byteIndex);
+                written.add(byteIndex + 1);
+
+                // Check it (slow, I know)
+                for(int i = 0; i < controlOne.size(); i++){
+                  byte testVal = readTestWriteOnlyByteArray(testByteArray, i);
+                  if(written.contains(i)) assertEquals(controlTwo.readByte(i), testVal);
+                  else assertEquals(controlOne.readByte(i), testVal);
+                }
+              }
+            }
+
+          }finally{
+            cleanTestByteArray(testByteArray);
+          }
+
+        }catch(OutOfMemoryError oom){
+          System.gc();
+          oom.printStackTrace();
+          System.out.println("Out of memory. Cannot perform this test due to insufficient memory space");
+          fail("Cannot perform test due to insufficient memory space");
+        }
+
+        // Clean up
+        System.gc();
+      }));
+    }
+
+    // Return tests
+    return tests;
+  }
+
+  @DisplayName("Test valid writeInt(long, int) calls")
+  @TestFactory
+  default Iterable<DynamicTest> testValidWriteIntCalls(){
+
+    // Set up test container
+    var tests = new LinkedList<DynamicTest>();
+
+    // Get RNG
+    var rng = getRNG();
+
+    // Sizes to test
+    var sizesToTest = new HashSet<Long>();
+    sizesToTest.add(4L); // Test size of four
+    //sizesToTest.add((long) Short.MAX_VALUE); // Big enough
+    for(int trial = 0; trial < TRIALS; trial++){ // Add random sizes to try
+      if(sizesToTest.add((long) rng.nextInt(500) + 5)) continue;
+      trial--; // Existing number, try again
+    }
+
+    // Run the tests
+    for(long size : sizesToTest){
+
+      // Get test-local RNG seed
+      int testLocalSeed = (int) (rng.nextInt() + size);
+
+      // Write test
+      tests.add(dynamicTest(f("full writeInt(long, int) on ByteArray of {}B size", size), () -> {
+
+        // Wrap in try and catch for possible OOM if trying to allocate max memory
+        try{
+
+          // Allocate the writeonly bytearray
+          var testByteArray = createTestWriteOnlyByteArray(size);
+
+          // Assert writeonly if applicable
+          if(!isReadableWritableOK()) assertFalse(testByteArray instanceof ReadableWritableByteArray);
+
+          try{
+
+            // Assert size
+            assertEquals(size, testByteArray.size());
+
+            // Write random bytes to control bytearray for later reference
+            var controlOne = new TestOnlyByteArray(size);
+            {
+              var testRNG = new Random(testLocalSeed);
+              for(long index = 0; index < size; index++){
+                controlOne.writeByte(index, (byte) testRNG.nextInt());
+              }
+            }
+
+            // Randomize the write order
+            var indices = new LinkedList<Integer>();
+            {
+              var testRNG = new Random(testLocalSeed);
+              IntStream.range(0, Math.toIntExact(size - 3)).forEach(indices::add);
+              Collections.shuffle(indices, testRNG);
+            }
+
+            // Loop until no more indices to try
+            {
+              var written = new HashSet<Integer>();
+              while(!indices.isEmpty()){
+
+                // Get index to write
+                int byteIndex = indices.remove(0);
+
+                // Rearrange value
+                int val = (0xff & controlOne.readByte(byteIndex)) << 8;
+                val = (val | (0xff & controlOne.readByte(byteIndex + 1))) << 8;
+                val = (val | (0xff & controlOne.readByte(byteIndex + 2))) << 8;
+                val |= (0xff & controlOne.readByte(byteIndex + 3));
+
+                // Write it
+                testByteArray.writeInt(byteIndex, val);
+
+                // Add to written set
+                written.add(byteIndex);
+                written.add(byteIndex + 1);
+                written.add(byteIndex + 2);
+                written.add(byteIndex + 3);
+
+                // Check it (slow, I know)
+                for(int i = 0; i < controlOne.size(); i++){
+                  byte testVal = readTestWriteOnlyByteArray(testByteArray, i);
+                  if(written.contains(i)) assertEquals(controlOne.readByte(i), testVal);
+                  else assertEquals(0, testVal);
+                }
+              }
+            }
+
+            // Come up with new control byte array (to check for overwrite correctness)
+            ReadableWritableByteArray controlTwo = new TestOnlyByteArray(size);
+            {
+              Random testRNG = new Random(testLocalSeed + 342);
+              for(long index = 0; index < size; index++){
+                controlTwo.writeByte(index, (byte) testRNG.nextInt());
+              }
+            }
+
+            // Randomize the write order
+            {
+              indices = new LinkedList<>();
+              Random testRNG = new Random(testLocalSeed + 232);
+              IntStream.range(0, Math.toIntExact(size - 3)).forEach(indices::add);
+              Collections.shuffle(indices, testRNG);
+            }
+
+            // Loop until no more indices to try
+            {
+              Set<Integer> written = new HashSet<>();
+              while(!indices.isEmpty()){
+
+                // Get index to write
+                int byteIndex = indices.remove(0);
+
+                // Rearrange value
+                int val = (0xff & controlTwo.readByte(byteIndex)) << 8;
+                val = (val | (0xff & controlTwo.readByte(byteIndex + 1))) << 8;
+                val = (val | (0xff & controlTwo.readByte(byteIndex + 2))) << 8;
+                val |= (0xff & controlTwo.readByte(byteIndex + 3));
+
+                // Write it
+                testByteArray.writeInt(byteIndex, val);
+
+                // Add to written set
+                written.add(byteIndex);
+                written.add(byteIndex + 1);
+                written.add(byteIndex + 2);
+                written.add(byteIndex + 3);
+
+                // Check it (slow, I know)
+                for(int i = 0; i < controlOne.size(); i++){
+                  byte testVal = readTestWriteOnlyByteArray(testByteArray, i);
+                  if(written.contains(i)) assertEquals(controlTwo.readByte(i), testVal);
+                  else assertEquals(controlOne.readByte(i), testVal);
+                }
+              }
+            }
+
+          }finally{
+            cleanTestByteArray(testByteArray);
+          }
+
+        }catch(OutOfMemoryError oom){
+          System.gc();
+          oom.printStackTrace();
+          System.out.println("Out of memory. Cannot perform this test due to insufficient memory space");
+          fail("Cannot perform test due to insufficient memory space");
+        }
+
+        // Clean up
+        System.gc();
+      }));
+    }
+
+    // Return tests
+    return tests;
+  }
+
+  @DisplayName("Test valid writeLong(long, long) calls")
+  @TestFactory
+  default Iterable<DynamicTest> testValidWriteLongCalls(){
+
+    // Set up test container
+    var tests = new LinkedList<DynamicTest>();
+
+    // Get RNG
+    var rng = getRNG();
+
+    // Sizes to test
+    var sizesToTest = new HashSet<Long>();
+    sizesToTest.add(8L); // Test size of eight
+    //sizesToTest.add((long) Short.MAX_VALUE); // Big enough
+    for(int trial = 0; trial < TRIALS; trial++){ // Add random sizes to try
+      if(sizesToTest.add((long) rng.nextInt(500) + 5)) continue;
+      trial--; // Existing number, try again
+    }
+
+    // Run the tests
+    for(long size : sizesToTest){
+
+      // Get test-local RNG seed
+      int testLocalSeed = (int) (rng.nextInt() + size);
+
+      // Write test
+      tests.add(dynamicTest(f("full writeLong(long, long) on ByteArray of {}B size", size), () -> {
+
+        // Wrap in try and catch for possible OOM if trying to allocate max memory
+        try{
+
+          // Allocate the writeonly bytearray
+          var testByteArray = createTestWriteOnlyByteArray(size);
+
+          // Assert writeonly if applicable
+          if(!isReadableWritableOK()) assertFalse(testByteArray instanceof ReadableWritableByteArray);
+
+          try{
+
+            // Assert size
+            assertEquals(size, testByteArray.size());
+
+            // Write random bytes to control bytearray for later reference
+            var controlOne = new TestOnlyByteArray(size);
+            {
+              var testRNG = new Random(testLocalSeed);
+              for(long index = 0; index < size; index++){
+                controlOne.writeByte(index, (byte) testRNG.nextInt());
+              }
+            }
+
+            // Randomize the write order
+            var indices = new LinkedList<Integer>();
+            {
+              var testRNG = new Random(testLocalSeed);
+              IntStream.range(0, Math.toIntExact(size - 7)).forEach(indices::add);
+              Collections.shuffle(indices, testRNG);
+            }
+
+            // Loop until no more indices to try
+            {
+              var written = new HashSet<Integer>();
+              while(!indices.isEmpty()){
+
+                // Get index to write
+                int byteIndex = indices.remove(0);
+
+                // Rearrange value
+                long val = (0xff & controlOne.readByte(byteIndex)) << 8;
+                val = (val | (0xff & controlOne.readByte(byteIndex + 1))) << 8;
+                val = (val | (0xff & controlOne.readByte(byteIndex + 2))) << 8;
+                val = (val | (0xff & controlOne.readByte(byteIndex + 3))) << 8;
+                val = (val | (0xff & controlOne.readByte(byteIndex + 4))) << 8;
+                val = (val | (0xff & controlOne.readByte(byteIndex + 5))) << 8;
+                val = (val | (0xff & controlOne.readByte(byteIndex + 6))) << 8;
+                val |= (0xff & controlOne.readByte(byteIndex + 7));
+
+                // Write it
+                testByteArray.writeLong(byteIndex, val);
+
+                // Add to written set
+                written.add(byteIndex);
+                written.add(byteIndex + 1);
+                written.add(byteIndex + 2);
+                written.add(byteIndex + 3);
+                written.add(byteIndex + 4);
+                written.add(byteIndex + 5);
+                written.add(byteIndex + 6);
+                written.add(byteIndex + 7);
+
+                // Check it (slow, I know)
+                for(int i = 0; i < controlOne.size(); i++){
+                  byte testVal = readTestWriteOnlyByteArray(testByteArray, i);
+                  if(written.contains(i)) assertEquals(controlOne.readByte(i), testVal);
+                  else assertEquals(0, testVal);
+                }
+              }
+            }
+
+            // Come up with new control byte array (to check for overwrite correctness)
+            ReadableWritableByteArray controlTwo = new TestOnlyByteArray(size);
+            {
+              Random testRNG = new Random(testLocalSeed + 342);
+              for(long index = 0; index < size; index++){
+                controlTwo.writeByte(index, (byte) testRNG.nextInt());
+              }
+            }
+
+            // Randomize the write order
+            {
+              indices = new LinkedList<>();
+              Random testRNG = new Random(testLocalSeed + 232);
+              IntStream.range(0, Math.toIntExact(size - 7)).forEach(indices::add);
+              Collections.shuffle(indices, testRNG);
+            }
+
+            // Loop until no more indices to try
+            {
+              Set<Integer> written = new HashSet<>();
+              while(!indices.isEmpty()){
+
+                // Get index to write
+                int byteIndex = indices.remove(0);
+
+                // Rearrange value
+                long val = (0xff & controlTwo.readByte(byteIndex)) << 8;
+                val = (val | (0xff & controlTwo.readByte(byteIndex + 1))) << 8;
+                val = (val | (0xff & controlTwo.readByte(byteIndex + 2))) << 8;
+                val = (val | (0xff & controlTwo.readByte(byteIndex + 3))) << 8;
+                val = (val | (0xff & controlTwo.readByte(byteIndex + 4))) << 8;
+                val = (val | (0xff & controlTwo.readByte(byteIndex + 5))) << 8;
+                val = (val | (0xff & controlTwo.readByte(byteIndex + 6))) << 8;
+                val |= (0xff & controlTwo.readByte(byteIndex + 7));
+
+                // Write it
+                testByteArray.writeLong(byteIndex, val);
+
+                // Add to written set
+                written.add(byteIndex);
+                written.add(byteIndex + 1);
+                written.add(byteIndex + 2);
+                written.add(byteIndex + 3);
+                written.add(byteIndex + 4);
+                written.add(byteIndex + 5);
+                written.add(byteIndex + 6);
+                written.add(byteIndex + 7);
+
+                // Check it (slow, I know)
+                for(int i = 0; i < controlOne.size(); i++){
+                  byte testVal = readTestWriteOnlyByteArray(testByteArray, i);
+                  if(written.contains(i)) assertEquals(controlTwo.readByte(i), testVal);
+                  else assertEquals(controlOne.readByte(i), testVal);
+                }
+              }
+            }
+
+          }finally{
+            cleanTestByteArray(testByteArray);
+          }
+
+        }catch(OutOfMemoryError oom){
+          System.gc();
+          oom.printStackTrace();
+          System.out.println("Out of memory. Cannot perform this test due to insufficient memory space");
+          fail("Cannot perform test due to insufficient memory space");
+        }
+
+        // Clean up
+        System.gc();
+      }));
+    }
+
+    // Return tests
+    return tests;
+  }
+
+  @DisplayName("Test valid writeFloat(long, float) calls")
+  @TestFactory
+  default Iterable<DynamicTest> testValidWriteFloatCalls(){
+
+    // Set up test container
+    var tests = new LinkedList<DynamicTest>();
+
+    // Get RNG
+    var rng = getRNG();
+
+    // Sizes to test
+    var sizesToTest = new HashSet<Long>();
+    sizesToTest.add(4L); // Test size of four
+    //sizesToTest.add((long) Short.MAX_VALUE); // Big enough
+    for(int trial = 0; trial < TRIALS; trial++){ // Add random sizes to try
+      if(sizesToTest.add((long) rng.nextInt(500) + 5)) continue;
+      trial--; // Existing number, try again
+    }
+
+    // Run the tests
+    for(long size : sizesToTest){
+
+      // Get test-local RNG seed
+      int testLocalSeed = (int) (rng.nextInt() + size);
+
+      // Write test
+      tests.add(dynamicTest(f("full writeFloat(long, float) on ByteArray of {}B size", size), () -> {
+
+        // Wrap in try and catch for possible OOM if trying to allocate max memory
+        try{
+
+          // Allocate the writeonly bytearray
+          var testByteArray = createTestWriteOnlyByteArray(size);
+
+          // Assert writeonly if applicable
+          if(!isReadableWritableOK()) assertFalse(testByteArray instanceof ReadableWritableByteArray);
+
+          try{
+
+            // Assert size
+            assertEquals(size, testByteArray.size());
+
+            // Write random bytes to control bytearray for later reference
+            var controlOne = new TestOnlyByteArray(size);
+            {
+              var testRNG = new Random(testLocalSeed);
+              for(long index = 0; index < size; index++){
+                controlOne.writeByte(index, (byte) testRNG.nextInt());
+              }
+            }
+
+            // Randomize the write order
+            var indices = new LinkedList<Integer>();
+            {
+              var testRNG = new Random(testLocalSeed);
+              IntStream.range(0, Math.toIntExact(size - 3)).forEach(indices::add);
+              Collections.shuffle(indices, testRNG);
+            }
+
+            // Loop until no more indices to try
+            {
+              var written = new HashSet<Integer>();
+              while(!indices.isEmpty()){
+
+                // Get index to write
+                int byteIndex = indices.remove(0);
+
+                // Rearrange value
+                int val = (0xff & controlOne.readByte(byteIndex)) << 8;
+                val = (val | (0xff & controlOne.readByte(byteIndex + 1))) << 8;
+                val = (val | (0xff & controlOne.readByte(byteIndex + 2))) << 8;
+                val |= (0xff & controlOne.readByte(byteIndex + 3));
+
+                // Write it
+                testByteArray.writeFloat(byteIndex, Float.intBitsToFloat(val));
+
+                // Add to written set
+                written.add(byteIndex);
+                written.add(byteIndex + 1);
+                written.add(byteIndex + 2);
+                written.add(byteIndex + 3);
+
+                // Check it (slow, I know)
+                for(int i = 0; i < controlOne.size(); i++){
+                  byte testVal = readTestWriteOnlyByteArray(testByteArray, i);
+                  if(written.contains(i)) assertEquals(controlOne.readByte(i), testVal);
+                  else assertEquals(0, testVal);
+                }
+              }
+            }
+
+            // Come up with new control byte array (to check for overwrite correctness)
+            var controlTwo = new TestOnlyByteArray(size);
+            {
+              Random testRNG = new Random(testLocalSeed + 342);
+              for(long index = 0; index < size; index++){
+                controlTwo.writeByte(index, (byte) testRNG.nextInt());
+              }
+            }
+
+            // Randomize the write order
+            {
+              indices = new LinkedList<>();
+              Random testRNG = new Random(testLocalSeed + 232);
+              IntStream.range(0, Math.toIntExact(size - 3)).forEach(indices::add);
+              Collections.shuffle(indices, testRNG);
+            }
+
+            // Loop until no more indices to try
+            {
+              Set<Integer> written = new HashSet<>();
+              while(!indices.isEmpty()){
+
+                // Get index to write
+                int byteIndex = indices.remove(0);
+
+                // Rearrange value
+                int val = (0xff & controlTwo.readByte(byteIndex)) << 8;
+                val = (val | (0xff & controlTwo.readByte(byteIndex + 1))) << 8;
+                val = (val | (0xff & controlTwo.readByte(byteIndex + 2))) << 8;
+                val |= (0xff & controlTwo.readByte(byteIndex + 3));
+
+                // Write it
+                testByteArray.writeFloat(byteIndex, Float.intBitsToFloat(val));
+
+                // Add to written set
+                written.add(byteIndex);
+                written.add(byteIndex + 1);
+                written.add(byteIndex + 2);
+                written.add(byteIndex + 3);
+
+                // Check it (slow, I know)
+                for(int i = 0; i < controlOne.size(); i++){
+                  byte testVal = readTestWriteOnlyByteArray(testByteArray, i);
+                  if(written.contains(i)) assertEquals(controlTwo.readByte(i), testVal);
+                  else assertEquals(controlOne.readByte(i), testVal);
+                }
+              }
+            }
+
+          }finally{
+            cleanTestByteArray(testByteArray);
+          }
+
+        }catch(OutOfMemoryError oom){
+          System.gc();
+          oom.printStackTrace();
+          System.out.println("Out of memory. Cannot perform this test due to insufficient memory space");
+          fail("Cannot perform test due to insufficient memory space");
+        }
+
+        // Clean up
+        System.gc();
+      }));
+    }
+
+    // Return tests
+    return tests;
+  }
+
+  @DisplayName("Test valid writeDouble(long, double) calls")
+  @TestFactory
+  default Iterable<DynamicTest> testValidWriteDoubleCalls(){
+
+    // Set up test container
+    var tests = new LinkedList<DynamicTest>();
+
+    // Get RNG
+    var rng = getRNG();
+
+    // Sizes to test
+    var sizesToTest = new HashSet<Long>();
+    sizesToTest.add(8L); // Test size of eight
+    //sizesToTest.add((long) Short.MAX_VALUE); // Big enough
+    for(int trial = 0; trial < TRIALS; trial++){ // Add random sizes to try
+      if(sizesToTest.add((long) rng.nextInt(500) + 5)) continue;
+      trial--; // Existing number, try again
+    }
+
+    // Run the tests
+    for(long size : sizesToTest){
+
+      // Get test-local RNG seed
+      int testLocalSeed = (int) (rng.nextInt() + size);
+
+      // Write test
+      tests.add(dynamicTest(f("full writeDouble(long, double) on ByteArray of {}B size", size), () -> {
+
+        // Wrap in try and catch for possible OOM if trying to allocate max memory
+        try{
+
+          // Allocate the writeonly bytearray
+          var testByteArray = createTestWriteOnlyByteArray(size);
+
+          // Assert writeonly if applicable
+          if(!isReadableWritableOK()) assertFalse(testByteArray instanceof ReadableWritableByteArray);
+
+          try{
+
+            // Assert size
+            assertEquals(size, testByteArray.size());
+
+            // Write random bytes to control bytearray for later reference
+            var controlOne = new TestOnlyByteArray(size);
+            {
+              var testRNG = new Random(testLocalSeed);
+              for(long index = 0; index < size; index++){
+                controlOne.writeByte(index, (byte) testRNG.nextInt());
+              }
+            }
+
+            // Randomize the write order
+            var indices = new LinkedList<Integer>();
+            {
+              var testRNG = new Random(testLocalSeed);
+              IntStream.range(0, Math.toIntExact(size - 7)).forEach(indices::add);
+              Collections.shuffle(indices, testRNG);
+            }
+
+            // Loop until no more indices to try
+            {
+              var written = new HashSet<Integer>();
+              while(!indices.isEmpty()){
+
+                // Get index to write
+                int byteIndex = indices.remove(0);
+
+                // Rearrange value
+                long val = (0xff & controlOne.readByte(byteIndex)) << 8;
+                val = (val | (0xff & controlOne.readByte(byteIndex + 1))) << 8;
+                val = (val | (0xff & controlOne.readByte(byteIndex + 2))) << 8;
+                val = (val | (0xff & controlOne.readByte(byteIndex + 3))) << 8;
+                val = (val | (0xff & controlOne.readByte(byteIndex + 4))) << 8;
+                val = (val | (0xff & controlOne.readByte(byteIndex + 5))) << 8;
+                val = (val | (0xff & controlOne.readByte(byteIndex + 6))) << 8;
+                val |= (0xff & controlOne.readByte(byteIndex + 7));
+
+                // Write it
+                testByteArray.writeDouble(byteIndex, Double.longBitsToDouble(val));
+
+                // Add to written set
+                written.add(byteIndex);
+                written.add(byteIndex + 1);
+                written.add(byteIndex + 2);
+                written.add(byteIndex + 3);
+                written.add(byteIndex + 4);
+                written.add(byteIndex + 5);
+                written.add(byteIndex + 6);
+                written.add(byteIndex + 7);
+
+                // Check it (slow, I know)
+                for(int i = 0; i < controlOne.size(); i++){
+                  byte testVal = readTestWriteOnlyByteArray(testByteArray, i);
+                  if(written.contains(i)) assertEquals(controlOne.readByte(i), testVal);
+                  else assertEquals(0, testVal);
+                }
+              }
+            }
+
+            // Come up with new control byte array (to check for overwrite correctness)
+            ReadableWritableByteArray controlTwo = new TestOnlyByteArray(size);
+            {
+              Random testRNG = new Random(testLocalSeed + 342);
+              for(long index = 0; index < size; index++){
+                controlTwo.writeByte(index, (byte) testRNG.nextInt());
+              }
+            }
+
+            // Randomize the write order
+            {
+              indices = new LinkedList<>();
+              Random testRNG = new Random(testLocalSeed + 232);
+              IntStream.range(0, Math.toIntExact(size - 7)).forEach(indices::add);
+              Collections.shuffle(indices, testRNG);
+            }
+
+            // Loop until no more indices to try
+            {
+              Set<Integer> written = new HashSet<>();
+              while(!indices.isEmpty()){
+
+                // Get index to write
+                int byteIndex = indices.remove(0);
+
+                // Rearrange value
+                long val = (0xff & controlTwo.readByte(byteIndex)) << 8;
+                val = (val | (0xff & controlTwo.readByte(byteIndex + 1))) << 8;
+                val = (val | (0xff & controlTwo.readByte(byteIndex + 2))) << 8;
+                val = (val | (0xff & controlTwo.readByte(byteIndex + 3))) << 8;
+                val = (val | (0xff & controlTwo.readByte(byteIndex + 4))) << 8;
+                val = (val | (0xff & controlTwo.readByte(byteIndex + 5))) << 8;
+                val = (val | (0xff & controlTwo.readByte(byteIndex + 6))) << 8;
+                val |= (0xff & controlTwo.readByte(byteIndex + 7));
+
+                // Write it
+                testByteArray.writeDouble(byteIndex, Double.longBitsToDouble(val));
+
+                // Add to written set
+                written.add(byteIndex);
+                written.add(byteIndex + 1);
+                written.add(byteIndex + 2);
+                written.add(byteIndex + 3);
+                written.add(byteIndex + 4);
+                written.add(byteIndex + 5);
+                written.add(byteIndex + 6);
+                written.add(byteIndex + 7);
 
                 // Check it (slow, I know)
                 for(int i = 0; i < controlOne.size(); i++){
@@ -819,6 +1496,227 @@ public interface SelfWriteOnlyByteArrayTest extends BaseWriteOnlyByteArrayTest{
               ByteArrayIndexOutOfBoundsException actualEx = assertThrows(
                 ByteArrayIndexOutOfBoundsException.class,
                 () -> testByteArray.writeByte(index, (byte) 0)
+              );
+
+              // Check the message
+              assertEquals(expectedEx.getMessage(), actualEx.getMessage());
+
+            }finally{
+              cleanTestByteArray(testByteArray);
+            }
+
+          }catch(OutOfMemoryError oom){
+            System.gc();
+            oom.printStackTrace();
+            fail("Cannot perform test due to insufficient memory space");
+          }
+
+          // Clean up
+          System.gc();
+        }));
+      }
+    }
+
+    // Return tests
+    return tests;
+  }
+
+  @DisplayName("Test bad writeShort(long, short) calls")
+  @TestFactory
+  default Iterable<DynamicTest> testInvalidWriteShortCalls(){
+
+    // Set up test container
+    List<DynamicTest> tests = new LinkedList<>();
+
+    // Get RNG
+    Random rng = getRNG();
+
+    // Sizes to test
+    Set<Long> sizesToTest = new HashSet<>();
+    sizesToTest.add(2L); // Test size of one
+    for(int trial = 0; trial < TRIALS; trial++){ // Add random sizes to try
+      if(sizesToTest.add((long) rng.nextInt(500) + 5)) continue;
+      trial--; // Existing number, try again
+    }
+
+    // Run the tests
+    for(long size : sizesToTest){
+
+      // Write test for negative index (-1)
+      tests.add(dynamicTest(f("writeShort(-1,short) on ByteArray of {}B size", size), () -> {
+
+        // Wrap in try and catch for possible OOM if trying to allocate max memory
+        try{
+
+          // Allocate the readonly bytearray
+          WriteOnlyByteArray testByteArray = createTestWriteOnlyByteArray(size);
+
+          // Assert readonly if applicable
+          if(!isReadableWritableOK()) assertFalse(testByteArray instanceof ReadableWritableByteArray);
+
+          try{
+
+            // Assert size
+            assertEquals(size, testByteArray.size());
+
+            // Get the expected exception
+            ByteArrayIndexOutOfBoundsException expectedEx = assertThrows(
+              ByteArrayIndexOutOfBoundsException.class,
+              () -> IndexingUtility.checkReadWrite(-1, 2, size)
+            );
+
+            // Now test the byte array
+            ByteArrayIndexOutOfBoundsException actualEx = assertThrows(
+              ByteArrayIndexOutOfBoundsException.class,
+              () -> testByteArray.writeShort(-1, (byte) 0)
+            );
+
+            // Check the message
+            assertEquals(expectedEx.getMessage(), actualEx.getMessage());
+
+          }finally{
+            cleanTestByteArray(testByteArray);
+          }
+
+        }catch(OutOfMemoryError oom){
+          System.gc();
+          oom.printStackTrace();
+          System.out.println("Out of memory. Cannot perform this test due to insufficient memory space");
+          fail("Cannot perform test due to insufficient memory space");
+        }
+
+        // Clean up
+        System.gc();
+      }));
+
+      // Write test for negative indices (random)
+      for(int trial = 0; trial < TRIALS; trial++){
+        long index = -Math.abs(rng.nextInt() + 500_000);
+        tests.add(dynamicTest(f("writeShort({},short) on ByteArray of {}B size", index, size), () -> {
+
+          // Wrap in try and catch for possible OOM if trying to allocate max memory
+          try{
+
+            // Allocate the readonly bytearray
+            WriteOnlyByteArray testByteArray = createTestWriteOnlyByteArray(size);
+
+            // Assert readonly if applicable
+            if(!isReadableWritableOK()) assertFalse(testByteArray instanceof ReadableWritableByteArray);
+
+            try{
+
+              // Assert size
+              assertEquals(size, testByteArray.size());
+
+              // Get the expected exception
+              ByteArrayIndexOutOfBoundsException expectedEx = assertThrows(
+                ByteArrayIndexOutOfBoundsException.class,
+                () -> IndexingUtility.checkReadWrite(index, 2, size)
+              );
+
+              // Now test the byte array
+              ByteArrayIndexOutOfBoundsException actualEx = assertThrows(
+                ByteArrayIndexOutOfBoundsException.class,
+                () -> testByteArray.writeShort(index, (byte) 0)
+              );
+
+              // Check the message
+              assertEquals(expectedEx.getMessage(), actualEx.getMessage());
+
+            }finally{
+              cleanTestByteArray(testByteArray);
+            }
+
+          }catch(OutOfMemoryError oom){
+            System.gc();
+            oom.printStackTrace();
+            fail("Cannot perform test due to insufficient memory space");
+          }
+
+          // Clean up
+          System.gc();
+        }));
+      }
+
+      // Write test for index that exceeds capacity
+      for(int overlap = 0; overlap < 2; overlap++){
+        int finalOverlap = overlap;
+        tests.add(dynamicTest(f("writeShort({},short) on ByteArray of {}B size", size - overlap, size), () -> {
+
+          // Wrap in try and catch for possible OOM if trying to allocate max memory
+          try{
+
+            // Allocate the readonly bytearray
+            WriteOnlyByteArray testByteArray = createTestWriteOnlyByteArray(size);
+
+            // Assert readonly if applicable
+            if(!isReadableWritableOK()) assertFalse(testByteArray instanceof ReadableWritableByteArray);
+
+            try{
+
+              // Assert size
+              assertEquals(size, testByteArray.size());
+
+              // Get the expected exception
+              var expectedEx = assertThrows(
+                ByteArrayLengthOverBoundsException.class,
+                () -> IndexingUtility.checkReadWrite(size - finalOverlap, 2, size)
+              );
+
+              // Now test the byte array
+              var actualEx = assertThrows(
+                ByteArrayLengthOverBoundsException.class,
+                () -> testByteArray.writeShort(size - finalOverlap, (byte) 0)
+              );
+
+              // Check the message
+              assertEquals(expectedEx.getMessage(), actualEx.getMessage());
+
+            }finally{
+              cleanTestByteArray(testByteArray);
+            }
+
+          }catch(OutOfMemoryError oom){
+            System.gc();
+            oom.printStackTrace();
+            System.out.println("Out of memory. Cannot perform this test due to insufficient memory space");
+            fail("Cannot perform test due to insufficient memory space");
+          }
+
+          // Clean up
+          System.gc();
+        }));
+      }
+
+      // Write test for index that exceeds capacity (random)
+      for(int trial = 0; trial < TRIALS; trial++){
+        long index = size + Math.abs(rng.nextInt());
+        tests.add(dynamicTest(f("writeShort({},short) on ByteArray of {}B size", index, size), () -> {
+
+          // Wrap in try and catch for possible OOM if trying to allocate max memory
+          try{
+
+            // Allocate the readonly bytearray
+            WriteOnlyByteArray testByteArray = createTestWriteOnlyByteArray(size);
+
+            // Assert readonly if applicable
+            if(!isReadableWritableOK()) assertFalse(testByteArray instanceof ReadableWritableByteArray);
+
+            try{
+
+              // Assert size
+              assertEquals(size, testByteArray.size());
+
+              // Get the expected exception
+              ByteArrayIndexOutOfBoundsException expectedEx = assertThrows(
+                ByteArrayIndexOutOfBoundsException.class,
+                () -> IndexingUtility.checkReadWrite(index, 2, size)
+              );
+
+              // Now test the byte array
+              ByteArrayIndexOutOfBoundsException actualEx = assertThrows(
+                ByteArrayIndexOutOfBoundsException.class,
+                () -> testByteArray.writeShort(index, (byte) 0)
               );
 
               // Check the message
