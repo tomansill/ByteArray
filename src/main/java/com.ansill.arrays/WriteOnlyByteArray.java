@@ -240,6 +240,8 @@ public interface WriteOnlyByteArray extends ByteArray{
    * index on {@link WriteOnlyByteArray} in a reverse order meaning first bytes on this {@link WriteOnlyByteArray}
    * will be written from last byte positions of the source {@link ReadOnlyByteArray} and continue to be written
    * with bytes from source {@link ReadOnlyByteArray} until its first byte positions.
+   * <p>
+   * This call is equivalent to calling normal @{code write(long,ReadOnlyByteArray)} then reversing the {@link ReadOnlyByteArray}.
    *
    * @param byteIndex non-negative index on this {@link WriteOnlyByteArray}
    * @param source    source {@link ReadOnlyByteArray} to copy bytes to this {@link WriteOnlyByteArray}

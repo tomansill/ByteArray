@@ -401,9 +401,9 @@ public interface SelfReadOnlyByteArrayTest extends BaseReadOnlyByteArrayTest, Se
     return tests;
   }
 
-  @DisplayName("Test valid readShort(long) calls")
+  @DisplayName("Test valid readShortBE(long) calls")
   @TestFactory
-  default Iterable<DynamicTest> testValidReadShortCalls(){
+  default Iterable<DynamicTest> testValidReadShortBECalls(){
 
     // Set up test container
     var tests = new LinkedList<DynamicTest>();
@@ -427,7 +427,7 @@ public interface SelfReadOnlyByteArrayTest extends BaseReadOnlyByteArrayTest, Se
       int testLocalSeed = (int) (rng.nextInt() + size);
 
       // Write test
-      tests.add(dynamicTest(f("full readShort(long) on ByteArray of {}B size", size), () -> {
+      tests.add(dynamicTest(f("full readShortBE(long) on ByteArray of {}B size", size), () -> {
 
         // Wrap in try and catch for possible OOM if trying to allocate max memory
         try{
@@ -482,9 +482,90 @@ public interface SelfReadOnlyByteArrayTest extends BaseReadOnlyByteArrayTest, Se
     return tests;
   }
 
-  @DisplayName("Test valid readInt(long) calls")
+  @DisplayName("Test valid readShortLE(long) calls")
   @TestFactory
-  default Iterable<DynamicTest> testValidReadIntCalls(){
+  default Iterable<DynamicTest> testValidReadShortLECalls(){
+
+    // Set up test container
+    var tests = new LinkedList<DynamicTest>();
+
+    // Get RNG
+    var rng = getRNG();
+
+    // Sizes to test
+    var sizesToTest = new HashSet<Long>();
+    sizesToTest.add(2L); // Test size of two
+    //sizesToTest.add((long) (Short.MAX_VALUE * 4)); // Silly big
+    for(int trial = 0; trial < TRIALS; trial++){ // Add random sizes to try
+      if(sizesToTest.add((long) rng.nextInt(500) + 5)) continue;
+      trial--; // Existing number, try again
+    }
+
+    // Run the tests
+    for(long size : sizesToTest){
+
+      // Get test-local RNG seed
+      int testLocalSeed = (int) (rng.nextInt() + size);
+
+      // Write test
+      tests.add(dynamicTest(f("full readShortLE(long) on ByteArray of {}B size", size), () -> {
+
+        // Wrap in try and catch for possible OOM if trying to allocate max memory
+        try{
+
+          // Allocate the readonly bytearray
+          var testByteArray = createTestReadOnlyByteArray(size);
+
+          // Assert readonly if applicable
+          if(!isReadableWritableOK()) assertFalse(testByteArray instanceof ReadableWritableByteArray);
+
+          try{
+
+            // Assert size
+            assertEquals(size, testByteArray.size());
+
+            // Write random bytes to test bytearray
+            {
+              var testRNG = new Random(testLocalSeed);
+              for(long index = 0; index < size; index++){
+                writeTestReadOnlyByteArray(testByteArray, index, (byte) testRNG.nextInt());
+              }
+            }
+
+            // Now check them all
+            {
+              var testRNG = new Random(testLocalSeed);
+              int randBuf = (0xff & testRNG.nextInt()); // Pre-roll
+              for(long index = 0; index < size - 1; index++){
+                randBuf <<= 8;
+                randBuf |= (0xff & testRNG.nextInt());
+                short expected = (short) (((0xff & randBuf) << 8) | ((0xff00 & randBuf) >> 8));
+                assertEquals(expected, testByteArray.readShortLE(index), "Index: " + index);
+              }
+            }
+          }finally{
+            cleanTestByteArray(testByteArray);
+          }
+
+        }catch(OutOfMemoryError oom){
+          System.gc();
+          oom.printStackTrace();
+          System.out.println("Out of memory. Cannot perform this test due to insufficient memory space");
+          fail("Cannot perform test due to insufficient memory space");
+        }
+
+        // Clean up
+        System.gc();
+      }));
+    }
+
+    // Return tests
+    return tests;
+  }
+
+  @DisplayName("Test valid readIntBE(long) calls")
+  @TestFactory
+  default Iterable<DynamicTest> testValidReadIntBECalls(){
 
     // Set up test container
     var tests = new LinkedList<DynamicTest>();
@@ -508,7 +589,7 @@ public interface SelfReadOnlyByteArrayTest extends BaseReadOnlyByteArrayTest, Se
       int testLocalSeed = (int) (rng.nextInt() + size);
 
       // Write test
-      tests.add(dynamicTest(f("full readInt(long) on ByteArray of {}B size", size), () -> {
+      tests.add(dynamicTest(f("full readIntBE(long) on ByteArray of {}B size", size), () -> {
 
         // Wrap in try and catch for possible OOM if trying to allocate max memory
         try{
@@ -564,9 +645,95 @@ public interface SelfReadOnlyByteArrayTest extends BaseReadOnlyByteArrayTest, Se
     return tests;
   }
 
-  @DisplayName("Test valid readLong(long) calls")
+  @DisplayName("Test valid readIntLE(long) calls")
   @TestFactory
-  default Iterable<DynamicTest> testValidReadLongCalls(){
+  default Iterable<DynamicTest> testValidReadIntLECalls(){
+
+    // Set up test container
+    var tests = new LinkedList<DynamicTest>();
+
+    // Get RNG
+    var rng = getRNG();
+
+    // Sizes to test
+    var sizesToTest = new HashSet<Long>();
+    sizesToTest.add(4L); // Test size of four
+    //sizesToTest.add((long) (Short.MAX_VALUE * 4)); // Silly big
+    for(int trial = 0; trial < TRIALS; trial++){ // Add random sizes to try
+      if(sizesToTest.add((long) rng.nextInt(500) + 5)) continue;
+      trial--; // Existing number, try again
+    }
+
+    // Run the tests
+    for(long size : sizesToTest){
+
+      // Get test-local RNG seed
+      int testLocalSeed = (int) (rng.nextInt() + size);
+
+      // Write test
+      tests.add(dynamicTest(f("full readIntLE(long) on ByteArray of {}B size", size), () -> {
+
+        // Wrap in try and catch for possible OOM if trying to allocate max memory
+        try{
+
+          // Allocate the readonly bytearray
+          var testByteArray = createTestReadOnlyByteArray(size);
+
+          // Assert readonly if applicable
+          if(!isReadableWritableOK()) assertFalse(testByteArray instanceof ReadableWritableByteArray);
+
+          try{
+
+            // Assert size
+            assertEquals(size, testByteArray.size());
+
+            // Write random bytes to test bytearray
+            {
+              var testRNG = new Random(testLocalSeed);
+              for(long index = 0; index < size; index++){
+                writeTestReadOnlyByteArray(testByteArray, index, (byte) testRNG.nextInt());
+              }
+            }
+
+            // Now check them all
+            {
+              var testRNG = new Random(testLocalSeed);
+              int randBuf = (0xff & testRNG.nextInt()) << 8; // Pre-roll
+              randBuf = (randBuf | (0xff & testRNG.nextInt())) << 8; // Pre-roll
+              randBuf = (randBuf | (0xff & testRNG.nextInt())); // Pre-roll
+              for(long index = 0; index < size - 3; index++){
+                randBuf <<= 8;
+                randBuf |= (0xff & testRNG.nextInt());
+                int expected = (randBuf << 24) |
+                               ((0xff00 & randBuf) << 8) |
+                               ((0xff0000 & randBuf) >>> 8) |
+                               (randBuf >>> 24);
+                assertEquals(expected, testByteArray.readIntLE(index), "Index: " + index);
+              }
+            }
+          }finally{
+            cleanTestByteArray(testByteArray);
+          }
+
+        }catch(OutOfMemoryError oom){
+          System.gc();
+          oom.printStackTrace();
+          System.out.println("Out of memory. Cannot perform this test due to insufficient memory space");
+          fail("Cannot perform test due to insufficient memory space");
+        }
+
+        // Clean up
+        System.gc();
+      }));
+    }
+
+    // Return tests
+    return tests;
+  }
+
+  @DisplayName("Test valid readLongBE(long) calls")
+  @TestFactory
+  default Iterable<DynamicTest> testValidReadLongBECalls(){
 
     // Set up test container
     var tests = new LinkedList<DynamicTest>();
@@ -590,7 +757,7 @@ public interface SelfReadOnlyByteArrayTest extends BaseReadOnlyByteArrayTest, Se
       int testLocalSeed = (int) (rng.nextInt() + size);
 
       // Write test
-      tests.add(dynamicTest(f("full readLong(long) on ByteArray of {}B size", size), () -> {
+      tests.add(dynamicTest(f("full readLongBE(long) on ByteArray of {}B size", size), () -> {
 
         // Wrap in try and catch for possible OOM if trying to allocate max memory
         try{
@@ -650,9 +817,103 @@ public interface SelfReadOnlyByteArrayTest extends BaseReadOnlyByteArrayTest, Se
     return tests;
   }
 
-  @DisplayName("Test valid readFloat(long) calls")
+  @DisplayName("Test valid readLongLE(long) calls")
   @TestFactory
-  default Iterable<DynamicTest> testValidReadFloatCalls(){
+  default Iterable<DynamicTest> testValidReadLongLECalls(){
+
+    // Set up test container
+    var tests = new LinkedList<DynamicTest>();
+
+    // Get RNG
+    var rng = getRNG();
+
+    // Sizes to test
+    var sizesToTest = new HashSet<Long>();
+    sizesToTest.add(8L); // Test size of eight
+    //sizesToTest.add((long) (Short.MAX_VALUE * 4)); // Silly big
+    for(int trial = 0; trial < TRIALS; trial++){ // Add random sizes to try
+      if(sizesToTest.add((long) rng.nextInt(500) + 5)) continue;
+      trial--; // Existing number, try again
+    }
+
+    // Run the tests
+    for(long size : sizesToTest){
+
+      // Get test-local RNG seed
+      int testLocalSeed = (int) (rng.nextInt() + size);
+
+      // Write test
+      tests.add(dynamicTest(f("full readLongLE(long) on ByteArray of {}B size", size), () -> {
+
+        // Wrap in try and catch for possible OOM if trying to allocate max memory
+        try{
+
+          // Allocate the readonly bytearray
+          var testByteArray = createTestReadOnlyByteArray(size);
+
+          // Assert readonly if applicable
+          if(!isReadableWritableOK()) assertFalse(testByteArray instanceof ReadableWritableByteArray);
+
+          try{
+
+            // Assert size
+            assertEquals(size, testByteArray.size());
+
+            // Write random bytes to test bytearray
+            {
+              var testRNG = new Random(testLocalSeed);
+              for(long index = 0; index < size; index++){
+                writeTestReadOnlyByteArray(testByteArray, index, (byte) testRNG.nextInt());
+              }
+            }
+
+            // Now check them all
+            {
+              var testRNG = new Random(testLocalSeed);
+              long randBuf = (0xff & testRNG.nextInt()) << 8; // Pre-roll
+              randBuf = (randBuf | (0xff & testRNG.nextInt())) << 8; // Pre-roll
+              randBuf = (randBuf | (0xff & testRNG.nextInt())) << 8; // Pre-roll
+              randBuf = (randBuf | (0xff & testRNG.nextInt())) << 8; // Pre-roll
+              randBuf = (randBuf | (0xff & testRNG.nextInt())) << 8; // Pre-roll
+              randBuf = (randBuf | (0xff & testRNG.nextInt())) << 8; // Pre-roll
+              randBuf = (randBuf | (0xff & testRNG.nextInt())); // Pre-roll
+              for(long index = 0; index < size - 7; index++){
+                randBuf <<= 8;
+                randBuf |= (0xff & testRNG.nextInt());
+                long expected = (randBuf << 56);
+                expected |= ((0xff00 & randBuf) << 40);
+                expected |= ((0xff0000 & randBuf) << 24);
+                expected |= ((0xff000000L & randBuf) << 8);
+                expected |= ((0xff00000000L & randBuf) >>> 8);
+                expected |= ((0xff0000000000L & randBuf) >>> 24);
+                expected |= ((0xff000000000000L & randBuf) >>> 40);
+                expected |= (randBuf >>> 56);
+                assertEquals(expected, testByteArray.readLongLE(index), "Index: " + index);
+              }
+            }
+          }finally{
+            cleanTestByteArray(testByteArray);
+          }
+
+        }catch(OutOfMemoryError oom){
+          System.gc();
+          oom.printStackTrace();
+          System.out.println("Out of memory. Cannot perform this test due to insufficient memory space");
+          fail("Cannot perform test due to insufficient memory space");
+        }
+
+        // Clean up
+        System.gc();
+      }));
+    }
+
+    // Return tests
+    return tests;
+  }
+
+  @DisplayName("Test valid readFloatBE(long) calls")
+  @TestFactory
+  default Iterable<DynamicTest> testValidReadFloatBECalls(){
 
     // Set up test container
     var tests = new LinkedList<DynamicTest>();
@@ -676,7 +937,7 @@ public interface SelfReadOnlyByteArrayTest extends BaseReadOnlyByteArrayTest, Se
       int testLocalSeed = (int) (rng.nextInt() + size);
 
       // Write test
-      tests.add(dynamicTest(f("full readFloat(long) on ByteArray of {}B size", size), () -> {
+      tests.add(dynamicTest(f("full readFloatBE(long) on ByteArray of {}B size", size), () -> {
 
         // Wrap in try and catch for possible OOM if trying to allocate max memory
         try{
@@ -732,9 +993,95 @@ public interface SelfReadOnlyByteArrayTest extends BaseReadOnlyByteArrayTest, Se
     return tests;
   }
 
-  @DisplayName("Test valid readDouble(long) calls")
+  @DisplayName("Test valid readFloatLE(long) calls")
   @TestFactory
-  default Iterable<DynamicTest> testValidReadDoubleCalls(){
+  default Iterable<DynamicTest> testValidReadFloatLECalls(){
+
+    // Set up test container
+    var tests = new LinkedList<DynamicTest>();
+
+    // Get RNG
+    var rng = getRNG();
+
+    // Sizes to test
+    var sizesToTest = new HashSet<Long>();
+    sizesToTest.add(4L); // Test size of four
+    //sizesToTest.add((long) (Short.MAX_VALUE * 4)); // Silly big
+    for(int trial = 0; trial < TRIALS; trial++){ // Add random sizes to try
+      if(sizesToTest.add((long) rng.nextInt(500) + 5)) continue;
+      trial--; // Existing number, try again
+    }
+
+    // Run the tests
+    for(long size : sizesToTest){
+
+      // Get test-local RNG seed
+      int testLocalSeed = (int) (rng.nextInt() + size);
+
+      // Write test
+      tests.add(dynamicTest(f("full readFloatLE(long) on ByteArray of {}B size", size), () -> {
+
+        // Wrap in try and catch for possible OOM if trying to allocate max memory
+        try{
+
+          // Allocate the readonly bytearray
+          var testByteArray = createTestReadOnlyByteArray(size);
+
+          // Assert readonly if applicable
+          if(!isReadableWritableOK()) assertFalse(testByteArray instanceof ReadableWritableByteArray);
+
+          try{
+
+            // Assert size
+            assertEquals(size, testByteArray.size());
+
+            // Write random bytes to test bytearray
+            {
+              var testRNG = new Random(testLocalSeed);
+              for(long index = 0; index < size; index++){
+                writeTestReadOnlyByteArray(testByteArray, index, (byte) testRNG.nextInt());
+              }
+            }
+
+            // Now check them all
+            {
+              var testRNG = new Random(testLocalSeed);
+              int randBuf = (0xff & testRNG.nextInt()) << 8; // Pre-roll
+              randBuf = (randBuf | (0xff & testRNG.nextInt())) << 8; // Pre-roll
+              randBuf = (randBuf | (0xff & testRNG.nextInt())); // Pre-roll
+              for(long index = 0; index < size - 3; index++){
+                randBuf <<= 8;
+                randBuf |= (0xff & testRNG.nextInt());
+                int expected = (randBuf << 24) |
+                               ((0xff00 & randBuf) << 8) |
+                               ((0xff0000 & randBuf) >>> 8) |
+                               (randBuf >>> 24);
+                assertEquals(Float.intBitsToFloat(expected), testByteArray.readFloatLE(index), "Index: " + index);
+              }
+            }
+          }finally{
+            cleanTestByteArray(testByteArray);
+          }
+
+        }catch(OutOfMemoryError oom){
+          System.gc();
+          oom.printStackTrace();
+          System.out.println("Out of memory. Cannot perform this test due to insufficient memory space");
+          fail("Cannot perform test due to insufficient memory space");
+        }
+
+        // Clean up
+        System.gc();
+      }));
+    }
+
+    // Return tests
+    return tests;
+  }
+
+  @DisplayName("Test valid readDoubleBE(long) calls")
+  @TestFactory
+  default Iterable<DynamicTest> testValidReadDoubleBECalls(){
 
     // Set up test container
     var tests = new LinkedList<DynamicTest>();
@@ -758,7 +1105,7 @@ public interface SelfReadOnlyByteArrayTest extends BaseReadOnlyByteArrayTest, Se
       int testLocalSeed = (int) (rng.nextInt() + size);
 
       // Write test
-      tests.add(dynamicTest(f("full readDouble(long) on ByteArray of {}B size", size), () -> {
+      tests.add(dynamicTest(f("full readDoubleBE(long) on ByteArray of {}B size", size), () -> {
 
         // Wrap in try and catch for possible OOM if trying to allocate max memory
         try{
@@ -796,6 +1143,100 @@ public interface SelfReadOnlyByteArrayTest extends BaseReadOnlyByteArrayTest, Se
                 randBuf <<= 8;
                 randBuf |= (0xff & testRNG.nextInt());
                 assertEquals(Double.longBitsToDouble(randBuf), testByteArray.readDoubleBE(index), "Index: " + index);
+              }
+            }
+          }finally{
+            cleanTestByteArray(testByteArray);
+          }
+
+        }catch(OutOfMemoryError oom){
+          System.gc();
+          oom.printStackTrace();
+          System.out.println("Out of memory. Cannot perform this test due to insufficient memory space");
+          fail("Cannot perform test due to insufficient memory space");
+        }
+
+        // Clean up
+        System.gc();
+      }));
+    }
+
+    // Return tests
+    return tests;
+  }
+
+  @DisplayName("Test valid readDoubleLE(long) calls")
+  @TestFactory
+  default Iterable<DynamicTest> testValidReadDoubleLECalls(){
+
+    // Set up test container
+    var tests = new LinkedList<DynamicTest>();
+
+    // Get RNG
+    var rng = getRNG();
+
+    // Sizes to test
+    var sizesToTest = new HashSet<Long>();
+    sizesToTest.add(8L); // Test size of eight
+    //sizesToTest.add((long) (Short.MAX_VALUE * 4)); // Silly big
+    for(int trial = 0; trial < TRIALS; trial++){ // Add random sizes to try
+      if(sizesToTest.add((long) rng.nextInt(500) + 5)) continue;
+      trial--; // Existing number, try again
+    }
+
+    // Run the tests
+    for(long size : sizesToTest){
+
+      // Get test-local RNG seed
+      int testLocalSeed = (int) (rng.nextInt() + size);
+
+      // Write test
+      tests.add(dynamicTest(f("full readDoubleLE(long) on ByteArray of {}B size", size), () -> {
+
+        // Wrap in try and catch for possible OOM if trying to allocate max memory
+        try{
+
+          // Allocate the readonly bytearray
+          var testByteArray = createTestReadOnlyByteArray(size);
+
+          // Assert readonly if applicable
+          if(!isReadableWritableOK()) assertFalse(testByteArray instanceof ReadableWritableByteArray);
+
+          try{
+
+            // Assert size
+            assertEquals(size, testByteArray.size());
+
+            // Write random bytes to test bytearray
+            {
+              var testRNG = new Random(testLocalSeed);
+              for(long index = 0; index < size; index++){
+                writeTestReadOnlyByteArray(testByteArray, index, (byte) testRNG.nextInt());
+              }
+            }
+
+            // Now check them all
+            {
+              var testRNG = new Random(testLocalSeed);
+              long randBuf = (0xff & testRNG.nextInt()) << 8; // Pre-roll
+              randBuf = (randBuf | (0xff & testRNG.nextInt())) << 8; // Pre-roll
+              randBuf = (randBuf | (0xff & testRNG.nextInt())) << 8; // Pre-roll
+              randBuf = (randBuf | (0xff & testRNG.nextInt())) << 8; // Pre-roll
+              randBuf = (randBuf | (0xff & testRNG.nextInt())) << 8; // Pre-roll
+              randBuf = (randBuf | (0xff & testRNG.nextInt())) << 8; // Pre-roll
+              randBuf = (randBuf | (0xff & testRNG.nextInt())); // Pre-roll
+              for(long index = 0; index < size - 7; index++){
+                randBuf <<= 8;
+                randBuf |= (0xff & testRNG.nextInt());
+                long expected = (randBuf << 56);
+                expected |= ((0xff00 & randBuf) << 40);
+                expected |= ((0xff0000 & randBuf) << 24);
+                expected |= ((0xff000000L & randBuf) << 8);
+                expected |= ((0xff00000000L & randBuf) >>> 8);
+                expected |= ((0xff0000000000L & randBuf) >>> 24);
+                expected |= ((0xff000000000000L & randBuf) >>> 40);
+                expected |= (randBuf >>> 56);
+                assertEquals(Double.longBitsToDouble(expected), testByteArray.readDoubleLE(index), "Index: " + index);
               }
             }
           }finally{
@@ -1223,9 +1664,9 @@ public interface SelfReadOnlyByteArrayTest extends BaseReadOnlyByteArrayTest, Se
     return tests;
   }
 
-  @DisplayName("Test bad readShort(long) calls")
+  @DisplayName("Test bad readShortBE(long) calls")
   @TestFactory
-  default Iterable<DynamicTest> testInvalidReadShortCalls(){
+  default Iterable<DynamicTest> testInvalidReadShortBECalls(){
 
     // Set up test container
     var tests = new LinkedList<DynamicTest>();
@@ -1245,7 +1686,7 @@ public interface SelfReadOnlyByteArrayTest extends BaseReadOnlyByteArrayTest, Se
     for(long size : sizesToTest){
 
       // Write test for negative index (-1)
-      tests.add(dynamicTest(f("readShort(-1) on ByteArray of {}B size", size), () -> {
+      tests.add(dynamicTest(f("readShortBE(-1) on ByteArray of {}B size", size), () -> {
 
         // Wrap in try and catch for possible OOM if trying to allocate max memory
         try{
@@ -1270,7 +1711,7 @@ public interface SelfReadOnlyByteArrayTest extends BaseReadOnlyByteArrayTest, Se
             // Now test the byte array
             ByteArrayIndexOutOfBoundsException actualEx = assertThrows(
               ByteArrayIndexOutOfBoundsException.class,
-              () -> testByteArray.readByte(-1)
+              () -> testByteArray.readShortBE(-1)
             );
 
             // Check the message
@@ -1294,7 +1735,7 @@ public interface SelfReadOnlyByteArrayTest extends BaseReadOnlyByteArrayTest, Se
       // Write test for negative indices (random)
       for(int trial = 0; trial < TRIALS; trial++){
         long index = -Math.abs(rng.nextInt() + 500_000);
-        tests.add(dynamicTest(f("readShort({}) on ByteArray of {}B size", index, size), () -> {
+        tests.add(dynamicTest(f("readShortBE({}) on ByteArray of {}B size", index, size), () -> {
 
           // Wrap in try and catch for possible OOM if trying to allocate max memory
           try{
@@ -1319,7 +1760,7 @@ public interface SelfReadOnlyByteArrayTest extends BaseReadOnlyByteArrayTest, Se
               // Now test the byte array
               ByteArrayIndexOutOfBoundsException actualEx = assertThrows(
                 ByteArrayIndexOutOfBoundsException.class,
-                () -> testByteArray.readByte(index)
+                () -> testByteArray.readShortBE(index)
               );
 
               // Check the message
@@ -1341,7 +1782,7 @@ public interface SelfReadOnlyByteArrayTest extends BaseReadOnlyByteArrayTest, Se
       }
 
       // Write test for index that exceeds capacity
-      tests.add(dynamicTest(f("readShort({}) on ByteArray of {}B size", size, size), () -> {
+      tests.add(dynamicTest(f("readShortBE({}) on ByteArray of {}B size", size, size), () -> {
 
         // Wrap in try and catch for possible OOM if trying to allocate max memory
         try{
@@ -1366,7 +1807,7 @@ public interface SelfReadOnlyByteArrayTest extends BaseReadOnlyByteArrayTest, Se
             // Now test the byte array
             ByteArrayIndexOutOfBoundsException actualEx = assertThrows(
               ByteArrayIndexOutOfBoundsException.class,
-              () -> testByteArray.readByte(size)
+              () -> testByteArray.readShortBE(size)
             );
 
             // Check the message
@@ -1390,7 +1831,7 @@ public interface SelfReadOnlyByteArrayTest extends BaseReadOnlyByteArrayTest, Se
       // Write test for index that exceeds capacity (random)
       for(int trial = 0; trial < TRIALS; trial++){
         long index = size + Math.abs(rng.nextInt());
-        tests.add(dynamicTest(f("readShort({}) on ByteArray of {}B size", index, size), () -> {
+        tests.add(dynamicTest(f("readShortBE({}) on ByteArray of {}B size", index, size), () -> {
 
           // Wrap in try and catch for possible OOM if trying to allocate max memory
           try{
@@ -1415,7 +1856,7 @@ public interface SelfReadOnlyByteArrayTest extends BaseReadOnlyByteArrayTest, Se
               // Now test the byte array
               ByteArrayIndexOutOfBoundsException actualEx = assertThrows(
                 ByteArrayIndexOutOfBoundsException.class,
-                () -> testByteArray.readByte(index)
+                () -> testByteArray.readShortBE(index)
               );
 
               // Check the message
@@ -1437,7 +1878,7 @@ public interface SelfReadOnlyByteArrayTest extends BaseReadOnlyByteArrayTest, Se
       }
 
       // Write test for length that exceeds capacity
-      tests.add(dynamicTest(f("readShort({}) on ByteArray of {}B size", size - 1, size), () -> {
+      tests.add(dynamicTest(f("readShortBE({}) on ByteArray of {}B size", size - 1, size), () -> {
 
         // Wrap in try and catch for possible OOM if trying to allocate max memory
         try{
@@ -1488,9 +1929,9 @@ public interface SelfReadOnlyByteArrayTest extends BaseReadOnlyByteArrayTest, Se
     return tests;
   }
 
-  @DisplayName("Test bad readInt(long) calls")
+  @DisplayName("Test bad readShortLE(long) calls")
   @TestFactory
-  default Iterable<DynamicTest> testInvalidReadIntCalls(){
+  default Iterable<DynamicTest> testInvalidReadShortLECalls(){
 
     // Set up test container
     var tests = new LinkedList<DynamicTest>();
@@ -1510,7 +1951,7 @@ public interface SelfReadOnlyByteArrayTest extends BaseReadOnlyByteArrayTest, Se
     for(long size : sizesToTest){
 
       // Write test for negative index (-1)
-      tests.add(dynamicTest(f("readInt(-1) on ByteArray of {}B size", size), () -> {
+      tests.add(dynamicTest(f("readShortLE(-1) on ByteArray of {}B size", size), () -> {
 
         // Wrap in try and catch for possible OOM if trying to allocate max memory
         try{
@@ -1535,7 +1976,7 @@ public interface SelfReadOnlyByteArrayTest extends BaseReadOnlyByteArrayTest, Se
             // Now test the byte array
             ByteArrayIndexOutOfBoundsException actualEx = assertThrows(
               ByteArrayIndexOutOfBoundsException.class,
-              () -> testByteArray.readByte(-1)
+              () -> testByteArray.readShortLE(-1)
             );
 
             // Check the message
@@ -1559,7 +2000,7 @@ public interface SelfReadOnlyByteArrayTest extends BaseReadOnlyByteArrayTest, Se
       // Write test for negative indices (random)
       for(int trial = 0; trial < TRIALS; trial++){
         long index = -Math.abs(rng.nextInt() + 500_000);
-        tests.add(dynamicTest(f("readInt({}) on ByteArray of {}B size", index, size), () -> {
+        tests.add(dynamicTest(f("readShortLE({}) on ByteArray of {}B size", index, size), () -> {
 
           // Wrap in try and catch for possible OOM if trying to allocate max memory
           try{
@@ -1584,7 +2025,7 @@ public interface SelfReadOnlyByteArrayTest extends BaseReadOnlyByteArrayTest, Se
               // Now test the byte array
               ByteArrayIndexOutOfBoundsException actualEx = assertThrows(
                 ByteArrayIndexOutOfBoundsException.class,
-                () -> testByteArray.readByte(index)
+                () -> testByteArray.readShortLE(index)
               );
 
               // Check the message
@@ -1606,7 +2047,7 @@ public interface SelfReadOnlyByteArrayTest extends BaseReadOnlyByteArrayTest, Se
       }
 
       // Write test for index that exceeds capacity
-      tests.add(dynamicTest(f("readInt({}) on ByteArray of {}B size", size, size), () -> {
+      tests.add(dynamicTest(f("readShortLE({}) on ByteArray of {}B size", size, size), () -> {
 
         // Wrap in try and catch for possible OOM if trying to allocate max memory
         try{
@@ -1631,7 +2072,7 @@ public interface SelfReadOnlyByteArrayTest extends BaseReadOnlyByteArrayTest, Se
             // Now test the byte array
             ByteArrayIndexOutOfBoundsException actualEx = assertThrows(
               ByteArrayIndexOutOfBoundsException.class,
-              () -> testByteArray.readByte(size)
+              () -> testByteArray.readShortLE(size)
             );
 
             // Check the message
@@ -1655,7 +2096,7 @@ public interface SelfReadOnlyByteArrayTest extends BaseReadOnlyByteArrayTest, Se
       // Write test for index that exceeds capacity (random)
       for(int trial = 0; trial < TRIALS; trial++){
         long index = size + Math.abs(rng.nextInt());
-        tests.add(dynamicTest(f("readInt({}) on ByteArray of {}B size", index, size), () -> {
+        tests.add(dynamicTest(f("readShortLE({}) on ByteArray of {}B size", index, size), () -> {
 
           // Wrap in try and catch for possible OOM if trying to allocate max memory
           try{
@@ -1680,7 +2121,7 @@ public interface SelfReadOnlyByteArrayTest extends BaseReadOnlyByteArrayTest, Se
               // Now test the byte array
               ByteArrayIndexOutOfBoundsException actualEx = assertThrows(
                 ByteArrayIndexOutOfBoundsException.class,
-                () -> testByteArray.readByte(index)
+                () -> testByteArray.readShortLE(index)
               );
 
               // Check the message
@@ -1702,7 +2143,272 @@ public interface SelfReadOnlyByteArrayTest extends BaseReadOnlyByteArrayTest, Se
       }
 
       // Write test for length that exceeds capacity
-      tests.add(dynamicTest(f("readInt({}) on ByteArray of {}B size", size - 1, size), () -> {
+      tests.add(dynamicTest(f("readShortLE({}) on ByteArray of {}B size", size - 1, size), () -> {
+
+        // Wrap in try and catch for possible OOM if trying to allocate max memory
+        try{
+
+          // Allocate the readonly bytearray
+          var testByteArray = createTestReadOnlyByteArray(size);
+
+          // Assert readonly if applicable
+          if(!isReadableWritableOK()) assertFalse(testByteArray instanceof ReadableWritableByteArray);
+
+          try{
+
+            // Assert size
+            assertEquals(size, testByteArray.size());
+
+            // Get the expected exception
+            var expectedEx = assertThrows(
+              ByteArrayLengthOverBoundsException.class,
+              () -> IndexingUtility.checkReadWrite(size - 1, 2, size)
+            );
+
+            // Now test the byte array
+            var actualEx = assertThrows(
+              ByteArrayLengthOverBoundsException.class,
+              () -> testByteArray.readShortLE(size - 1)
+            );
+
+            // Check the message
+            assertEquals(expectedEx.getMessage(), actualEx.getMessage());
+
+          }finally{
+            cleanTestByteArray(testByteArray);
+          }
+
+        }catch(OutOfMemoryError oom){
+          System.gc();
+          oom.printStackTrace();
+          System.out.println("Out of memory. Cannot perform this test due to insufficient memory space");
+          fail("Cannot perform test due to insufficient memory space");
+        }
+
+        // Clean up
+        System.gc();
+      }));
+    }
+
+    // Return tests
+    return tests;
+  }
+
+  @DisplayName("Test bad readIntBE(long) calls")
+  @TestFactory
+  default Iterable<DynamicTest> testInvalidReadIntBECalls(){
+
+    // Set up test container
+    var tests = new LinkedList<DynamicTest>();
+
+    // Get RNG
+    var rng = getRNG();
+
+    // Sizes to test
+    var sizesToTest = new HashSet<Long>();
+    sizesToTest.add(1L); // Test size of one
+    for(int trial = 0; trial < TRIALS; trial++){ // Add random sizes to try
+      if(sizesToTest.add((long) rng.nextInt(500) + 5)) continue;
+      trial--; // Existing number, try again
+    }
+
+    // Run the tests
+    for(long size : sizesToTest){
+
+      // Write test for negative index (-1)
+      tests.add(dynamicTest(f("readIntBE(-1) on ByteArray of {}B size", size), () -> {
+
+        // Wrap in try and catch for possible OOM if trying to allocate max memory
+        try{
+
+          // Allocate the readonly bytearray
+          ReadOnlyByteArray testByteArray = createTestReadOnlyByteArray(size);
+
+          // Assert readonly if applicable
+          if(!isReadableWritableOK()) assertFalse(testByteArray instanceof ReadableWritableByteArray);
+
+          try{
+
+            // Assert size
+            assertEquals(size, testByteArray.size());
+
+            // Get the expected exception
+            ByteArrayIndexOutOfBoundsException expectedEx = assertThrows(
+              ByteArrayIndexOutOfBoundsException.class,
+              () -> IndexingUtility.checkReadWriteByte(-1, size)
+            );
+
+            // Now test the byte array
+            ByteArrayIndexOutOfBoundsException actualEx = assertThrows(
+              ByteArrayIndexOutOfBoundsException.class,
+              () -> testByteArray.readIntBE(-1)
+            );
+
+            // Check the message
+            assertEquals(expectedEx.getMessage(), actualEx.getMessage());
+
+          }finally{
+            cleanTestByteArray(testByteArray);
+          }
+
+        }catch(OutOfMemoryError oom){
+          System.gc();
+          oom.printStackTrace();
+          System.out.println("Out of memory. Cannot perform this test due to insufficient memory space");
+          fail("Cannot perform test due to insufficient memory space");
+        }
+
+        // Clean up
+        System.gc();
+      }));
+
+      // Write test for negative indices (random)
+      for(int trial = 0; trial < TRIALS; trial++){
+        long index = -Math.abs(rng.nextInt() + 500_000);
+        tests.add(dynamicTest(f("readIntBE({}) on ByteArray of {}B size", index, size), () -> {
+
+          // Wrap in try and catch for possible OOM if trying to allocate max memory
+          try{
+
+            // Allocate the readonly bytearray
+            ReadOnlyByteArray testByteArray = createTestReadOnlyByteArray(size);
+
+            // Assert readonly if applicable
+            if(!isReadableWritableOK()) assertFalse(testByteArray instanceof ReadableWritableByteArray);
+
+            try{
+
+              // Assert size
+              assertEquals(size, testByteArray.size());
+
+              // Get the expected exception
+              ByteArrayIndexOutOfBoundsException expectedEx = assertThrows(
+                ByteArrayIndexOutOfBoundsException.class,
+                () -> IndexingUtility.checkReadWriteByte(index, size)
+              );
+
+              // Now test the byte array
+              ByteArrayIndexOutOfBoundsException actualEx = assertThrows(
+                ByteArrayIndexOutOfBoundsException.class,
+                () -> testByteArray.readIntBE(index)
+              );
+
+              // Check the message
+              assertEquals(expectedEx.getMessage(), actualEx.getMessage());
+
+            }finally{
+              cleanTestByteArray(testByteArray);
+            }
+
+          }catch(OutOfMemoryError oom){
+            System.gc();
+            oom.printStackTrace();
+            fail("Cannot perform test due to insufficient memory space");
+          }
+
+          // Clean up
+          System.gc();
+        }));
+      }
+
+      // Write test for index that exceeds capacity
+      tests.add(dynamicTest(f("readIntBE({}) on ByteArray of {}B size", size, size), () -> {
+
+        // Wrap in try and catch for possible OOM if trying to allocate max memory
+        try{
+
+          // Allocate the readonly bytearray
+          ReadOnlyByteArray testByteArray = createTestReadOnlyByteArray(size);
+
+          // Assert readonly if applicable
+          if(!isReadableWritableOK()) assertFalse(testByteArray instanceof ReadableWritableByteArray);
+
+          try{
+
+            // Assert size
+            assertEquals(size, testByteArray.size());
+
+            // Get the expected exception
+            ByteArrayIndexOutOfBoundsException expectedEx = assertThrows(
+              ByteArrayIndexOutOfBoundsException.class,
+              () -> IndexingUtility.checkReadWriteByte(size, size)
+            );
+
+            // Now test the byte array
+            ByteArrayIndexOutOfBoundsException actualEx = assertThrows(
+              ByteArrayIndexOutOfBoundsException.class,
+              () -> testByteArray.readIntBE(size)
+            );
+
+            // Check the message
+            assertEquals(expectedEx.getMessage(), actualEx.getMessage());
+
+          }finally{
+            cleanTestByteArray(testByteArray);
+          }
+
+        }catch(OutOfMemoryError oom){
+          System.gc();
+          oom.printStackTrace();
+          System.out.println("Out of memory. Cannot perform this test due to insufficient memory space");
+          fail("Cannot perform test due to insufficient memory space");
+        }
+
+        // Clean up
+        System.gc();
+      }));
+
+      // Write test for index that exceeds capacity (random)
+      for(int trial = 0; trial < TRIALS; trial++){
+        long index = size + Math.abs(rng.nextInt());
+        tests.add(dynamicTest(f("readIntBE({}) on ByteArray of {}B size", index, size), () -> {
+
+          // Wrap in try and catch for possible OOM if trying to allocate max memory
+          try{
+
+            // Allocate the readonly bytearray
+            ReadOnlyByteArray testByteArray = createTestReadOnlyByteArray(size);
+
+            // Assert readonly if applicable
+            if(!isReadableWritableOK()) assertFalse(testByteArray instanceof ReadableWritableByteArray);
+
+            try{
+
+              // Assert size
+              assertEquals(size, testByteArray.size());
+
+              // Get the expected exception
+              ByteArrayIndexOutOfBoundsException expectedEx = assertThrows(
+                ByteArrayIndexOutOfBoundsException.class,
+                () -> IndexingUtility.checkReadWriteByte(index, size)
+              );
+
+              // Now test the byte array
+              ByteArrayIndexOutOfBoundsException actualEx = assertThrows(
+                ByteArrayIndexOutOfBoundsException.class,
+                () -> testByteArray.readIntBE(index)
+              );
+
+              // Check the message
+              assertEquals(expectedEx.getMessage(), actualEx.getMessage());
+
+            }finally{
+              cleanTestByteArray(testByteArray);
+            }
+
+          }catch(OutOfMemoryError oom){
+            System.gc();
+            oom.printStackTrace();
+            fail("Cannot perform test due to insufficient memory space");
+          }
+
+          // Clean up
+          System.gc();
+        }));
+      }
+
+      // Write test for length that exceeds capacity
+      tests.add(dynamicTest(f("readIntBE({}) on ByteArray of {}B size", size - 1, size), () -> {
 
         // Wrap in try and catch for possible OOM if trying to allocate max memory
         try{
@@ -1753,9 +2459,9 @@ public interface SelfReadOnlyByteArrayTest extends BaseReadOnlyByteArrayTest, Se
     return tests;
   }
 
-  @DisplayName("Test bad readLong(long) calls")
+  @DisplayName("Test bad readIntLE(long) calls")
   @TestFactory
-  default Iterable<DynamicTest> testInvalidReadLongCalls(){
+  default Iterable<DynamicTest> testInvalidReadIntLECalls(){
 
     // Set up test container
     var tests = new LinkedList<DynamicTest>();
@@ -1775,7 +2481,7 @@ public interface SelfReadOnlyByteArrayTest extends BaseReadOnlyByteArrayTest, Se
     for(long size : sizesToTest){
 
       // Write test for negative index (-1)
-      tests.add(dynamicTest(f("readLong(-1) on ByteArray of {}B size", size), () -> {
+      tests.add(dynamicTest(f("readIntLE(-1) on ByteArray of {}B size", size), () -> {
 
         // Wrap in try and catch for possible OOM if trying to allocate max memory
         try{
@@ -1800,7 +2506,7 @@ public interface SelfReadOnlyByteArrayTest extends BaseReadOnlyByteArrayTest, Se
             // Now test the byte array
             ByteArrayIndexOutOfBoundsException actualEx = assertThrows(
               ByteArrayIndexOutOfBoundsException.class,
-              () -> testByteArray.readByte(-1)
+              () -> testByteArray.readIntLE(-1)
             );
 
             // Check the message
@@ -1824,7 +2530,7 @@ public interface SelfReadOnlyByteArrayTest extends BaseReadOnlyByteArrayTest, Se
       // Write test for negative indices (random)
       for(int trial = 0; trial < TRIALS; trial++){
         long index = -Math.abs(rng.nextInt() + 500_000);
-        tests.add(dynamicTest(f("readLong({}) on ByteArray of {}B size", index, size), () -> {
+        tests.add(dynamicTest(f("readIntLE({}) on ByteArray of {}B size", index, size), () -> {
 
           // Wrap in try and catch for possible OOM if trying to allocate max memory
           try{
@@ -1849,7 +2555,7 @@ public interface SelfReadOnlyByteArrayTest extends BaseReadOnlyByteArrayTest, Se
               // Now test the byte array
               ByteArrayIndexOutOfBoundsException actualEx = assertThrows(
                 ByteArrayIndexOutOfBoundsException.class,
-                () -> testByteArray.readByte(index)
+                () -> testByteArray.readIntLE(index)
               );
 
               // Check the message
@@ -1871,7 +2577,7 @@ public interface SelfReadOnlyByteArrayTest extends BaseReadOnlyByteArrayTest, Se
       }
 
       // Write test for index that exceeds capacity
-      tests.add(dynamicTest(f("readLong({}) on ByteArray of {}B size", size, size), () -> {
+      tests.add(dynamicTest(f("readIntLE({}) on ByteArray of {}B size", size, size), () -> {
 
         // Wrap in try and catch for possible OOM if trying to allocate max memory
         try{
@@ -1896,7 +2602,7 @@ public interface SelfReadOnlyByteArrayTest extends BaseReadOnlyByteArrayTest, Se
             // Now test the byte array
             ByteArrayIndexOutOfBoundsException actualEx = assertThrows(
               ByteArrayIndexOutOfBoundsException.class,
-              () -> testByteArray.readByte(size)
+              () -> testByteArray.readIntLE(size)
             );
 
             // Check the message
@@ -1920,7 +2626,7 @@ public interface SelfReadOnlyByteArrayTest extends BaseReadOnlyByteArrayTest, Se
       // Write test for index that exceeds capacity (random)
       for(int trial = 0; trial < TRIALS; trial++){
         long index = size + Math.abs(rng.nextInt());
-        tests.add(dynamicTest(f("readLong({}) on ByteArray of {}B size", index, size), () -> {
+        tests.add(dynamicTest(f("readIntLE({}) on ByteArray of {}B size", index, size), () -> {
 
           // Wrap in try and catch for possible OOM if trying to allocate max memory
           try{
@@ -1945,7 +2651,7 @@ public interface SelfReadOnlyByteArrayTest extends BaseReadOnlyByteArrayTest, Se
               // Now test the byte array
               ByteArrayIndexOutOfBoundsException actualEx = assertThrows(
                 ByteArrayIndexOutOfBoundsException.class,
-                () -> testByteArray.readByte(index)
+                () -> testByteArray.readIntLE(index)
               );
 
               // Check the message
@@ -1967,7 +2673,272 @@ public interface SelfReadOnlyByteArrayTest extends BaseReadOnlyByteArrayTest, Se
       }
 
       // Write test for length that exceeds capacity
-      tests.add(dynamicTest(f("readLong({}) on ByteArray of {}B size", size - 1, size), () -> {
+      tests.add(dynamicTest(f("readIntLE({}) on ByteArray of {}B size", size - 1, size), () -> {
+
+        // Wrap in try and catch for possible OOM if trying to allocate max memory
+        try{
+
+          // Allocate the readonly bytearray
+          var testByteArray = createTestReadOnlyByteArray(size);
+
+          // Assert readonly if applicable
+          if(!isReadableWritableOK()) assertFalse(testByteArray instanceof ReadableWritableByteArray);
+
+          try{
+
+            // Assert size
+            assertEquals(size, testByteArray.size());
+
+            // Get the expected exception
+            var expectedEx = assertThrows(
+              ByteArrayLengthOverBoundsException.class,
+              () -> IndexingUtility.checkReadWrite(size - 1, 4, size)
+            );
+
+            // Now test the byte array
+            var actualEx = assertThrows(
+              ByteArrayLengthOverBoundsException.class,
+              () -> testByteArray.readIntLE(size - 1)
+            );
+
+            // Check the message
+            assertEquals(expectedEx.getMessage(), actualEx.getMessage());
+
+          }finally{
+            cleanTestByteArray(testByteArray);
+          }
+
+        }catch(OutOfMemoryError oom){
+          System.gc();
+          oom.printStackTrace();
+          System.out.println("Out of memory. Cannot perform this test due to insufficient memory space");
+          fail("Cannot perform test due to insufficient memory space");
+        }
+
+        // Clean up
+        System.gc();
+      }));
+    }
+
+    // Return tests
+    return tests;
+  }
+
+  @DisplayName("Test bad readLongBE(long) calls")
+  @TestFactory
+  default Iterable<DynamicTest> testInvalidReadLongBECalls(){
+
+    // Set up test container
+    var tests = new LinkedList<DynamicTest>();
+
+    // Get RNG
+    var rng = getRNG();
+
+    // Sizes to test
+    var sizesToTest = new HashSet<Long>();
+    sizesToTest.add(1L); // Test size of one
+    for(int trial = 0; trial < TRIALS; trial++){ // Add random sizes to try
+      if(sizesToTest.add((long) rng.nextInt(500) + 5)) continue;
+      trial--; // Existing number, try again
+    }
+
+    // Run the tests
+    for(long size : sizesToTest){
+
+      // Write test for negative index (-1)
+      tests.add(dynamicTest(f("readLongBE(-1) on ByteArray of {}B size", size), () -> {
+
+        // Wrap in try and catch for possible OOM if trying to allocate max memory
+        try{
+
+          // Allocate the readonly bytearray
+          ReadOnlyByteArray testByteArray = createTestReadOnlyByteArray(size);
+
+          // Assert readonly if applicable
+          if(!isReadableWritableOK()) assertFalse(testByteArray instanceof ReadableWritableByteArray);
+
+          try{
+
+            // Assert size
+            assertEquals(size, testByteArray.size());
+
+            // Get the expected exception
+            ByteArrayIndexOutOfBoundsException expectedEx = assertThrows(
+              ByteArrayIndexOutOfBoundsException.class,
+              () -> IndexingUtility.checkReadWriteByte(-1, size)
+            );
+
+            // Now test the byte array
+            ByteArrayIndexOutOfBoundsException actualEx = assertThrows(
+              ByteArrayIndexOutOfBoundsException.class,
+              () -> testByteArray.readLongBE(-1)
+            );
+
+            // Check the message
+            assertEquals(expectedEx.getMessage(), actualEx.getMessage());
+
+          }finally{
+            cleanTestByteArray(testByteArray);
+          }
+
+        }catch(OutOfMemoryError oom){
+          System.gc();
+          oom.printStackTrace();
+          System.out.println("Out of memory. Cannot perform this test due to insufficient memory space");
+          fail("Cannot perform test due to insufficient memory space");
+        }
+
+        // Clean up
+        System.gc();
+      }));
+
+      // Write test for negative indices (random)
+      for(int trial = 0; trial < TRIALS; trial++){
+        long index = -Math.abs(rng.nextInt() + 500_000);
+        tests.add(dynamicTest(f("readLongBE({}) on ByteArray of {}B size", index, size), () -> {
+
+          // Wrap in try and catch for possible OOM if trying to allocate max memory
+          try{
+
+            // Allocate the readonly bytearray
+            ReadOnlyByteArray testByteArray = createTestReadOnlyByteArray(size);
+
+            // Assert readonly if applicable
+            if(!isReadableWritableOK()) assertFalse(testByteArray instanceof ReadableWritableByteArray);
+
+            try{
+
+              // Assert size
+              assertEquals(size, testByteArray.size());
+
+              // Get the expected exception
+              ByteArrayIndexOutOfBoundsException expectedEx = assertThrows(
+                ByteArrayIndexOutOfBoundsException.class,
+                () -> IndexingUtility.checkReadWriteByte(index, size)
+              );
+
+              // Now test the byte array
+              ByteArrayIndexOutOfBoundsException actualEx = assertThrows(
+                ByteArrayIndexOutOfBoundsException.class,
+                () -> testByteArray.readLongBE(index)
+              );
+
+              // Check the message
+              assertEquals(expectedEx.getMessage(), actualEx.getMessage());
+
+            }finally{
+              cleanTestByteArray(testByteArray);
+            }
+
+          }catch(OutOfMemoryError oom){
+            System.gc();
+            oom.printStackTrace();
+            fail("Cannot perform test due to insufficient memory space");
+          }
+
+          // Clean up
+          System.gc();
+        }));
+      }
+
+      // Write test for index that exceeds capacity
+      tests.add(dynamicTest(f("readLongBE({}) on ByteArray of {}B size", size, size), () -> {
+
+        // Wrap in try and catch for possible OOM if trying to allocate max memory
+        try{
+
+          // Allocate the readonly bytearray
+          ReadOnlyByteArray testByteArray = createTestReadOnlyByteArray(size);
+
+          // Assert readonly if applicable
+          if(!isReadableWritableOK()) assertFalse(testByteArray instanceof ReadableWritableByteArray);
+
+          try{
+
+            // Assert size
+            assertEquals(size, testByteArray.size());
+
+            // Get the expected exception
+            ByteArrayIndexOutOfBoundsException expectedEx = assertThrows(
+              ByteArrayIndexOutOfBoundsException.class,
+              () -> IndexingUtility.checkReadWriteByte(size, size)
+            );
+
+            // Now test the byte array
+            ByteArrayIndexOutOfBoundsException actualEx = assertThrows(
+              ByteArrayIndexOutOfBoundsException.class,
+              () -> testByteArray.readLongBE(size)
+            );
+
+            // Check the message
+            assertEquals(expectedEx.getMessage(), actualEx.getMessage());
+
+          }finally{
+            cleanTestByteArray(testByteArray);
+          }
+
+        }catch(OutOfMemoryError oom){
+          System.gc();
+          oom.printStackTrace();
+          System.out.println("Out of memory. Cannot perform this test due to insufficient memory space");
+          fail("Cannot perform test due to insufficient memory space");
+        }
+
+        // Clean up
+        System.gc();
+      }));
+
+      // Write test for index that exceeds capacity (random)
+      for(int trial = 0; trial < TRIALS; trial++){
+        long index = size + Math.abs(rng.nextInt());
+        tests.add(dynamicTest(f("readLongBE({}) on ByteArray of {}B size", index, size), () -> {
+
+          // Wrap in try and catch for possible OOM if trying to allocate max memory
+          try{
+
+            // Allocate the readonly bytearray
+            ReadOnlyByteArray testByteArray = createTestReadOnlyByteArray(size);
+
+            // Assert readonly if applicable
+            if(!isReadableWritableOK()) assertFalse(testByteArray instanceof ReadableWritableByteArray);
+
+            try{
+
+              // Assert size
+              assertEquals(size, testByteArray.size());
+
+              // Get the expected exception
+              ByteArrayIndexOutOfBoundsException expectedEx = assertThrows(
+                ByteArrayIndexOutOfBoundsException.class,
+                () -> IndexingUtility.checkReadWriteByte(index, size)
+              );
+
+              // Now test the byte array
+              ByteArrayIndexOutOfBoundsException actualEx = assertThrows(
+                ByteArrayIndexOutOfBoundsException.class,
+                () -> testByteArray.readLongBE(index)
+              );
+
+              // Check the message
+              assertEquals(expectedEx.getMessage(), actualEx.getMessage());
+
+            }finally{
+              cleanTestByteArray(testByteArray);
+            }
+
+          }catch(OutOfMemoryError oom){
+            System.gc();
+            oom.printStackTrace();
+            fail("Cannot perform test due to insufficient memory space");
+          }
+
+          // Clean up
+          System.gc();
+        }));
+      }
+
+      // Write test for length that exceeds capacity
+      tests.add(dynamicTest(f("readLongBE({}) on ByteArray of {}B size", size - 1, size), () -> {
 
         // Wrap in try and catch for possible OOM if trying to allocate max memory
         try{
@@ -2018,9 +2989,9 @@ public interface SelfReadOnlyByteArrayTest extends BaseReadOnlyByteArrayTest, Se
     return tests;
   }
 
-  @DisplayName("Test bad readFloat(long) calls")
+  @DisplayName("Test bad readLongLE(long) calls")
   @TestFactory
-  default Iterable<DynamicTest> testInvalidReadFloatCalls(){
+  default Iterable<DynamicTest> testInvalidReadLongLECalls(){
 
     // Set up test container
     var tests = new LinkedList<DynamicTest>();
@@ -2040,7 +3011,7 @@ public interface SelfReadOnlyByteArrayTest extends BaseReadOnlyByteArrayTest, Se
     for(long size : sizesToTest){
 
       // Write test for negative index (-1)
-      tests.add(dynamicTest(f("readFloat(-1) on ByteArray of {}B size", size), () -> {
+      tests.add(dynamicTest(f("readLongLE(-1) on ByteArray of {}B size", size), () -> {
 
         // Wrap in try and catch for possible OOM if trying to allocate max memory
         try{
@@ -2065,7 +3036,7 @@ public interface SelfReadOnlyByteArrayTest extends BaseReadOnlyByteArrayTest, Se
             // Now test the byte array
             ByteArrayIndexOutOfBoundsException actualEx = assertThrows(
               ByteArrayIndexOutOfBoundsException.class,
-              () -> testByteArray.readByte(-1)
+              () -> testByteArray.readLongLE(-1)
             );
 
             // Check the message
@@ -2089,7 +3060,7 @@ public interface SelfReadOnlyByteArrayTest extends BaseReadOnlyByteArrayTest, Se
       // Write test for negative indices (random)
       for(int trial = 0; trial < TRIALS; trial++){
         long index = -Math.abs(rng.nextInt() + 500_000);
-        tests.add(dynamicTest(f("readFloat({}) on ByteArray of {}B size", index, size), () -> {
+        tests.add(dynamicTest(f("readLongLE({}) on ByteArray of {}B size", index, size), () -> {
 
           // Wrap in try and catch for possible OOM if trying to allocate max memory
           try{
@@ -2114,7 +3085,7 @@ public interface SelfReadOnlyByteArrayTest extends BaseReadOnlyByteArrayTest, Se
               // Now test the byte array
               ByteArrayIndexOutOfBoundsException actualEx = assertThrows(
                 ByteArrayIndexOutOfBoundsException.class,
-                () -> testByteArray.readByte(index)
+                () -> testByteArray.readLongLE(index)
               );
 
               // Check the message
@@ -2136,7 +3107,7 @@ public interface SelfReadOnlyByteArrayTest extends BaseReadOnlyByteArrayTest, Se
       }
 
       // Write test for index that exceeds capacity
-      tests.add(dynamicTest(f("readFloat({}) on ByteArray of {}B size", size, size), () -> {
+      tests.add(dynamicTest(f("readLongLE({}) on ByteArray of {}B size", size, size), () -> {
 
         // Wrap in try and catch for possible OOM if trying to allocate max memory
         try{
@@ -2161,7 +3132,7 @@ public interface SelfReadOnlyByteArrayTest extends BaseReadOnlyByteArrayTest, Se
             // Now test the byte array
             ByteArrayIndexOutOfBoundsException actualEx = assertThrows(
               ByteArrayIndexOutOfBoundsException.class,
-              () -> testByteArray.readByte(size)
+              () -> testByteArray.readLongLE(size)
             );
 
             // Check the message
@@ -2185,7 +3156,7 @@ public interface SelfReadOnlyByteArrayTest extends BaseReadOnlyByteArrayTest, Se
       // Write test for index that exceeds capacity (random)
       for(int trial = 0; trial < TRIALS; trial++){
         long index = size + Math.abs(rng.nextInt());
-        tests.add(dynamicTest(f("readFloat({}) on ByteArray of {}B size", index, size), () -> {
+        tests.add(dynamicTest(f("readLongLE({}) on ByteArray of {}B size", index, size), () -> {
 
           // Wrap in try and catch for possible OOM if trying to allocate max memory
           try{
@@ -2210,7 +3181,7 @@ public interface SelfReadOnlyByteArrayTest extends BaseReadOnlyByteArrayTest, Se
               // Now test the byte array
               ByteArrayIndexOutOfBoundsException actualEx = assertThrows(
                 ByteArrayIndexOutOfBoundsException.class,
-                () -> testByteArray.readByte(index)
+                () -> testByteArray.readLongLE(index)
               );
 
               // Check the message
@@ -2232,7 +3203,272 @@ public interface SelfReadOnlyByteArrayTest extends BaseReadOnlyByteArrayTest, Se
       }
 
       // Write test for length that exceeds capacity
-      tests.add(dynamicTest(f("readFloat({}) on ByteArray of {}B size", size - 1, size), () -> {
+      tests.add(dynamicTest(f("readLongLE({}) on ByteArray of {}B size", size - 1, size), () -> {
+
+        // Wrap in try and catch for possible OOM if trying to allocate max memory
+        try{
+
+          // Allocate the readonly bytearray
+          var testByteArray = createTestReadOnlyByteArray(size);
+
+          // Assert readonly if applicable
+          if(!isReadableWritableOK()) assertFalse(testByteArray instanceof ReadableWritableByteArray);
+
+          try{
+
+            // Assert size
+            assertEquals(size, testByteArray.size());
+
+            // Get the expected exception
+            var expectedEx = assertThrows(
+              ByteArrayLengthOverBoundsException.class,
+              () -> IndexingUtility.checkReadWrite(size - 1, 8, size)
+            );
+
+            // Now test the byte array
+            var actualEx = assertThrows(
+              ByteArrayLengthOverBoundsException.class,
+              () -> testByteArray.readLongLE(size - 1)
+            );
+
+            // Check the message
+            assertEquals(expectedEx.getMessage(), actualEx.getMessage());
+
+          }finally{
+            cleanTestByteArray(testByteArray);
+          }
+
+        }catch(OutOfMemoryError oom){
+          System.gc();
+          oom.printStackTrace();
+          System.out.println("Out of memory. Cannot perform this test due to insufficient memory space");
+          fail("Cannot perform test due to insufficient memory space");
+        }
+
+        // Clean up
+        System.gc();
+      }));
+    }
+
+    // Return tests
+    return tests;
+  }
+
+  @DisplayName("Test bad readFloatBE(long) calls")
+  @TestFactory
+  default Iterable<DynamicTest> testInvalidReadFloatBECalls(){
+
+    // Set up test container
+    var tests = new LinkedList<DynamicTest>();
+
+    // Get RNG
+    var rng = getRNG();
+
+    // Sizes to test
+    var sizesToTest = new HashSet<Long>();
+    sizesToTest.add(1L); // Test size of one
+    for(int trial = 0; trial < TRIALS; trial++){ // Add random sizes to try
+      if(sizesToTest.add((long) rng.nextInt(500) + 5)) continue;
+      trial--; // Existing number, try again
+    }
+
+    // Run the tests
+    for(long size : sizesToTest){
+
+      // Write test for negative index (-1)
+      tests.add(dynamicTest(f("readFloatBE(-1) on ByteArray of {}B size", size), () -> {
+
+        // Wrap in try and catch for possible OOM if trying to allocate max memory
+        try{
+
+          // Allocate the readonly bytearray
+          ReadOnlyByteArray testByteArray = createTestReadOnlyByteArray(size);
+
+          // Assert readonly if applicable
+          if(!isReadableWritableOK()) assertFalse(testByteArray instanceof ReadableWritableByteArray);
+
+          try{
+
+            // Assert size
+            assertEquals(size, testByteArray.size());
+
+            // Get the expected exception
+            ByteArrayIndexOutOfBoundsException expectedEx = assertThrows(
+              ByteArrayIndexOutOfBoundsException.class,
+              () -> IndexingUtility.checkReadWriteByte(-1, size)
+            );
+
+            // Now test the byte array
+            ByteArrayIndexOutOfBoundsException actualEx = assertThrows(
+              ByteArrayIndexOutOfBoundsException.class,
+              () -> testByteArray.readFloatBE(-1)
+            );
+
+            // Check the message
+            assertEquals(expectedEx.getMessage(), actualEx.getMessage());
+
+          }finally{
+            cleanTestByteArray(testByteArray);
+          }
+
+        }catch(OutOfMemoryError oom){
+          System.gc();
+          oom.printStackTrace();
+          System.out.println("Out of memory. Cannot perform this test due to insufficient memory space");
+          fail("Cannot perform test due to insufficient memory space");
+        }
+
+        // Clean up
+        System.gc();
+      }));
+
+      // Write test for negative indices (random)
+      for(int trial = 0; trial < TRIALS; trial++){
+        long index = -Math.abs(rng.nextInt() + 500_000);
+        tests.add(dynamicTest(f("readFloatBE({}) on ByteArray of {}B size", index, size), () -> {
+
+          // Wrap in try and catch for possible OOM if trying to allocate max memory
+          try{
+
+            // Allocate the readonly bytearray
+            ReadOnlyByteArray testByteArray = createTestReadOnlyByteArray(size);
+
+            // Assert readonly if applicable
+            if(!isReadableWritableOK()) assertFalse(testByteArray instanceof ReadableWritableByteArray);
+
+            try{
+
+              // Assert size
+              assertEquals(size, testByteArray.size());
+
+              // Get the expected exception
+              ByteArrayIndexOutOfBoundsException expectedEx = assertThrows(
+                ByteArrayIndexOutOfBoundsException.class,
+                () -> IndexingUtility.checkReadWriteByte(index, size)
+              );
+
+              // Now test the byte array
+              ByteArrayIndexOutOfBoundsException actualEx = assertThrows(
+                ByteArrayIndexOutOfBoundsException.class,
+                () -> testByteArray.readFloatBE(index)
+              );
+
+              // Check the message
+              assertEquals(expectedEx.getMessage(), actualEx.getMessage());
+
+            }finally{
+              cleanTestByteArray(testByteArray);
+            }
+
+          }catch(OutOfMemoryError oom){
+            System.gc();
+            oom.printStackTrace();
+            fail("Cannot perform test due to insufficient memory space");
+          }
+
+          // Clean up
+          System.gc();
+        }));
+      }
+
+      // Write test for index that exceeds capacity
+      tests.add(dynamicTest(f("readFloatBE({}) on ByteArray of {}B size", size, size), () -> {
+
+        // Wrap in try and catch for possible OOM if trying to allocate max memory
+        try{
+
+          // Allocate the readonly bytearray
+          ReadOnlyByteArray testByteArray = createTestReadOnlyByteArray(size);
+
+          // Assert readonly if applicable
+          if(!isReadableWritableOK()) assertFalse(testByteArray instanceof ReadableWritableByteArray);
+
+          try{
+
+            // Assert size
+            assertEquals(size, testByteArray.size());
+
+            // Get the expected exception
+            ByteArrayIndexOutOfBoundsException expectedEx = assertThrows(
+              ByteArrayIndexOutOfBoundsException.class,
+              () -> IndexingUtility.checkReadWriteByte(size, size)
+            );
+
+            // Now test the byte array
+            ByteArrayIndexOutOfBoundsException actualEx = assertThrows(
+              ByteArrayIndexOutOfBoundsException.class,
+              () -> testByteArray.readFloatBE(size)
+            );
+
+            // Check the message
+            assertEquals(expectedEx.getMessage(), actualEx.getMessage());
+
+          }finally{
+            cleanTestByteArray(testByteArray);
+          }
+
+        }catch(OutOfMemoryError oom){
+          System.gc();
+          oom.printStackTrace();
+          System.out.println("Out of memory. Cannot perform this test due to insufficient memory space");
+          fail("Cannot perform test due to insufficient memory space");
+        }
+
+        // Clean up
+        System.gc();
+      }));
+
+      // Write test for index that exceeds capacity (random)
+      for(int trial = 0; trial < TRIALS; trial++){
+        long index = size + Math.abs(rng.nextInt());
+        tests.add(dynamicTest(f("readFloatBE({}) on ByteArray of {}B size", index, size), () -> {
+
+          // Wrap in try and catch for possible OOM if trying to allocate max memory
+          try{
+
+            // Allocate the readonly bytearray
+            ReadOnlyByteArray testByteArray = createTestReadOnlyByteArray(size);
+
+            // Assert readonly if applicable
+            if(!isReadableWritableOK()) assertFalse(testByteArray instanceof ReadableWritableByteArray);
+
+            try{
+
+              // Assert size
+              assertEquals(size, testByteArray.size());
+
+              // Get the expected exception
+              ByteArrayIndexOutOfBoundsException expectedEx = assertThrows(
+                ByteArrayIndexOutOfBoundsException.class,
+                () -> IndexingUtility.checkReadWriteByte(index, size)
+              );
+
+              // Now test the byte array
+              ByteArrayIndexOutOfBoundsException actualEx = assertThrows(
+                ByteArrayIndexOutOfBoundsException.class,
+                () -> testByteArray.readFloatBE(index)
+              );
+
+              // Check the message
+              assertEquals(expectedEx.getMessage(), actualEx.getMessage());
+
+            }finally{
+              cleanTestByteArray(testByteArray);
+            }
+
+          }catch(OutOfMemoryError oom){
+            System.gc();
+            oom.printStackTrace();
+            fail("Cannot perform test due to insufficient memory space");
+          }
+
+          // Clean up
+          System.gc();
+        }));
+      }
+
+      // Write test for length that exceeds capacity
+      tests.add(dynamicTest(f("readFloatBE({}) on ByteArray of {}B size", size - 1, size), () -> {
 
         // Wrap in try and catch for possible OOM if trying to allocate max memory
         try{
@@ -2283,9 +3519,9 @@ public interface SelfReadOnlyByteArrayTest extends BaseReadOnlyByteArrayTest, Se
     return tests;
   }
 
-  @DisplayName("Test bad readDouble(long) calls")
+  @DisplayName("Test bad readFloatLE(long) calls")
   @TestFactory
-  default Iterable<DynamicTest> testInvalidReadDoubleCalls(){
+  default Iterable<DynamicTest> testInvalidReadFloatLECalls(){
 
     // Set up test container
     var tests = new LinkedList<DynamicTest>();
@@ -2305,7 +3541,7 @@ public interface SelfReadOnlyByteArrayTest extends BaseReadOnlyByteArrayTest, Se
     for(long size : sizesToTest){
 
       // Write test for negative index (-1)
-      tests.add(dynamicTest(f("readDouble(-1) on ByteArray of {}B size", size), () -> {
+      tests.add(dynamicTest(f("readFloatLE(-1) on ByteArray of {}B size", size), () -> {
 
         // Wrap in try and catch for possible OOM if trying to allocate max memory
         try{
@@ -2330,7 +3566,7 @@ public interface SelfReadOnlyByteArrayTest extends BaseReadOnlyByteArrayTest, Se
             // Now test the byte array
             ByteArrayIndexOutOfBoundsException actualEx = assertThrows(
               ByteArrayIndexOutOfBoundsException.class,
-              () -> testByteArray.readByte(-1)
+              () -> testByteArray.readFloatLE(-1)
             );
 
             // Check the message
@@ -2354,7 +3590,7 @@ public interface SelfReadOnlyByteArrayTest extends BaseReadOnlyByteArrayTest, Se
       // Write test for negative indices (random)
       for(int trial = 0; trial < TRIALS; trial++){
         long index = -Math.abs(rng.nextInt() + 500_000);
-        tests.add(dynamicTest(f("readDouble({}) on ByteArray of {}B size", index, size), () -> {
+        tests.add(dynamicTest(f("readFloatLE({}) on ByteArray of {}B size", index, size), () -> {
 
           // Wrap in try and catch for possible OOM if trying to allocate max memory
           try{
@@ -2379,7 +3615,7 @@ public interface SelfReadOnlyByteArrayTest extends BaseReadOnlyByteArrayTest, Se
               // Now test the byte array
               ByteArrayIndexOutOfBoundsException actualEx = assertThrows(
                 ByteArrayIndexOutOfBoundsException.class,
-                () -> testByteArray.readByte(index)
+                () -> testByteArray.readFloatLE(index)
               );
 
               // Check the message
@@ -2401,7 +3637,7 @@ public interface SelfReadOnlyByteArrayTest extends BaseReadOnlyByteArrayTest, Se
       }
 
       // Write test for index that exceeds capacity
-      tests.add(dynamicTest(f("readDouble({}) on ByteArray of {}B size", size, size), () -> {
+      tests.add(dynamicTest(f("readFloatLE({}) on ByteArray of {}B size", size, size), () -> {
 
         // Wrap in try and catch for possible OOM if trying to allocate max memory
         try{
@@ -2426,7 +3662,7 @@ public interface SelfReadOnlyByteArrayTest extends BaseReadOnlyByteArrayTest, Se
             // Now test the byte array
             ByteArrayIndexOutOfBoundsException actualEx = assertThrows(
               ByteArrayIndexOutOfBoundsException.class,
-              () -> testByteArray.readByte(size)
+              () -> testByteArray.readFloatLE(size)
             );
 
             // Check the message
@@ -2450,7 +3686,7 @@ public interface SelfReadOnlyByteArrayTest extends BaseReadOnlyByteArrayTest, Se
       // Write test for index that exceeds capacity (random)
       for(int trial = 0; trial < TRIALS; trial++){
         long index = size + Math.abs(rng.nextInt());
-        tests.add(dynamicTest(f("readDouble({}) on ByteArray of {}B size", index, size), () -> {
+        tests.add(dynamicTest(f("readFloatLE({}) on ByteArray of {}B size", index, size), () -> {
 
           // Wrap in try and catch for possible OOM if trying to allocate max memory
           try{
@@ -2475,7 +3711,7 @@ public interface SelfReadOnlyByteArrayTest extends BaseReadOnlyByteArrayTest, Se
               // Now test the byte array
               ByteArrayIndexOutOfBoundsException actualEx = assertThrows(
                 ByteArrayIndexOutOfBoundsException.class,
-                () -> testByteArray.readByte(index)
+                () -> testByteArray.readFloatLE(index)
               );
 
               // Check the message
@@ -2497,7 +3733,272 @@ public interface SelfReadOnlyByteArrayTest extends BaseReadOnlyByteArrayTest, Se
       }
 
       // Write test for length that exceeds capacity
-      tests.add(dynamicTest(f("readDouble({}) on ByteArray of {}B size", size - 1, size), () -> {
+      tests.add(dynamicTest(f("readFloatLE({}) on ByteArray of {}B size", size - 1, size), () -> {
+
+        // Wrap in try and catch for possible OOM if trying to allocate max memory
+        try{
+
+          // Allocate the readonly bytearray
+          var testByteArray = createTestReadOnlyByteArray(size);
+
+          // Assert readonly if applicable
+          if(!isReadableWritableOK()) assertFalse(testByteArray instanceof ReadableWritableByteArray);
+
+          try{
+
+            // Assert size
+            assertEquals(size, testByteArray.size());
+
+            // Get the expected exception
+            var expectedEx = assertThrows(
+              ByteArrayLengthOverBoundsException.class,
+              () -> IndexingUtility.checkReadWrite(size - 1, 4, size)
+            );
+
+            // Now test the byte array
+            var actualEx = assertThrows(
+              ByteArrayLengthOverBoundsException.class,
+              () -> testByteArray.readFloatLE(size - 1)
+            );
+
+            // Check the message
+            assertEquals(expectedEx.getMessage(), actualEx.getMessage());
+
+          }finally{
+            cleanTestByteArray(testByteArray);
+          }
+
+        }catch(OutOfMemoryError oom){
+          System.gc();
+          oom.printStackTrace();
+          System.out.println("Out of memory. Cannot perform this test due to insufficient memory space");
+          fail("Cannot perform test due to insufficient memory space");
+        }
+
+        // Clean up
+        System.gc();
+      }));
+    }
+
+    // Return tests
+    return tests;
+  }
+
+  @DisplayName("Test bad readDoubleBE(long) calls")
+  @TestFactory
+  default Iterable<DynamicTest> testInvalidReadDoubleBECalls(){
+
+    // Set up test container
+    var tests = new LinkedList<DynamicTest>();
+
+    // Get RNG
+    var rng = getRNG();
+
+    // Sizes to test
+    var sizesToTest = new HashSet<Long>();
+    sizesToTest.add(1L); // Test size of one
+    for(int trial = 0; trial < TRIALS; trial++){ // Add random sizes to try
+      if(sizesToTest.add((long) rng.nextInt(500) + 5)) continue;
+      trial--; // Existing number, try again
+    }
+
+    // Run the tests
+    for(long size : sizesToTest){
+
+      // Write test for negative index (-1)
+      tests.add(dynamicTest(f("readDoubleBE(-1) on ByteArray of {}B size", size), () -> {
+
+        // Wrap in try and catch for possible OOM if trying to allocate max memory
+        try{
+
+          // Allocate the readonly bytearray
+          ReadOnlyByteArray testByteArray = createTestReadOnlyByteArray(size);
+
+          // Assert readonly if applicable
+          if(!isReadableWritableOK()) assertFalse(testByteArray instanceof ReadableWritableByteArray);
+
+          try{
+
+            // Assert size
+            assertEquals(size, testByteArray.size());
+
+            // Get the expected exception
+            ByteArrayIndexOutOfBoundsException expectedEx = assertThrows(
+              ByteArrayIndexOutOfBoundsException.class,
+              () -> IndexingUtility.checkReadWriteByte(-1, size)
+            );
+
+            // Now test the byte array
+            ByteArrayIndexOutOfBoundsException actualEx = assertThrows(
+              ByteArrayIndexOutOfBoundsException.class,
+              () -> testByteArray.readDoubleBE(-1)
+            );
+
+            // Check the message
+            assertEquals(expectedEx.getMessage(), actualEx.getMessage());
+
+          }finally{
+            cleanTestByteArray(testByteArray);
+          }
+
+        }catch(OutOfMemoryError oom){
+          System.gc();
+          oom.printStackTrace();
+          System.out.println("Out of memory. Cannot perform this test due to insufficient memory space");
+          fail("Cannot perform test due to insufficient memory space");
+        }
+
+        // Clean up
+        System.gc();
+      }));
+
+      // Write test for negative indices (random)
+      for(int trial = 0; trial < TRIALS; trial++){
+        long index = -Math.abs(rng.nextInt() + 500_000);
+        tests.add(dynamicTest(f("readDoubleBE({}) on ByteArray of {}B size", index, size), () -> {
+
+          // Wrap in try and catch for possible OOM if trying to allocate max memory
+          try{
+
+            // Allocate the readonly bytearray
+            ReadOnlyByteArray testByteArray = createTestReadOnlyByteArray(size);
+
+            // Assert readonly if applicable
+            if(!isReadableWritableOK()) assertFalse(testByteArray instanceof ReadableWritableByteArray);
+
+            try{
+
+              // Assert size
+              assertEquals(size, testByteArray.size());
+
+              // Get the expected exception
+              ByteArrayIndexOutOfBoundsException expectedEx = assertThrows(
+                ByteArrayIndexOutOfBoundsException.class,
+                () -> IndexingUtility.checkReadWriteByte(index, size)
+              );
+
+              // Now test the byte array
+              ByteArrayIndexOutOfBoundsException actualEx = assertThrows(
+                ByteArrayIndexOutOfBoundsException.class,
+                () -> testByteArray.readDoubleBE(index)
+              );
+
+              // Check the message
+              assertEquals(expectedEx.getMessage(), actualEx.getMessage());
+
+            }finally{
+              cleanTestByteArray(testByteArray);
+            }
+
+          }catch(OutOfMemoryError oom){
+            System.gc();
+            oom.printStackTrace();
+            fail("Cannot perform test due to insufficient memory space");
+          }
+
+          // Clean up
+          System.gc();
+        }));
+      }
+
+      // Write test for index that exceeds capacity
+      tests.add(dynamicTest(f("readDoubleBE({}) on ByteArray of {}B size", size, size), () -> {
+
+        // Wrap in try and catch for possible OOM if trying to allocate max memory
+        try{
+
+          // Allocate the readonly bytearray
+          ReadOnlyByteArray testByteArray = createTestReadOnlyByteArray(size);
+
+          // Assert readonly if applicable
+          if(!isReadableWritableOK()) assertFalse(testByteArray instanceof ReadableWritableByteArray);
+
+          try{
+
+            // Assert size
+            assertEquals(size, testByteArray.size());
+
+            // Get the expected exception
+            ByteArrayIndexOutOfBoundsException expectedEx = assertThrows(
+              ByteArrayIndexOutOfBoundsException.class,
+              () -> IndexingUtility.checkReadWriteByte(size, size)
+            );
+
+            // Now test the byte array
+            ByteArrayIndexOutOfBoundsException actualEx = assertThrows(
+              ByteArrayIndexOutOfBoundsException.class,
+              () -> testByteArray.readDoubleBE(size)
+            );
+
+            // Check the message
+            assertEquals(expectedEx.getMessage(), actualEx.getMessage());
+
+          }finally{
+            cleanTestByteArray(testByteArray);
+          }
+
+        }catch(OutOfMemoryError oom){
+          System.gc();
+          oom.printStackTrace();
+          System.out.println("Out of memory. Cannot perform this test due to insufficient memory space");
+          fail("Cannot perform test due to insufficient memory space");
+        }
+
+        // Clean up
+        System.gc();
+      }));
+
+      // Write test for index that exceeds capacity (random)
+      for(int trial = 0; trial < TRIALS; trial++){
+        long index = size + Math.abs(rng.nextInt());
+        tests.add(dynamicTest(f("readDoubleBE({}) on ByteArray of {}B size", index, size), () -> {
+
+          // Wrap in try and catch for possible OOM if trying to allocate max memory
+          try{
+
+            // Allocate the readonly bytearray
+            ReadOnlyByteArray testByteArray = createTestReadOnlyByteArray(size);
+
+            // Assert readonly if applicable
+            if(!isReadableWritableOK()) assertFalse(testByteArray instanceof ReadableWritableByteArray);
+
+            try{
+
+              // Assert size
+              assertEquals(size, testByteArray.size());
+
+              // Get the expected exception
+              ByteArrayIndexOutOfBoundsException expectedEx = assertThrows(
+                ByteArrayIndexOutOfBoundsException.class,
+                () -> IndexingUtility.checkReadWriteByte(index, size)
+              );
+
+              // Now test the byte array
+              ByteArrayIndexOutOfBoundsException actualEx = assertThrows(
+                ByteArrayIndexOutOfBoundsException.class,
+                () -> testByteArray.readDoubleBE(index)
+              );
+
+              // Check the message
+              assertEquals(expectedEx.getMessage(), actualEx.getMessage());
+
+            }finally{
+              cleanTestByteArray(testByteArray);
+            }
+
+          }catch(OutOfMemoryError oom){
+            System.gc();
+            oom.printStackTrace();
+            fail("Cannot perform test due to insufficient memory space");
+          }
+
+          // Clean up
+          System.gc();
+        }));
+      }
+
+      // Write test for length that exceeds capacity
+      tests.add(dynamicTest(f("readDoubleBE({}) on ByteArray of {}B size", size - 1, size), () -> {
 
         // Wrap in try and catch for possible OOM if trying to allocate max memory
         try{
@@ -2523,6 +4024,271 @@ public interface SelfReadOnlyByteArrayTest extends BaseReadOnlyByteArrayTest, Se
             var actualEx = assertThrows(
               ByteArrayLengthOverBoundsException.class,
               () -> testByteArray.readDoubleBE(size - 1)
+            );
+
+            // Check the message
+            assertEquals(expectedEx.getMessage(), actualEx.getMessage());
+
+          }finally{
+            cleanTestByteArray(testByteArray);
+          }
+
+        }catch(OutOfMemoryError oom){
+          System.gc();
+          oom.printStackTrace();
+          System.out.println("Out of memory. Cannot perform this test due to insufficient memory space");
+          fail("Cannot perform test due to insufficient memory space");
+        }
+
+        // Clean up
+        System.gc();
+      }));
+    }
+
+    // Return tests
+    return tests;
+  }
+
+  @DisplayName("Test bad readDoubleLE(long) calls")
+  @TestFactory
+  default Iterable<DynamicTest> testInvalidReadDoubleLECalls(){
+
+    // Set up test container
+    var tests = new LinkedList<DynamicTest>();
+
+    // Get RNG
+    var rng = getRNG();
+
+    // Sizes to test
+    var sizesToTest = new HashSet<Long>();
+    sizesToTest.add(1L); // Test size of one
+    for(int trial = 0; trial < TRIALS; trial++){ // Add random sizes to try
+      if(sizesToTest.add((long) rng.nextInt(500) + 5)) continue;
+      trial--; // Existing number, try again
+    }
+
+    // Run the tests
+    for(long size : sizesToTest){
+
+      // Write test for negative index (-1)
+      tests.add(dynamicTest(f("readDoubleLE(-1) on ByteArray of {}B size", size), () -> {
+
+        // Wrap in try and catch for possible OOM if trying to allocate max memory
+        try{
+
+          // Allocate the readonly bytearray
+          ReadOnlyByteArray testByteArray = createTestReadOnlyByteArray(size);
+
+          // Assert readonly if applicable
+          if(!isReadableWritableOK()) assertFalse(testByteArray instanceof ReadableWritableByteArray);
+
+          try{
+
+            // Assert size
+            assertEquals(size, testByteArray.size());
+
+            // Get the expected exception
+            ByteArrayIndexOutOfBoundsException expectedEx = assertThrows(
+              ByteArrayIndexOutOfBoundsException.class,
+              () -> IndexingUtility.checkReadWriteByte(-1, size)
+            );
+
+            // Now test the byte array
+            ByteArrayIndexOutOfBoundsException actualEx = assertThrows(
+              ByteArrayIndexOutOfBoundsException.class,
+              () -> testByteArray.readDoubleLE(-1)
+            );
+
+            // Check the message
+            assertEquals(expectedEx.getMessage(), actualEx.getMessage());
+
+          }finally{
+            cleanTestByteArray(testByteArray);
+          }
+
+        }catch(OutOfMemoryError oom){
+          System.gc();
+          oom.printStackTrace();
+          System.out.println("Out of memory. Cannot perform this test due to insufficient memory space");
+          fail("Cannot perform test due to insufficient memory space");
+        }
+
+        // Clean up
+        System.gc();
+      }));
+
+      // Write test for negative indices (random)
+      for(int trial = 0; trial < TRIALS; trial++){
+        long index = -Math.abs(rng.nextInt() + 500_000);
+        tests.add(dynamicTest(f("readDoubleLE({}) on ByteArray of {}B size", index, size), () -> {
+
+          // Wrap in try and catch for possible OOM if trying to allocate max memory
+          try{
+
+            // Allocate the readonly bytearray
+            ReadOnlyByteArray testByteArray = createTestReadOnlyByteArray(size);
+
+            // Assert readonly if applicable
+            if(!isReadableWritableOK()) assertFalse(testByteArray instanceof ReadableWritableByteArray);
+
+            try{
+
+              // Assert size
+              assertEquals(size, testByteArray.size());
+
+              // Get the expected exception
+              ByteArrayIndexOutOfBoundsException expectedEx = assertThrows(
+                ByteArrayIndexOutOfBoundsException.class,
+                () -> IndexingUtility.checkReadWriteByte(index, size)
+              );
+
+              // Now test the byte array
+              ByteArrayIndexOutOfBoundsException actualEx = assertThrows(
+                ByteArrayIndexOutOfBoundsException.class,
+                () -> testByteArray.readDoubleLE(index)
+              );
+
+              // Check the message
+              assertEquals(expectedEx.getMessage(), actualEx.getMessage());
+
+            }finally{
+              cleanTestByteArray(testByteArray);
+            }
+
+          }catch(OutOfMemoryError oom){
+            System.gc();
+            oom.printStackTrace();
+            fail("Cannot perform test due to insufficient memory space");
+          }
+
+          // Clean up
+          System.gc();
+        }));
+      }
+
+      // Write test for index that exceeds capacity
+      tests.add(dynamicTest(f("readDoubleLE({}) on ByteArray of {}B size", size, size), () -> {
+
+        // Wrap in try and catch for possible OOM if trying to allocate max memory
+        try{
+
+          // Allocate the readonly bytearray
+          ReadOnlyByteArray testByteArray = createTestReadOnlyByteArray(size);
+
+          // Assert readonly if applicable
+          if(!isReadableWritableOK()) assertFalse(testByteArray instanceof ReadableWritableByteArray);
+
+          try{
+
+            // Assert size
+            assertEquals(size, testByteArray.size());
+
+            // Get the expected exception
+            ByteArrayIndexOutOfBoundsException expectedEx = assertThrows(
+              ByteArrayIndexOutOfBoundsException.class,
+              () -> IndexingUtility.checkReadWriteByte(size, size)
+            );
+
+            // Now test the byte array
+            ByteArrayIndexOutOfBoundsException actualEx = assertThrows(
+              ByteArrayIndexOutOfBoundsException.class,
+              () -> testByteArray.readDoubleLE(size)
+            );
+
+            // Check the message
+            assertEquals(expectedEx.getMessage(), actualEx.getMessage());
+
+          }finally{
+            cleanTestByteArray(testByteArray);
+          }
+
+        }catch(OutOfMemoryError oom){
+          System.gc();
+          oom.printStackTrace();
+          System.out.println("Out of memory. Cannot perform this test due to insufficient memory space");
+          fail("Cannot perform test due to insufficient memory space");
+        }
+
+        // Clean up
+        System.gc();
+      }));
+
+      // Write test for index that exceeds capacity (random)
+      for(int trial = 0; trial < TRIALS; trial++){
+        long index = size + Math.abs(rng.nextInt());
+        tests.add(dynamicTest(f("readDoubleLE({}) on ByteArray of {}B size", index, size), () -> {
+
+          // Wrap in try and catch for possible OOM if trying to allocate max memory
+          try{
+
+            // Allocate the readonly bytearray
+            ReadOnlyByteArray testByteArray = createTestReadOnlyByteArray(size);
+
+            // Assert readonly if applicable
+            if(!isReadableWritableOK()) assertFalse(testByteArray instanceof ReadableWritableByteArray);
+
+            try{
+
+              // Assert size
+              assertEquals(size, testByteArray.size());
+
+              // Get the expected exception
+              ByteArrayIndexOutOfBoundsException expectedEx = assertThrows(
+                ByteArrayIndexOutOfBoundsException.class,
+                () -> IndexingUtility.checkReadWriteByte(index, size)
+              );
+
+              // Now test the byte array
+              ByteArrayIndexOutOfBoundsException actualEx = assertThrows(
+                ByteArrayIndexOutOfBoundsException.class,
+                () -> testByteArray.readDoubleLE(index)
+              );
+
+              // Check the message
+              assertEquals(expectedEx.getMessage(), actualEx.getMessage());
+
+            }finally{
+              cleanTestByteArray(testByteArray);
+            }
+
+          }catch(OutOfMemoryError oom){
+            System.gc();
+            oom.printStackTrace();
+            fail("Cannot perform test due to insufficient memory space");
+          }
+
+          // Clean up
+          System.gc();
+        }));
+      }
+
+      // Write test for length that exceeds capacity
+      tests.add(dynamicTest(f("readDoubleLE({}) on ByteArray of {}B size", size - 1, size), () -> {
+
+        // Wrap in try and catch for possible OOM if trying to allocate max memory
+        try{
+
+          // Allocate the readonly bytearray
+          var testByteArray = createTestReadOnlyByteArray(size);
+
+          // Assert readonly if applicable
+          if(!isReadableWritableOK()) assertFalse(testByteArray instanceof ReadableWritableByteArray);
+
+          try{
+
+            // Assert size
+            assertEquals(size, testByteArray.size());
+
+            // Get the expected exception
+            var expectedEx = assertThrows(
+              ByteArrayLengthOverBoundsException.class,
+              () -> IndexingUtility.checkReadWrite(size - 1, 8, size)
+            );
+
+            // Now test the byte array
+            var actualEx = assertThrows(
+              ByteArrayLengthOverBoundsException.class,
+              () -> testByteArray.readDoubleLE(size - 1)
             );
 
             // Check the message

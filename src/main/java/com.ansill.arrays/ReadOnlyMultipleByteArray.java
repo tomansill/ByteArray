@@ -171,8 +171,8 @@ final class ReadOnlyMultipleByteArray implements ReadOnlyByteArray{
       // Subset and read
       byteArray.readReversed(
         relativeByteIndex,
-        destination.subsetOf(destination.size() - remainingLength, lenToCopy)
-      ); // TODO check subsetOf here
+        destination.subsetOf((destination.size() - 1) - (destination.size() - remainingLength), lenToCopy)
+      );
 
       // Adjust relative byte index and remaining length
       relativeByteIndex = Long.max(0, relativeByteIndex - byteArray.size() - lenToCopy);

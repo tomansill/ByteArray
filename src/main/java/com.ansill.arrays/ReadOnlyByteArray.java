@@ -264,6 +264,8 @@ public interface ReadOnlyByteArray extends ByteArray{
    * destination {@link WriteOnlyByteArray} in a reverse order meaning first bytes on this {@link ReadOnlyByteArray}
    * will be written to last byte positions of the destination {@link WriteOnlyByteArray} and fill the destination
    * {@link WriteOnlyByteArray} to its first byte positions.
+   * <p>
+   * This call is equivalent to calling normal @{code read(long,WriteOnlyByteArray)} then reversing the {@link WriteOnlyByteArray}.
    *
    * @param byteIndex   non-negative index on this {@link ReadOnlyByteArray}
    * @param destination destination {@link WriteOnlyByteArray} to be written to while reading the

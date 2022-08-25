@@ -600,6 +600,20 @@ final class ReadableWritableMultipleByteArray implements ReadableWritableByteArr
   }
 
   /**
+   * {@inheritDoc}
+   */
+  @Override
+  public void writeReversed(long byteIndex, @Nonnull ReadOnlyByteArray source)
+  throws ByteArrayIndexOutOfBoundsException, ByteArrayLengthOverBoundsException{
+
+    // Check parameters
+    checkWrite(byteIndex, source, size);
+
+    // Pass it over
+    innerWriteReversed(byteIndex, source);
+  }
+
+  /**
    * Inner write
    *
    * @param byteIndex byte index to start the write
@@ -628,6 +642,45 @@ final class ReadableWritableMultipleByteArray implements ReadableWritableByteArr
 
       // Subset and write
       byteArray.write(relativeByteIndex, source.subsetOf(source.size() - remainingLength, lenToCopy));
+
+      // Adjust relative byte index and remaining length
+      relativeByteIndex = Long.max(0, relativeByteIndex - byteArray.size() - lenToCopy);
+      remainingLength -= lenToCopy;
+    }
+  }
+
+  /**
+   * Inner write in reverse order
+   *
+   * @param byteIndex byte index to start the write
+   * @param source    source byte array to copy the data from
+   * @throws ByteArrayIndexOutOfBoundsException thrown if the index is out of bounds
+   * @throws ByteArrayLengthOverBoundsException thrown if the length is over the bounds
+   */
+  private void innerWriteReversed(final long byteIndex, @Nonnull ReadOnlyByteArray source)
+  throws ByteArrayIndexOutOfBoundsException, ByteArrayLengthOverBoundsException, ByteArrayInvalidLengthException{
+
+    // Get floor index
+    long floorIndex = indexMap.floorKey(byteIndex);
+
+    // Get submap
+    var submap = indexMap.subMap(floorIndex, true, byteIndex + source.size(), false);
+
+    // Adjust the byteIndex to match submap
+    long relativeByteIndex = byteIndex - floorIndex;
+
+    // Loop through the submap
+    long remainingLength = source.size();
+    for(var byteArray : submap.values()){
+
+      // Determine the amount of bytes to copy
+      long lenToCopy = Long.min(byteArray.size() - relativeByteIndex, remainingLength);
+
+      // Subset and write
+      byteArray.writeReversed(
+        relativeByteIndex,
+        source.subsetOf((source.size() - 1) - (source.size() - remainingLength), lenToCopy)
+      );
 
       // Adjust relative byte index and remaining length
       relativeByteIndex = Long.max(0, relativeByteIndex - byteArray.size() - lenToCopy);
