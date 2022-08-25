@@ -29,6 +29,32 @@ class ReadOnlyByteArrayWrapper implements ReadOnlyByteArray{
   }
 
   @Override
+  public short readShort(long byteIndex) throws ByteArrayIndexOutOfBoundsException, ByteArrayLengthOverBoundsException{
+    return original.readShort(byteIndex);
+  }
+
+  @Override
+  public int readInt(long byteIndex) throws ByteArrayIndexOutOfBoundsException, ByteArrayLengthOverBoundsException{
+    return original.readInt(byteIndex);
+  }
+
+  @Override
+  public long readLong(long byteIndex) throws ByteArrayIndexOutOfBoundsException, ByteArrayLengthOverBoundsException{
+    return original.readLong(byteIndex);
+  }
+
+  @Override
+  public float readFloat(long byteIndex) throws ByteArrayIndexOutOfBoundsException, ByteArrayLengthOverBoundsException{
+    return original.readFloat(byteIndex);
+  }
+
+  @Override
+  public double readDouble(long byteIndex)
+  throws ByteArrayIndexOutOfBoundsException, ByteArrayLengthOverBoundsException{
+    return original.readDouble(byteIndex);
+  }
+
+  @Override
   public void read(long byteIndex, @Nonnull WriteOnlyByteArray destination)
   throws ByteArrayIndexOutOfBoundsException, ByteArrayLengthOverBoundsException{
     original.read(byteIndex, destination);

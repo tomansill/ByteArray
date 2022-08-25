@@ -11,9 +11,9 @@ import org.junit.jupiter.api.Nested;
 import test.BaseByteArrayTest;
 import test.BaseReadableWritableByteArrayTest;
 import test.other.ReadOnlyByteArrayWithOtherByteArrayTest;
-import test.other.ReadableWritableByteArrayWithOtherByteArrayTest;
 import test.other.WriteOnlyByteArrayWithOtherByteArrayTest;
 import test.self.SelfReadOnlyByteArray64BitTest;
+import test.self.SelfReadableWritableByteArray64BitTest;
 import test.self.SelfWriteOnlyByteArray64BitTest;
 
 import javax.annotation.Nonnull;
@@ -106,9 +106,7 @@ public class TestOnlyByteArrayNestedTest{
   @Nested
   @DisplayName("ReadableWritable test")
   public class ReadableWritableByteArrayTest
-    implements TestOnlyByteArrayTest,
-    ReadableWritableByteArrayWithOtherByteArrayTest, BaseReadableWritableByteArrayTest, SelfWriteOnlyByteArray64BitTest,
-    SelfReadOnlyByteArray64BitTest{
+    implements TestOnlyByteArrayTest, BaseReadableWritableByteArrayTest, SelfReadableWritableByteArray64BitTest{
 
     @Override
     public boolean isReadableWritableOK(){

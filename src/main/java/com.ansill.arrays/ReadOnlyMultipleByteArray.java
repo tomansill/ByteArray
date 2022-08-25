@@ -2,10 +2,12 @@ package com.ansill.arrays;
 
 import javax.annotation.Nonnegative;
 import javax.annotation.Nonnull;
+import java.nio.ByteBuffer;
 import java.util.List;
 import java.util.TreeMap;
 
 import static com.ansill.arrays.IndexingUtility.checkRead;
+import static com.ansill.arrays.IndexingUtility.checkReadWrite;
 import static com.ansill.arrays.IndexingUtility.checkReadWriteByte;
 import static com.ansill.arrays.IndexingUtility.checkSubsetOf;
 import static com.ansill.arrays.ReadableWritableMultipleByteArray.innerSubsetOf;
@@ -123,6 +125,87 @@ final class ReadOnlyMultipleByteArray implements ReadOnlyByteArray{
 
     // Read it
     return innerReadByte(indexMap, byteIndex);
+  }
+
+  @Override
+  public short readShort(long byteIndex) throws ByteArrayIndexOutOfBoundsException, ByteArrayLengthOverBoundsException{
+
+    // Check
+    checkReadWrite(byteIndex, 2, size);
+
+    // Use ByteBuffer
+    var bb = ByteBuffer.allocate(2);
+
+    // Read
+    ReadOnlyMultipleByteArray.innerRead(indexMap, byteIndex, new ByteBufferByteArray(bb));
+
+    // Read the results
+    return bb.getShort();
+  }
+
+  @Override
+  public int readInt(long byteIndex) throws ByteArrayIndexOutOfBoundsException, ByteArrayLengthOverBoundsException{
+
+    // Check
+    checkReadWrite(byteIndex, 4, size);
+
+    // Use ByteBuffer
+    var bb = ByteBuffer.allocate(4);
+
+    // Read
+    ReadOnlyMultipleByteArray.innerRead(indexMap, byteIndex, new ByteBufferByteArray(bb));
+
+    // Read the results
+    return bb.getInt();
+  }
+
+  @Override
+  public long readLong(long byteIndex) throws ByteArrayIndexOutOfBoundsException, ByteArrayLengthOverBoundsException{
+
+    // Check
+    checkReadWrite(byteIndex, 8, size);
+
+    // Use ByteBuffer
+    var bb = ByteBuffer.allocate(8);
+
+    // Read
+    ReadOnlyMultipleByteArray.innerRead(indexMap, byteIndex, new ByteBufferByteArray(bb));
+
+    // Read the results
+    return bb.getLong();
+  }
+
+  @Override
+  public float readFloat(long byteIndex) throws ByteArrayIndexOutOfBoundsException, ByteArrayLengthOverBoundsException{
+
+    // Check
+    checkReadWrite(byteIndex, 4, size);
+
+    // Use ByteBuffer
+    var bb = ByteBuffer.allocate(4);
+
+    // Read
+    ReadOnlyMultipleByteArray.innerRead(indexMap, byteIndex, new ByteBufferByteArray(bb));
+
+    // Read the results
+    return bb.getFloat();
+  }
+
+  @Override
+  public double readDouble(long byteIndex)
+  throws ByteArrayIndexOutOfBoundsException, ByteArrayLengthOverBoundsException{
+
+    // Check
+    checkReadWrite(byteIndex, 8, size);
+
+    // Use ByteBuffer
+    var bb = ByteBuffer.allocate(8);
+
+    // Read
+    ReadOnlyMultipleByteArray.innerRead(indexMap, byteIndex, new ByteBufferByteArray(bb));
+
+    // Read the results
+    return bb.getDouble();
   }
 
   @Override

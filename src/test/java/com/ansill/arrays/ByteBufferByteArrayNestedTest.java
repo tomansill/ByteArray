@@ -3,12 +3,12 @@ package com.ansill.arrays;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import test.BaseByteArrayTest;
-import test.BaseReadableWritableByteArrayTest;
-import test.BaseWriteOnlyByteArrayTest;
 import test.other.ReadOnlyByteArrayWithOtherByteArrayTest;
 import test.other.ReadableWritableByteArrayWithOtherByteArrayTest;
 import test.other.WriteOnlyByteArrayWithOtherByteArrayTest;
 import test.self.SelfReadOnlyByteArrayTest;
+import test.self.SelfReadableWritableByteArrayTest;
+import test.self.SelfWriteOnlyByteArrayTest;
 
 import javax.annotation.Nonnull;
 import java.nio.ByteBuffer;
@@ -31,7 +31,7 @@ public class ByteBufferByteArrayNestedTest{
       }
 
       // Read
-      return ((ByteBufferByteArray) testByteArray).data.get((int) byteIndex);
+      return ((ByteBufferByteArray) testByteArray).readByte(byteIndex);
     }
 
     public void writeTestReadOnlyByteArray(@Nonnull ReadOnlyByteArray testByteArray, long byteIndex, byte value){
@@ -47,7 +47,7 @@ public class ByteBufferByteArrayNestedTest{
       }
 
       // Update
-      ((ByteBufferByteArray) testByteArray).data.put((int) byteIndex, value);
+      ((ByteBufferByteArray) testByteArray).writeByte((int) byteIndex, value);
     }
 
     @Nonnull
@@ -135,7 +135,7 @@ public class ByteBufferByteArrayNestedTest{
 
     @Nested
     @DisplayName("WriteOnly test")
-    public class WriteOnlyByteBufferByteArrayTest extends ByteBufferByteArrayTest implements BaseWriteOnlyByteArrayTest{
+    public class WriteOnlyByteBufferByteArrayTest extends ByteBufferByteArrayTest implements SelfWriteOnlyByteArrayTest{
 
     }
 
@@ -168,7 +168,7 @@ public class ByteBufferByteArrayNestedTest{
 
     @Nested
     @DisplayName("WriteOnly test with control ByteArray implementation")
-    public class WriteOnlyByteBufferByteArrayWithControlByteArrayTest extends WriteOnlyByteBufferByteArrayTest
+    public class WriteOnlyByteBufferByteArrayWithControlByteArrayTest extends ByteBufferByteArrayTest
       implements
       WriteOnlyByteArrayWithOtherByteArrayTest{
 
@@ -194,7 +194,7 @@ public class ByteBufferByteArrayNestedTest{
     @Nested
     @DisplayName("ReadableWritable test")
     public class ReadableWritableByteBufferByteArrayTest extends ByteBufferByteArrayTest
-      implements BaseReadableWritableByteArrayTest{
+      implements SelfReadableWritableByteArrayTest{
 
       @Nonnull
       public ReadOnlyByteArray createTestReadOnlyByteArray(long size){

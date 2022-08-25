@@ -47,19 +47,22 @@ together and represent it as a single array of data.
       s
 - `ReadOnlyByteArray`
     - Read-only version of `ByteArray`
-    - Provides `readByte(long)` and `read(long, WriteOnlyByteArray)` methods to read the bytes from
-      the `ReadOnlyByteArray`
+    - Provides `readByte(long)`, `readShort(long)`, `readInt(long)`, `readLong(long)`, `readFloat(long)`,
+      `readDouble(long)`, and `read(long, WriteOnlyByteArray)` methods to read the bytes from the `ReadOnlyByteArray`
     - **IMPORTANT:** Not necessarily an immutable version of `ReadableWritableByteArray`, however, it can be made
       *practically immutable* if the backing data is adequately protected from modifications. Any modifications to the
       backing data or to its associated `ReadableWritableByteArray`s will propagate the changes to `ReadOnlyByteArray`.
 - `WriteOnlyByteArray`
     - Write-only version of `ByteArray`
-    - Provides `writeByte(long, byte)` and `write(long, ReadOnlyByteArray)` methods to write the bytes to
-      the `WriteOnlyByteArray`
+    - Provides `writeByte(long, byte)`, `writeShort(long, short)`, `writeInt(long, int)`, `writeLong(long, long)`,
+      `writeFloat(long, float)`, `writeDouble(long, double)`, and `write(long, ReadOnlyByteArray)` methods to write
+      the bytes to the `WriteOnlyByteArray`
 - `ReadableWritableByteArray`
     - Readable-writable version of `ByteArray`
     - Combination of `ReadOnlyByteArray` and `WriteOnlyByteArray` interfaces
-    - Provides `readByte(long)`, `read(long, WriteOnlyByteArray)`, `writeByte(long, byte)`,
+    - Provides `readByte(long)`, `readShort(long)`, `readInt(long)`, `readLong(long)`, `readFloat(long)`,
+      `readDouble(long)`, `read(long, WriteOnlyByteArray)`, `writeByte(long, byte)`, `writeShort(long, short)`,
+      `writeInt(long, int)`, `writeLong(long, long)`, `writeFloat(long, float)`, `writeDouble(long, double)`,
       and `write(long, ReadOnlyByteArray)` methods to fully read or write the bytes to `ReadableWritableByteArray`
     - Provides `toReadOnly()` and `toWriteOnly()` methods to convert `ReadableWritableByteArray` to
       either `ReadOnlyByteArray` or `WriteOnlyByteArray` to lock out accesses
@@ -180,17 +183,6 @@ largeByteArray.subsetOf(2, 4).read(0, source);
 
 ## TO-DOs
 
-- Implement the remaining read/write calls to match capability of `ByteBuffer`'s reads/writes.
-    - `readShort(long)`
-    - `readInt(long)`
-    - `readLong(long)`
-    - `readFloat(long)`
-    - `readDouble(long)`
-    - `writeShort(long,short)`
-    - `writeInt(long,int)`
-    - `writeLong(long,long)`
-    - `writeFloat(long,float)`
-    - `writeDouble(long,double)`
 - Endian-ness support?
     - Use `java.nio.ByteOrder`?
     - `reverse()` method or `to(java.nio.ByteOrder)` method? *(less work as all read/writes shall obey one endianness

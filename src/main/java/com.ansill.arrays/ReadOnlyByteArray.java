@@ -27,6 +27,106 @@ public interface ReadOnlyByteArray extends ByteArray{
   byte readByte(@Nonnegative long byteIndex) throws ByteArrayIndexOutOfBoundsException;
 
   /**
+   * Reads a short at a specified index on this {@link ReadOnlyByteArray}
+   *
+   * @param byteIndex non-negative index on this {@link ReadOnlyByteArray}
+   * @return short value
+   * @throws ByteArrayIndexOutOfBoundsException thrown if byteIndex is out of bounds
+   * @throws ByteArrayLengthOverBoundsException thrown if the value cannot be fully extracted as it goes over the length of the byte array
+   */
+  default short readShort(@Nonnegative long byteIndex)
+  throws ByteArrayIndexOutOfBoundsException, ByteArrayLengthOverBoundsException{
+
+    // Check
+    IndexingUtility.checkReadWrite(byteIndex, 2, this.size());
+
+    // Use two readByte calls
+    int value = (0xff & readByte(byteIndex)) << 8;
+    value |= (0xff & readByte(byteIndex + 1));
+
+    // Return value
+    return (short) value;
+  }
+
+  /**
+   * Reads an int at a specified index on this {@link ReadOnlyByteArray}
+   *
+   * @param byteIndex non-negative index on this {@link ReadOnlyByteArray}
+   * @return int value
+   * @throws ByteArrayIndexOutOfBoundsException thrown if byteIndex is out of bounds
+   * @throws ByteArrayLengthOverBoundsException thrown if the value cannot be fully extracted as it goes over the length of the byte array
+   */
+  default int readInt(@Nonnegative long byteIndex)
+  throws ByteArrayIndexOutOfBoundsException, ByteArrayLengthOverBoundsException{
+
+    // Check
+    IndexingUtility.checkReadWrite(byteIndex, 4, this.size());
+
+    // Use four readByte calls
+    int value = (0xff & readByte(byteIndex)) << 8;
+    value = (value | (0xff & readByte(byteIndex + 1))) << 8;
+    value = (value | (0xff & readByte(byteIndex + 2))) << 8;
+    value = (value | (0xff & readByte(byteIndex + 3)));
+
+    // Return value
+    return value;
+  }
+
+  /**
+   * Reads a long at a specified index on this {@link ReadOnlyByteArray}
+   *
+   * @param byteIndex non-negative index on this {@link ReadOnlyByteArray}
+   * @return long value
+   * @throws ByteArrayIndexOutOfBoundsException thrown if byteIndex is out of bounds
+   * @throws ByteArrayLengthOverBoundsException thrown if the value cannot be fully extracted as it goes over the length of the byte array
+   */
+  default long readLong(@Nonnegative long byteIndex)
+  throws ByteArrayIndexOutOfBoundsException, ByteArrayLengthOverBoundsException{
+
+    // Check
+    IndexingUtility.checkReadWrite(byteIndex, 8, this.size());
+
+    // Use eight readByte calls
+    long value = (0xff & readByte(byteIndex)) << 8;
+    value = (value | (0xff & readByte(byteIndex + 1))) << 8;
+    value = (value | (0xff & readByte(byteIndex + 2))) << 8;
+    value = (value | (0xff & readByte(byteIndex + 3))) << 8;
+    value = (value | (0xff & readByte(byteIndex + 4))) << 8;
+    value = (value | (0xff & readByte(byteIndex + 5))) << 8;
+    value = (value | (0xff & readByte(byteIndex + 6))) << 8;
+    value = (value | (0xff & readByte(byteIndex + 7)));
+
+    // Return value
+    return value;
+  }
+
+  /**
+   * Reads a float at a specified index on this {@link ReadOnlyByteArray}
+   *
+   * @param byteIndex non-negative index on this {@link ReadOnlyByteArray}
+   * @return float value
+   * @throws ByteArrayIndexOutOfBoundsException thrown if byteIndex is out of bounds
+   * @throws ByteArrayLengthOverBoundsException thrown if the value cannot be fully extracted as it goes over the length of the byte array
+   */
+  default float readFloat(@Nonnegative long byteIndex)
+  throws ByteArrayIndexOutOfBoundsException, ByteArrayLengthOverBoundsException{
+    return Float.intBitsToFloat(readInt(byteIndex));
+  }
+
+  /**
+   * Reads a double at a specified index on this {@link ReadOnlyByteArray}
+   *
+   * @param byteIndex non-negative index on this {@link ReadOnlyByteArray}
+   * @return double value
+   * @throws ByteArrayIndexOutOfBoundsException thrown if byteIndex is out of bounds
+   * @throws ByteArrayLengthOverBoundsException thrown if the value cannot be fully extracted as it goes over the length of the byte array
+   */
+  default double readDouble(@Nonnegative long byteIndex)
+  throws ByteArrayIndexOutOfBoundsException, ByteArrayLengthOverBoundsException{
+    return Double.longBitsToDouble(readLong(byteIndex));
+  }
+
+  /**
    * Reads bytes from this {@link ReadOnlyByteArray} starting at specified byte index and writes the bytes to destination {@link WriteOnlyByteArray}.
    *
    * @param byteIndex   non-negative index on this {@link ReadOnlyByteArray}

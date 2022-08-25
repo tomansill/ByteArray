@@ -3,7 +3,6 @@ package test.self;
 import com.ansill.arrays.ReadableWritableByteArray;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import test.BaseWriteOnlyByteArrayTest;
 
 import java.util.HashSet;
 import java.util.Random;
@@ -14,8 +13,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.fail;
 
-public interface SelfWriteOnlyByteArray64BitTest extends BaseWriteOnlyByteArrayTest{
-
+public interface SelfWriteOnlyByteArray64BitTest extends SelfWriteOnlyByteArrayTest{
 
   @DisplayName("Test readWrite(long) on 64-bit addressable data")
   @Test

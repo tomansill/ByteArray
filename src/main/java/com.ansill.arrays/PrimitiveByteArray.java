@@ -7,6 +7,7 @@ import javax.annotation.Nonnegative;
 import javax.annotation.Nonnull;
 
 import static com.ansill.arrays.IndexingUtility.checkRead;
+import static com.ansill.arrays.IndexingUtility.checkReadWrite;
 import static com.ansill.arrays.IndexingUtility.checkReadWriteByte;
 import static com.ansill.arrays.IndexingUtility.checkSubsetOf;
 import static com.ansill.arrays.IndexingUtility.checkWrite;
@@ -99,6 +100,39 @@ final class PrimitiveByteArray implements ReadableWritableByteArray, ReadOnlyByt
     return data[(int) (start + byteIndex)];
   }
 
+  @Override
+  public short readShort(long byteIndex) throws ByteArrayIndexOutOfBoundsException, ByteArrayLengthOverBoundsException{
+    checkReadWrite(byteIndex, 2, this.size());
+    int value = (0xff & data[(int) (start + byteIndex)]) << 8;
+    value |= (0xff & data[(int) (start + byteIndex + 1)]);
+    return (short) value;
+  }
+
+  @Override
+  public int readInt(long byteIndex) throws ByteArrayIndexOutOfBoundsException, ByteArrayLengthOverBoundsException{
+    checkReadWrite(byteIndex, 4, this.size());
+    int value = (0xff & data[(int) (start + byteIndex)]) << 8;
+    value = (value | (0xff & data[(int) (start + byteIndex + 1)])) << 8;
+    value = (value | (0xff & data[(int) (start + byteIndex + 2)])) << 8;
+    value |= (0xff & data[(int) (start + byteIndex + 3)]);
+    return value;
+  }
+
+  @Override
+  public long readLong(long byteIndex) throws ByteArrayIndexOutOfBoundsException, ByteArrayLengthOverBoundsException{
+    checkReadWrite(byteIndex, 8, this.size());
+    long value = (0xff & data[(int) (start + byteIndex)]) << 8;
+    value = (value | (0xff & data[(int) (start + byteIndex + 1)])) << 8;
+    value = (value | (0xff & data[(int) (start + byteIndex + 2)])) << 8;
+    value = (value | (0xff & data[(int) (start + byteIndex + 3)])) << 8;
+    value = (value | (0xff & data[(int) (start + byteIndex + 4)])) << 8;
+    value = (value | (0xff & data[(int) (start + byteIndex + 5)])) << 8;
+    value = (value | (0xff & data[(int) (start + byteIndex + 6)])) << 8;
+    value |= (0xff & data[(int) (start + byteIndex + 7)]);
+    return value;
+  }
+
+
   /**
    * {@inheritDoc}
    */
@@ -167,6 +201,38 @@ final class PrimitiveByteArray implements ReadableWritableByteArray, ReadOnlyByt
   public void writeByte(long byteIndex, byte value) throws ByteArrayIndexOutOfBoundsException{
     checkReadWriteByte(byteIndex, size);
     data[(int) (start + byteIndex)] = value;
+  }
+
+  @Override
+  public void writeShort(long byteIndex, short value)
+  throws ByteArrayIndexOutOfBoundsException, ByteArrayLengthOverBoundsException{
+    checkReadWrite(byteIndex, 2, size);
+    data[(int) (start + byteIndex)] = (byte) (value >>> 8);
+    data[(int) (start + byteIndex + 1)] = (byte) value;
+  }
+
+  @Override
+  public void writeInt(long byteIndex, int value)
+  throws ByteArrayIndexOutOfBoundsException, ByteArrayLengthOverBoundsException{
+    checkReadWrite(byteIndex, 4, size);
+    data[(int) (start + byteIndex)] = (byte) (value >>> 24);
+    data[(int) (start + byteIndex + 1)] = (byte) (value >>> 16);
+    data[(int) (start + byteIndex + 2)] = (byte) (value >>> 8);
+    data[(int) (start + byteIndex + 3)] = (byte) value;
+  }
+
+  @Override
+  public void writeLong(long byteIndex, long value)
+  throws ByteArrayIndexOutOfBoundsException, ByteArrayLengthOverBoundsException{
+    checkReadWrite(byteIndex, 8, size);
+    data[(int) (start + byteIndex)] = (byte) (value >>> 56);
+    data[(int) (start + byteIndex + 1)] = (byte) (value >>> 48);
+    data[(int) (start + byteIndex + 2)] = (byte) (value >>> 40);
+    data[(int) (start + byteIndex + 3)] = (byte) (value >>> 32);
+    data[(int) (start + byteIndex + 4)] = (byte) (value >>> 24);
+    data[(int) (start + byteIndex + 5)] = (byte) (value >>> 16);
+    data[(int) (start + byteIndex + 6)] = (byte) (value >>> 8);
+    data[(int) (start + byteIndex + 7)] = (byte) value;
   }
 
   /**
