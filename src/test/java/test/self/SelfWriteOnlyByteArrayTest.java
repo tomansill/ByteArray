@@ -551,7 +551,7 @@ public interface SelfWriteOnlyByteArrayTest extends BaseWriteOnlyByteArrayTest{
                 val |= (0xff & controlOne.readByte(byteIndex + 1));
 
                 // Write it
-                testByteArray.writeShort(byteIndex, (short) val);
+                testByteArray.writeShortBE(byteIndex, (short) val);
 
                 // Add to written set
                 written.add(byteIndex);
@@ -596,7 +596,7 @@ public interface SelfWriteOnlyByteArrayTest extends BaseWriteOnlyByteArrayTest{
                 val |= (0xff & controlTwo.readByte(byteIndex + 1));
 
                 // Write it
-                testByteArray.writeShort(byteIndex, (short) val);
+                testByteArray.writeShortBE(byteIndex, (short) val);
 
                 // Add to written set
                 written.add(byteIndex);
@@ -705,7 +705,7 @@ public interface SelfWriteOnlyByteArrayTest extends BaseWriteOnlyByteArrayTest{
                 val |= (0xff & controlOne.readByte(byteIndex + 3));
 
                 // Write it
-                testByteArray.writeInt(byteIndex, val);
+                testByteArray.writeIntBE(byteIndex, val);
 
                 // Add to written set
                 written.add(byteIndex);
@@ -754,7 +754,7 @@ public interface SelfWriteOnlyByteArrayTest extends BaseWriteOnlyByteArrayTest{
                 val |= (0xff & controlTwo.readByte(byteIndex + 3));
 
                 // Write it
-                testByteArray.writeInt(byteIndex, val);
+                testByteArray.writeIntBE(byteIndex, val);
 
                 // Add to written set
                 written.add(byteIndex);
@@ -869,7 +869,7 @@ public interface SelfWriteOnlyByteArrayTest extends BaseWriteOnlyByteArrayTest{
                 val |= (0xff & controlOne.readByte(byteIndex + 7));
 
                 // Write it
-                testByteArray.writeLong(byteIndex, val);
+                testByteArray.writeLongBE(byteIndex, val);
 
                 // Add to written set
                 written.add(byteIndex);
@@ -926,7 +926,7 @@ public interface SelfWriteOnlyByteArrayTest extends BaseWriteOnlyByteArrayTest{
                 val |= (0xff & controlTwo.readByte(byteIndex + 7));
 
                 // Write it
-                testByteArray.writeLong(byteIndex, val);
+                testByteArray.writeLongBE(byteIndex, val);
 
                 // Add to written set
                 written.add(byteIndex);
@@ -1014,7 +1014,7 @@ public interface SelfWriteOnlyByteArrayTest extends BaseWriteOnlyByteArrayTest{
             {
               var testRNG = new Random(testLocalSeed);
               for(long index = 0; index < size / 4; index++){
-                controlOne.writeFloat(index * 4, testRNG.nextInt() * testRNG.nextFloat());
+                controlOne.writeFloatBE(index * 4, testRNG.nextInt() * testRNG.nextFloat());
               }
             }
 
@@ -1043,7 +1043,7 @@ public interface SelfWriteOnlyByteArrayTest extends BaseWriteOnlyByteArrayTest{
                 val |= (0xff & controlOne.readByte(byteIndex + 3));
 
                 // Write it
-                testByteArray.writeFloat(byteIndex, Float.intBitsToFloat(val));
+                testByteArray.writeFloatBE(byteIndex, Float.intBitsToFloat(val));
 
                 // Add to written set
                 written.add(byteIndex);
@@ -1065,7 +1065,7 @@ public interface SelfWriteOnlyByteArrayTest extends BaseWriteOnlyByteArrayTest{
             {
               Random testRNG = new Random(testLocalSeed + 342);
               for(long index = 0; index < size / 4; index++){
-                controlTwo.writeFloat(index * 4, testRNG.nextInt() * testRNG.nextFloat());
+                controlTwo.writeFloatBE(index * 4, testRNG.nextInt() * testRNG.nextFloat());
               }
             }
 
@@ -1093,7 +1093,7 @@ public interface SelfWriteOnlyByteArrayTest extends BaseWriteOnlyByteArrayTest{
                 val |= (0xff & controlTwo.readByte(byteIndex + 3));
 
                 // Write it
-                testByteArray.writeFloat(byteIndex, Float.intBitsToFloat(val));
+                testByteArray.writeFloatBE(byteIndex, Float.intBitsToFloat(val));
 
                 // Add to written set
                 written.add(byteIndex);
@@ -1177,7 +1177,7 @@ public interface SelfWriteOnlyByteArrayTest extends BaseWriteOnlyByteArrayTest{
             {
               var testRNG = new Random(testLocalSeed);
               for(long index = 0; index < size / 8; index++){
-                controlOne.writeDouble(index * 8, testRNG.nextLong() * testRNG.nextDouble());
+                controlOne.writeDoubleBE(index * 8, testRNG.nextLong() * testRNG.nextDouble());
               }
             }
 
@@ -1210,7 +1210,7 @@ public interface SelfWriteOnlyByteArrayTest extends BaseWriteOnlyByteArrayTest{
                 val |= (0xff & controlOne.readByte(byteIndex + 7));
 
                 // Write it
-                testByteArray.writeDouble(byteIndex, Double.longBitsToDouble(val));
+                testByteArray.writeDoubleBE(byteIndex, Double.longBitsToDouble(val));
 
                 // Add to written set
                 written.add(byteIndex);
@@ -1236,7 +1236,7 @@ public interface SelfWriteOnlyByteArrayTest extends BaseWriteOnlyByteArrayTest{
             {
               Random testRNG = new Random(testLocalSeed + 342);
               for(long index = 0; index < size / 8; index++){
-                controlTwo.writeDouble(index * 8, testRNG.nextLong() * testRNG.nextDouble());
+                controlTwo.writeDoubleBE(index * 8, testRNG.nextLong() * testRNG.nextDouble());
               }
             }
 
@@ -1269,7 +1269,7 @@ public interface SelfWriteOnlyByteArrayTest extends BaseWriteOnlyByteArrayTest{
                 val |= (0xff & controlTwo.readByte(byteIndex + 7));
 
                 // Write it
-                testByteArray.writeDouble(byteIndex, Double.longBitsToDouble(val));
+                testByteArray.writeDoubleBE(byteIndex, Double.longBitsToDouble(val));
 
                 // Add to written set
                 written.add(byteIndex);
@@ -1575,7 +1575,7 @@ public interface SelfWriteOnlyByteArrayTest extends BaseWriteOnlyByteArrayTest{
             // Now test the byte array
             ByteArrayIndexOutOfBoundsException actualEx = assertThrows(
               ByteArrayIndexOutOfBoundsException.class,
-              () -> testByteArray.writeShort(-1, (byte) 0)
+              () -> testByteArray.writeShortBE(-1, (byte) 0)
             );
 
             // Check the message
@@ -1624,7 +1624,7 @@ public interface SelfWriteOnlyByteArrayTest extends BaseWriteOnlyByteArrayTest{
               // Now test the byte array
               ByteArrayIndexOutOfBoundsException actualEx = assertThrows(
                 ByteArrayIndexOutOfBoundsException.class,
-                () -> testByteArray.writeShort(index, (byte) 0)
+                () -> testByteArray.writeShortBE(index, (byte) 0)
               );
 
               // Check the message
@@ -1671,7 +1671,7 @@ public interface SelfWriteOnlyByteArrayTest extends BaseWriteOnlyByteArrayTest{
             // Now test the byte array
             var actualEx = assertThrows(
               ByteArrayIndexOutOfBoundsException.class,
-              () -> testByteArray.writeShort(size, (byte) 0)
+              () -> testByteArray.writeShortBE(size, (byte) 0)
             );
 
             // Check the message
@@ -1718,7 +1718,7 @@ public interface SelfWriteOnlyByteArrayTest extends BaseWriteOnlyByteArrayTest{
             // Now test the byte array
             var actualEx = assertThrows(
               ByteArrayLengthOverBoundsException.class,
-              () -> testByteArray.writeShort(size - 1, (byte) 0)
+              () -> testByteArray.writeShortBE(size - 1, (byte) 0)
             );
 
             // Check the message
@@ -1767,7 +1767,7 @@ public interface SelfWriteOnlyByteArrayTest extends BaseWriteOnlyByteArrayTest{
               // Now test the byte array
               ByteArrayIndexOutOfBoundsException actualEx = assertThrows(
                 ByteArrayIndexOutOfBoundsException.class,
-                () -> testByteArray.writeShort(index, (byte) 0)
+                () -> testByteArray.writeShortBE(index, (byte) 0)
               );
 
               // Check the message
@@ -1840,7 +1840,7 @@ public interface SelfWriteOnlyByteArrayTest extends BaseWriteOnlyByteArrayTest{
             // Now test the byte array
             ByteArrayIndexOutOfBoundsException actualEx = assertThrows(
               ByteArrayIndexOutOfBoundsException.class,
-              () -> testByteArray.writeInt(-1, (byte) 0)
+              () -> testByteArray.writeIntBE(-1, (byte) 0)
             );
 
             // Check the message
@@ -1889,7 +1889,7 @@ public interface SelfWriteOnlyByteArrayTest extends BaseWriteOnlyByteArrayTest{
               // Now test the byte array
               ByteArrayIndexOutOfBoundsException actualEx = assertThrows(
                 ByteArrayIndexOutOfBoundsException.class,
-                () -> testByteArray.writeInt(index, (byte) 0)
+                () -> testByteArray.writeIntBE(index, (byte) 0)
               );
 
               // Check the message
@@ -1936,7 +1936,7 @@ public interface SelfWriteOnlyByteArrayTest extends BaseWriteOnlyByteArrayTest{
             // Now test the byte array
             var actualEx = assertThrows(
               ByteArrayIndexOutOfBoundsException.class,
-              () -> testByteArray.writeInt(size, (byte) 0)
+              () -> testByteArray.writeIntBE(size, (byte) 0)
             );
 
             // Check the message
@@ -1985,7 +1985,7 @@ public interface SelfWriteOnlyByteArrayTest extends BaseWriteOnlyByteArrayTest{
               // Now test the byte array
               var actualEx = assertThrows(
                 ByteArrayLengthOverBoundsException.class,
-                () -> testByteArray.writeInt(size - finalOffset, (byte) 0)
+                () -> testByteArray.writeIntBE(size - finalOffset, (byte) 0)
               );
 
               // Check the message
@@ -2035,7 +2035,7 @@ public interface SelfWriteOnlyByteArrayTest extends BaseWriteOnlyByteArrayTest{
               // Now test the byte array
               ByteArrayIndexOutOfBoundsException actualEx = assertThrows(
                 ByteArrayIndexOutOfBoundsException.class,
-                () -> testByteArray.writeInt(index, (byte) 0)
+                () -> testByteArray.writeIntBE(index, (byte) 0)
               );
 
               // Check the message
@@ -2108,7 +2108,7 @@ public interface SelfWriteOnlyByteArrayTest extends BaseWriteOnlyByteArrayTest{
             // Now test the byte array
             var actualEx = assertThrows(
               ByteArrayIndexOutOfBoundsException.class,
-              () -> testByteArray.writeLong(-1, (byte) 0)
+              () -> testByteArray.writeLongBE(-1, (byte) 0)
             );
 
             // Check the message
@@ -2157,7 +2157,7 @@ public interface SelfWriteOnlyByteArrayTest extends BaseWriteOnlyByteArrayTest{
               // Now test the byte array
               var actualEx = assertThrows(
                 ByteArrayIndexOutOfBoundsException.class,
-                () -> testByteArray.writeLong(index, (byte) 0)
+                () -> testByteArray.writeLongBE(index, (byte) 0)
               );
 
               // Check the message
@@ -2204,7 +2204,7 @@ public interface SelfWriteOnlyByteArrayTest extends BaseWriteOnlyByteArrayTest{
             // Now test the byte array
             var actualEx = assertThrows(
               ByteArrayIndexOutOfBoundsException.class,
-              () -> testByteArray.writeLong(size, (byte) 0)
+              () -> testByteArray.writeLongBE(size, (byte) 0)
             );
 
             // Check the message
@@ -2253,7 +2253,7 @@ public interface SelfWriteOnlyByteArrayTest extends BaseWriteOnlyByteArrayTest{
               // Now test the byte array
               var actualEx = assertThrows(
                 ByteArrayLengthOverBoundsException.class,
-                () -> testByteArray.writeLong(size - finalOffset, (byte) 0)
+                () -> testByteArray.writeLongBE(size - finalOffset, (byte) 0)
               );
 
               // Check the message
@@ -2303,7 +2303,7 @@ public interface SelfWriteOnlyByteArrayTest extends BaseWriteOnlyByteArrayTest{
               // Now test the byte array
               var actualEx = assertThrows(
                 ByteArrayIndexOutOfBoundsException.class,
-                () -> testByteArray.writeLong(index, (byte) 0)
+                () -> testByteArray.writeLongBE(index, (byte) 0)
               );
 
               // Check the message
@@ -2376,7 +2376,7 @@ public interface SelfWriteOnlyByteArrayTest extends BaseWriteOnlyByteArrayTest{
             // Now test the byte array
             ByteArrayIndexOutOfBoundsException actualEx = assertThrows(
               ByteArrayIndexOutOfBoundsException.class,
-              () -> testByteArray.writeFloat(-1, (byte) 0)
+              () -> testByteArray.writeFloatBE(-1, (byte) 0)
             );
 
             // Check the message
@@ -2425,7 +2425,7 @@ public interface SelfWriteOnlyByteArrayTest extends BaseWriteOnlyByteArrayTest{
               // Now test the byte array
               ByteArrayIndexOutOfBoundsException actualEx = assertThrows(
                 ByteArrayIndexOutOfBoundsException.class,
-                () -> testByteArray.writeFloat(index, (byte) 0)
+                () -> testByteArray.writeFloatBE(index, (byte) 0)
               );
 
               // Check the message
@@ -2472,7 +2472,7 @@ public interface SelfWriteOnlyByteArrayTest extends BaseWriteOnlyByteArrayTest{
             // Now test the byte array
             var actualEx = assertThrows(
               ByteArrayIndexOutOfBoundsException.class,
-              () -> testByteArray.writeFloat(size, (byte) 0)
+              () -> testByteArray.writeFloatBE(size, (byte) 0)
             );
 
             // Check the message
@@ -2521,7 +2521,7 @@ public interface SelfWriteOnlyByteArrayTest extends BaseWriteOnlyByteArrayTest{
               // Now test the byte array
               var actualEx = assertThrows(
                 ByteArrayLengthOverBoundsException.class,
-                () -> testByteArray.writeFloat(size - finalOffset, (byte) 0)
+                () -> testByteArray.writeFloatBE(size - finalOffset, (byte) 0)
               );
 
               // Check the message
@@ -2571,7 +2571,7 @@ public interface SelfWriteOnlyByteArrayTest extends BaseWriteOnlyByteArrayTest{
               // Now test the byte array
               ByteArrayIndexOutOfBoundsException actualEx = assertThrows(
                 ByteArrayIndexOutOfBoundsException.class,
-                () -> testByteArray.writeFloat(index, (byte) 0)
+                () -> testByteArray.writeFloatBE(index, (byte) 0)
               );
 
               // Check the message
@@ -2644,7 +2644,7 @@ public interface SelfWriteOnlyByteArrayTest extends BaseWriteOnlyByteArrayTest{
             // Now test the byte array
             var actualEx = assertThrows(
               ByteArrayIndexOutOfBoundsException.class,
-              () -> testByteArray.writeDouble(-1, (byte) 0)
+              () -> testByteArray.writeDoubleBE(-1, (byte) 0)
             );
 
             // Check the message
@@ -2693,7 +2693,7 @@ public interface SelfWriteOnlyByteArrayTest extends BaseWriteOnlyByteArrayTest{
               // Now test the byte array
               var actualEx = assertThrows(
                 ByteArrayIndexOutOfBoundsException.class,
-                () -> testByteArray.writeDouble(index, (byte) 0)
+                () -> testByteArray.writeDoubleBE(index, (byte) 0)
               );
 
               // Check the message
@@ -2740,7 +2740,7 @@ public interface SelfWriteOnlyByteArrayTest extends BaseWriteOnlyByteArrayTest{
             // Now test the byte array
             var actualEx = assertThrows(
               ByteArrayIndexOutOfBoundsException.class,
-              () -> testByteArray.writeDouble(size, (byte) 0)
+              () -> testByteArray.writeDoubleBE(size, (byte) 0)
             );
 
             // Check the message
@@ -2789,7 +2789,7 @@ public interface SelfWriteOnlyByteArrayTest extends BaseWriteOnlyByteArrayTest{
               // Now test the byte array
               var actualEx = assertThrows(
                 ByteArrayLengthOverBoundsException.class,
-                () -> testByteArray.writeDouble(size - finalOffset, (byte) 0)
+                () -> testByteArray.writeDoubleBE(size - finalOffset, (byte) 0)
               );
 
               // Check the message
@@ -2839,7 +2839,7 @@ public interface SelfWriteOnlyByteArrayTest extends BaseWriteOnlyByteArrayTest{
               // Now test the byte array
               var actualEx = assertThrows(
                 ByteArrayIndexOutOfBoundsException.class,
-                () -> testByteArray.writeDouble(index, (byte) 0)
+                () -> testByteArray.writeDoubleBE(index, (byte) 0)
               );
 
               // Check the message

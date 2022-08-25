@@ -3,6 +3,7 @@ package com.ansill.arrays;
 import javax.annotation.Nonnegative;
 import javax.annotation.Nonnull;
 import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
 import java.util.List;
 import java.util.TreeMap;
 
@@ -62,6 +63,15 @@ final class ReadOnlyMultipleByteArray implements ReadOnlyByteArray{
     this.size = size;
   }
 
+  /**
+   * Performs a read on this {@link ReadOnlyByteArray} to get a byte value at specified index
+   *
+   * @param indexMap  index map used to retrieve a byte
+   * @param byteIndex index of byte
+   * @param <T>       type that extends {@link ReadOnlyByteArray}
+   * @return byte
+   * @throws ByteArrayIndexOutOfBoundsException thrown if byteIndex is out of the bounds
+   */
   static <T extends ReadOnlyByteArray> byte innerReadByte(@Nonnull TreeMap<Long,T> indexMap, long byteIndex)
   throws ByteArrayIndexOutOfBoundsException{
 
@@ -81,6 +91,18 @@ final class ReadOnlyMultipleByteArray implements ReadOnlyByteArray{
     return byteArray.readByte(localIndex);
   }
 
+  /**
+   * Performs a read on this {@link ReadOnlyByteArray} and copy the resulting bytes to destination
+   * {@link WriteOnlyByteArray}.
+   *
+   * @param indexMap    map of byte arrays with indices
+   * @param byteIndex   byte index on where to start reading
+   * @param destination destination {@link WriteOnlyByteArray}
+   * @param <T>         class that extends {@link ReadOnlyByteArray}
+   * @throws ByteArrayIndexOutOfBoundsException thrown if index is out of the bounds
+   * @throws ByteArrayLengthOverBoundsException thrown if copying the values to destination byte array will go outside
+   *                                            the bounds
+   */
   static <T extends ReadOnlyByteArray> void innerRead(
     @Nonnull TreeMap<Long,T> indexMap,
     long byteIndex,
@@ -112,11 +134,63 @@ final class ReadOnlyMultipleByteArray implements ReadOnlyByteArray{
     }
   }
 
+  /**
+   * Performs a read on this {@link ReadOnlyByteArray} and copy the resulting bytes to destination
+   * {@link WriteOnlyByteArray} by filling WriteOnlyByteArray in reverse order.
+   *
+   * @param indexMap    map of byte arrays with indices
+   * @param byteIndex   byte index on where to start reading
+   * @param destination destination {@link WriteOnlyByteArray}
+   * @param <T>         class that extends {@link ReadOnlyByteArray}
+   * @throws ByteArrayIndexOutOfBoundsException thrown if index is out of the bounds
+   * @throws ByteArrayLengthOverBoundsException thrown if copying the values to destination byte array will go outside
+   *                                            the bounds
+   */
+  static <T extends ReadOnlyByteArray> void innerReadReversed(
+    @Nonnull TreeMap<Long,T> indexMap,
+    long byteIndex,
+    @Nonnull WriteOnlyByteArray destination
+  ) throws ByteArrayIndexOutOfBoundsException, ByteArrayLengthOverBoundsException{
+
+    // Get floor index
+    long floorIndex = indexMap.floorKey(byteIndex);
+
+    // Get submap
+    var submap = indexMap.subMap(floorIndex, true, byteIndex + destination.size(), false);
+
+    // Adjust the byteIndex to match submap
+    long relativeByteIndex = byteIndex - floorIndex;
+
+    // Loop through the submap
+    long remainingLength = destination.size();
+    for(var byteArray : submap.values()){
+
+      // Determine the amount of bytes to copy
+      long lenToCopy = Long.min(byteArray.size() - relativeByteIndex, remainingLength);
+
+      // Subset and read
+      byteArray.readReversed(
+        relativeByteIndex,
+        destination.subsetOf(destination.size() - remainingLength, lenToCopy)
+      ); // TODO check subsetOf here
+
+      // Adjust relative byte index and remaining length
+      relativeByteIndex = Long.max(0, relativeByteIndex - byteArray.size() - lenToCopy);
+      remainingLength -= lenToCopy;
+    }
+  }
+
+  /**
+   * {@inheritDoc}
+   */
   @Override
   public long size(){
     return size;
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
   public byte readByte(long byteIndex) throws ByteArrayIndexOutOfBoundsException{
 
@@ -127,8 +201,12 @@ final class ReadOnlyMultipleByteArray implements ReadOnlyByteArray{
     return innerReadByte(indexMap, byteIndex);
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
-  public short readShort(long byteIndex) throws ByteArrayIndexOutOfBoundsException, ByteArrayLengthOverBoundsException{
+  public short readShortBE(long byteIndex)
+  throws ByteArrayIndexOutOfBoundsException, ByteArrayLengthOverBoundsException{
 
     // Check
     checkReadWrite(byteIndex, 2, size);
@@ -143,8 +221,31 @@ final class ReadOnlyMultipleByteArray implements ReadOnlyByteArray{
     return bb.getShort();
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
-  public int readInt(long byteIndex) throws ByteArrayIndexOutOfBoundsException, ByteArrayLengthOverBoundsException{
+  public short readShortLE(long byteIndex)
+  throws ByteArrayIndexOutOfBoundsException, ByteArrayLengthOverBoundsException{
+
+    // Check
+    checkReadWrite(byteIndex, 2, size);
+
+    // Use ByteBuffer
+    var bb = ByteBuffer.allocate(2);
+
+    // Read
+    ReadOnlyMultipleByteArray.innerRead(indexMap, byteIndex, new ByteBufferByteArray(bb));
+
+    // Read the results
+    return bb.order(ByteOrder.LITTLE_ENDIAN).getShort();
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public int readIntBE(long byteIndex) throws ByteArrayIndexOutOfBoundsException, ByteArrayLengthOverBoundsException{
 
     // Check
     checkReadWrite(byteIndex, 4, size);
@@ -159,8 +260,30 @@ final class ReadOnlyMultipleByteArray implements ReadOnlyByteArray{
     return bb.getInt();
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
-  public long readLong(long byteIndex) throws ByteArrayIndexOutOfBoundsException, ByteArrayLengthOverBoundsException{
+  public int readIntLE(long byteIndex) throws ByteArrayIndexOutOfBoundsException, ByteArrayLengthOverBoundsException{
+
+    // Check
+    checkReadWrite(byteIndex, 4, size);
+
+    // Use ByteBuffer
+    var bb = ByteBuffer.allocate(4);
+
+    // Read
+    ReadOnlyMultipleByteArray.innerRead(indexMap, byteIndex, new ByteBufferByteArray(bb));
+
+    // Read the results
+    return bb.order(ByteOrder.LITTLE_ENDIAN).getInt();
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public long readLongBE(long byteIndex) throws ByteArrayIndexOutOfBoundsException, ByteArrayLengthOverBoundsException{
 
     // Check
     checkReadWrite(byteIndex, 8, size);
@@ -175,8 +298,31 @@ final class ReadOnlyMultipleByteArray implements ReadOnlyByteArray{
     return bb.getLong();
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
-  public float readFloat(long byteIndex) throws ByteArrayIndexOutOfBoundsException, ByteArrayLengthOverBoundsException{
+  public long readLongLE(long byteIndex) throws ByteArrayIndexOutOfBoundsException, ByteArrayLengthOverBoundsException{
+
+    // Check
+    checkReadWrite(byteIndex, 8, size);
+
+    // Use ByteBuffer
+    var bb = ByteBuffer.allocate(8);
+
+    // Read
+    ReadOnlyMultipleByteArray.innerRead(indexMap, byteIndex, new ByteBufferByteArray(bb));
+
+    // Read the results
+    return bb.order(ByteOrder.LITTLE_ENDIAN).getLong();
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public float readFloatBE(long byteIndex)
+  throws ByteArrayIndexOutOfBoundsException, ByteArrayLengthOverBoundsException{
 
     // Check
     checkReadWrite(byteIndex, 4, size);
@@ -191,8 +337,31 @@ final class ReadOnlyMultipleByteArray implements ReadOnlyByteArray{
     return bb.getFloat();
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
-  public double readDouble(long byteIndex)
+  public float readFloatLE(long byteIndex)
+  throws ByteArrayIndexOutOfBoundsException, ByteArrayLengthOverBoundsException{
+
+    // Check
+    checkReadWrite(byteIndex, 4, size);
+
+    // Use ByteBuffer
+    var bb = ByteBuffer.allocate(4);
+
+    // Read
+    ReadOnlyMultipleByteArray.innerRead(indexMap, byteIndex, new ByteBufferByteArray(bb));
+
+    // Read the results
+    return bb.order(ByteOrder.LITTLE_ENDIAN).getFloat();
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public double readDoubleBE(long byteIndex)
   throws ByteArrayIndexOutOfBoundsException, ByteArrayLengthOverBoundsException{
 
     // Check
@@ -208,6 +377,29 @@ final class ReadOnlyMultipleByteArray implements ReadOnlyByteArray{
     return bb.getDouble();
   }
 
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public double readDoubleLE(long byteIndex)
+  throws ByteArrayIndexOutOfBoundsException, ByteArrayLengthOverBoundsException{
+
+    // Check
+    checkReadWrite(byteIndex, 8, size);
+
+    // Use ByteBuffer
+    var bb = ByteBuffer.allocate(8);
+
+    // Read
+    ReadOnlyMultipleByteArray.innerRead(indexMap, byteIndex, new ByteBufferByteArray(bb));
+
+    // Read the results
+    return bb.order(ByteOrder.LITTLE_ENDIAN).getDouble();
+  }
+
+  /**
+   * {@inheritDoc}
+   */
   @Override
   public void read(long byteIndex, @Nonnull WriteOnlyByteArray destination)
   throws ByteArrayIndexOutOfBoundsException, ByteArrayLengthOverBoundsException{
@@ -219,6 +411,23 @@ final class ReadOnlyMultipleByteArray implements ReadOnlyByteArray{
     innerRead(indexMap, byteIndex, destination);
   }
 
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public void readReversed(long byteIndex, @Nonnull WriteOnlyByteArray destination)
+  throws ByteArrayIndexOutOfBoundsException, ByteArrayLengthOverBoundsException{
+
+    // Check parameters
+    checkRead(byteIndex, destination, size);
+
+    // Pass it over
+    innerReadReversed(indexMap, byteIndex, destination);
+  }
+
+  /**
+   * {@inheritDoc}
+   */
   @Nonnull
   @Override
   public ReadOnlyByteArray subsetOf(long start, long length)
@@ -240,6 +449,9 @@ final class ReadOnlyMultipleByteArray implements ReadOnlyByteArray{
     return new com.ansill.arrays.ReadOnlyMultipleByteArray(resultingArray);
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
   public String toString(){
 

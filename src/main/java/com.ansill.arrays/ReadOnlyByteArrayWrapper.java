@@ -29,29 +29,31 @@ class ReadOnlyByteArrayWrapper implements ReadOnlyByteArray{
   }
 
   @Override
-  public short readShort(long byteIndex) throws ByteArrayIndexOutOfBoundsException, ByteArrayLengthOverBoundsException{
-    return original.readShort(byteIndex);
-  }
-
-  @Override
-  public int readInt(long byteIndex) throws ByteArrayIndexOutOfBoundsException, ByteArrayLengthOverBoundsException{
-    return original.readInt(byteIndex);
-  }
-
-  @Override
-  public long readLong(long byteIndex) throws ByteArrayIndexOutOfBoundsException, ByteArrayLengthOverBoundsException{
-    return original.readLong(byteIndex);
-  }
-
-  @Override
-  public float readFloat(long byteIndex) throws ByteArrayIndexOutOfBoundsException, ByteArrayLengthOverBoundsException{
-    return original.readFloat(byteIndex);
-  }
-
-  @Override
-  public double readDouble(long byteIndex)
+  public short readShortBE(long byteIndex)
   throws ByteArrayIndexOutOfBoundsException, ByteArrayLengthOverBoundsException{
-    return original.readDouble(byteIndex);
+    return original.readShortBE(byteIndex);
+  }
+
+  @Override
+  public int readIntBE(long byteIndex) throws ByteArrayIndexOutOfBoundsException, ByteArrayLengthOverBoundsException{
+    return original.readIntBE(byteIndex);
+  }
+
+  @Override
+  public long readLongBE(long byteIndex) throws ByteArrayIndexOutOfBoundsException, ByteArrayLengthOverBoundsException{
+    return original.readLongBE(byteIndex);
+  }
+
+  @Override
+  public float readFloatBE(long byteIndex)
+  throws ByteArrayIndexOutOfBoundsException, ByteArrayLengthOverBoundsException{
+    return original.readFloatBE(byteIndex);
+  }
+
+  @Override
+  public double readDoubleBE(long byteIndex)
+  throws ByteArrayIndexOutOfBoundsException, ByteArrayLengthOverBoundsException{
+    return original.readDoubleBE(byteIndex);
   }
 
   @Override

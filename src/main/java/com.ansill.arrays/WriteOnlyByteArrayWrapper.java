@@ -29,33 +29,33 @@ class WriteOnlyByteArrayWrapper implements WriteOnlyByteArray{
   }
 
   @Override
-  public void writeShort(long byteIndex, short value)
+  public void writeShortBE(long byteIndex, short value)
   throws ByteArrayIndexOutOfBoundsException, ByteArrayLengthOverBoundsException{
-    original.writeShort(byteIndex, value);
+    original.writeShortBE(byteIndex, value);
   }
 
   @Override
-  public void writeInt(long byteIndex, int value)
+  public void writeIntBE(long byteIndex, int value)
   throws ByteArrayIndexOutOfBoundsException, ByteArrayLengthOverBoundsException{
-    original.writeInt(byteIndex, value);
+    original.writeIntBE(byteIndex, value);
   }
 
   @Override
-  public void writeLong(long byteIndex, long value)
+  public void writeLongBE(long byteIndex, long value)
   throws ByteArrayIndexOutOfBoundsException, ByteArrayLengthOverBoundsException{
-    original.writeLong(byteIndex, value);
+    original.writeLongBE(byteIndex, value);
   }
 
   @Override
-  public void writeFloat(long byteIndex, float value)
+  public void writeFloatBE(long byteIndex, float value)
   throws ByteArrayIndexOutOfBoundsException, ByteArrayLengthOverBoundsException{
-    original.writeFloat(byteIndex, value);
+    original.writeFloatBE(byteIndex, value);
   }
 
   @Override
-  public void writeDouble(long byteIndex, double value)
+  public void writeDoubleBE(long byteIndex, double value)
   throws ByteArrayIndexOutOfBoundsException, ByteArrayLengthOverBoundsException{
-    original.writeDouble(byteIndex, value);
+    original.writeDoubleBE(byteIndex, value);
   }
 
   @Override

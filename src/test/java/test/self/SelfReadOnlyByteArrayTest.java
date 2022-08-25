@@ -459,7 +459,7 @@ public interface SelfReadOnlyByteArrayTest extends BaseReadOnlyByteArrayTest, Se
                 randBuf <<= 8;
                 randBuf |= (0xff & testRNG.nextInt());
                 short expected = (short) (0xffff & randBuf);
-                assertEquals(expected, testByteArray.readShort(index), "Index: " + index);
+                assertEquals(expected, testByteArray.readShortBE(index), "Index: " + index);
               }
             }
           }finally{
@@ -541,7 +541,7 @@ public interface SelfReadOnlyByteArrayTest extends BaseReadOnlyByteArrayTest, Se
               for(long index = 0; index < size - 3; index++){
                 randBuf <<= 8;
                 randBuf |= (0xff & testRNG.nextInt());
-                assertEquals(randBuf, testByteArray.readInt(index), "Index: " + index);
+                assertEquals(randBuf, testByteArray.readIntBE(index), "Index: " + index);
               }
             }
           }finally{
@@ -627,7 +627,7 @@ public interface SelfReadOnlyByteArrayTest extends BaseReadOnlyByteArrayTest, Se
               for(long index = 0; index < size - 7; index++){
                 randBuf <<= 8;
                 randBuf |= (0xff & testRNG.nextInt());
-                assertEquals(randBuf, testByteArray.readLong(index), "Index: " + index);
+                assertEquals(randBuf, testByteArray.readLongBE(index), "Index: " + index);
               }
             }
           }finally{
@@ -709,7 +709,7 @@ public interface SelfReadOnlyByteArrayTest extends BaseReadOnlyByteArrayTest, Se
               for(long index = 0; index < size - 3; index++){
                 randBuf <<= 8;
                 randBuf |= (0xff & testRNG.nextInt());
-                assertEquals(Float.intBitsToFloat(randBuf), testByteArray.readFloat(index), "Index: " + index);
+                assertEquals(Float.intBitsToFloat(randBuf), testByteArray.readFloatBE(index), "Index: " + index);
               }
             }
           }finally{
@@ -795,7 +795,7 @@ public interface SelfReadOnlyByteArrayTest extends BaseReadOnlyByteArrayTest, Se
               for(long index = 0; index < size - 7; index++){
                 randBuf <<= 8;
                 randBuf |= (0xff & testRNG.nextInt());
-                assertEquals(Double.longBitsToDouble(randBuf), testByteArray.readDouble(index), "Index: " + index);
+                assertEquals(Double.longBitsToDouble(randBuf), testByteArray.readDoubleBE(index), "Index: " + index);
               }
             }
           }finally{
@@ -1462,7 +1462,7 @@ public interface SelfReadOnlyByteArrayTest extends BaseReadOnlyByteArrayTest, Se
             // Now test the byte array
             var actualEx = assertThrows(
               ByteArrayLengthOverBoundsException.class,
-              () -> testByteArray.readShort(size - 1)
+              () -> testByteArray.readShortBE(size - 1)
             );
 
             // Check the message
@@ -1727,7 +1727,7 @@ public interface SelfReadOnlyByteArrayTest extends BaseReadOnlyByteArrayTest, Se
             // Now test the byte array
             var actualEx = assertThrows(
               ByteArrayLengthOverBoundsException.class,
-              () -> testByteArray.readInt(size - 1)
+              () -> testByteArray.readIntBE(size - 1)
             );
 
             // Check the message
@@ -1992,7 +1992,7 @@ public interface SelfReadOnlyByteArrayTest extends BaseReadOnlyByteArrayTest, Se
             // Now test the byte array
             var actualEx = assertThrows(
               ByteArrayLengthOverBoundsException.class,
-              () -> testByteArray.readLong(size - 1)
+              () -> testByteArray.readLongBE(size - 1)
             );
 
             // Check the message
@@ -2257,7 +2257,7 @@ public interface SelfReadOnlyByteArrayTest extends BaseReadOnlyByteArrayTest, Se
             // Now test the byte array
             var actualEx = assertThrows(
               ByteArrayLengthOverBoundsException.class,
-              () -> testByteArray.readFloat(size - 1)
+              () -> testByteArray.readFloatBE(size - 1)
             );
 
             // Check the message
@@ -2522,7 +2522,7 @@ public interface SelfReadOnlyByteArrayTest extends BaseReadOnlyByteArrayTest, Se
             // Now test the byte array
             var actualEx = assertThrows(
               ByteArrayLengthOverBoundsException.class,
-              () -> testByteArray.readDouble(size - 1)
+              () -> testByteArray.readDoubleBE(size - 1)
             );
 
             // Check the message
