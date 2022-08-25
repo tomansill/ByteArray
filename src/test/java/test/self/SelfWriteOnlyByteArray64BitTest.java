@@ -15,7 +15,6 @@ import static org.junit.jupiter.api.Assertions.fail;
 
 public interface SelfWriteOnlyByteArray64BitTest extends SelfWriteOnlyByteArrayTest{
 
-
   @DisplayName("Test readWrite(long) on 64-bit addressable data")
   @Test
   default void testWriteByteOn64BitData(){
