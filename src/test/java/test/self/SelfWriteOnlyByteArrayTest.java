@@ -34,7 +34,7 @@ import static org.junit.jupiter.api.DynamicTest.dynamicTest;
 public interface SelfWriteOnlyByteArrayTest extends BaseWriteOnlyByteArrayTest, SelfByteArrayTest{
 
   @Nonnull
-  static Iterable<DynamicTest> generateTestsInvalidWriteCallsByteArray(
+  static Iterable<DynamicTest> generateTestsInvalidCopyFromCallsByteArray(
     @Nonnull Random rng,
     @Nonnull String type,
     @Nonnull BiFunction<WriteOnlyByteArray,Long,Byte> testBAReaderFun,
@@ -63,7 +63,7 @@ public interface SelfWriteOnlyByteArrayTest extends BaseWriteOnlyByteArrayTest, 
 
       // Test null bytearray
       tests.add(dynamicTest(
-              f("test write(0, null) on ByteArray of {}B size", selfSize),
+              f("test copyFrom(0, null) on ByteArray of {}B size", selfSize),
               () -> {
 
                 // Wrap in try to make sure memory gets cleaned up
@@ -81,14 +81,14 @@ public interface SelfWriteOnlyByteArrayTest extends BaseWriteOnlyByteArrayTest, 
                     // Build the expected exception
                     IllegalArgumentException expected = assertThrows(
                             IllegalArgumentException.class,
-                            () -> IndexingUtility.checkWrite(0, null, selfSize)
+                            () -> IndexingUtility.checkcopyFrom(0, null, selfSize)
                     );
 
                     // Test it
 	                  //noinspection DataFlowIssue
                     IllegalArgumentException actual = assertThrows(
                             IllegalArgumentException.class,
-                            () -> testArray.write(0, null)
+                            () -> testArray.copyFrom(0, null)
                     );
 
                     // Compare messages
@@ -115,7 +115,7 @@ public interface SelfWriteOnlyByteArrayTest extends BaseWriteOnlyByteArrayTest, 
 
       // Test too-large bytearray
       tests.add(dynamicTest(
-        f("test write(0, {}(size={})) on ByteArray of {}B size", type, selfSize + 1, selfSize),
+        f("test copyFrom(0, {}(size={})) on ByteArray of {}B size", type, selfSize + 1, selfSize),
         () -> {
 
           // Wrap in try to make sure memory gets cleaned up
@@ -145,13 +145,13 @@ public interface SelfWriteOnlyByteArrayTest extends BaseWriteOnlyByteArrayTest, 
               // Build the expected exception
               ByteArrayLengthOverBoundsException expected = assertThrows(
                 ByteArrayLengthOverBoundsException.class,
-                () -> IndexingUtility.checkWrite(0, control, selfSize)
+                () -> IndexingUtility.checkcopyFrom(0, control, selfSize)
               );
 
               // Test it
               ByteArrayLengthOverBoundsException actual = assertThrows(
                 ByteArrayLengthOverBoundsException.class,
-                () -> testArray.write(0, control)
+                () -> testArray.copyFrom(0, control)
               );
 
               // Compare messages
@@ -189,7 +189,7 @@ public interface SelfWriteOnlyByteArrayTest extends BaseWriteOnlyByteArrayTest, 
         int byteIndex = -Integer.max(rng.nextInt((int) selfSize), 1);
         int len = Integer.max(1, rng.nextInt((int) selfSize));
         tests.add(dynamicTest(f(
-          "test read({}, {}(size={})) on ByteArray of {}B size",
+          "test copyTo({}, {}(size={})) on ByteArray of {}B size",
           byteIndex,
           type,
           len,
@@ -223,13 +223,13 @@ public interface SelfWriteOnlyByteArrayTest extends BaseWriteOnlyByteArrayTest, 
               // Build the expected exception
               ByteArrayIndexOutOfBoundsException expected = assertThrows(
                 ByteArrayIndexOutOfBoundsException.class,
-                () -> IndexingUtility.checkWrite(byteIndex, control, selfSize)
+                () -> IndexingUtility.checkcopyFrom(byteIndex, control, selfSize)
               );
 
               // Test it
               ByteArrayIndexOutOfBoundsException actual = assertThrows(
                 ByteArrayIndexOutOfBoundsException.class,
-                () -> testArray.write(byteIndex, control)
+                () -> testArray.copyFrom(byteIndex, control)
               );
 
               // Compare messages
@@ -269,7 +269,7 @@ public interface SelfWriteOnlyByteArrayTest extends BaseWriteOnlyByteArrayTest, 
         int byteIndex = (int) (selfSize + rng.nextInt((int) selfSize) + 1);
         int len = Integer.max(1, rng.nextInt((int) selfSize));
         tests.add(dynamicTest(f(
-          "test read({}, {}(size={})) on ByteArray of {}B size",
+          "test copyTo({}, {}(size={})) on ByteArray of {}B size",
           byteIndex,
           type,
           len,
@@ -303,13 +303,13 @@ public interface SelfWriteOnlyByteArrayTest extends BaseWriteOnlyByteArrayTest, 
               // Build the expected exception
               ByteArrayIndexOutOfBoundsException expected = assertThrows(
                 ByteArrayIndexOutOfBoundsException.class,
-                () -> IndexingUtility.checkWrite(byteIndex, control, selfSize)
+                () -> IndexingUtility.checkcopyFrom(byteIndex, control, selfSize)
               );
 
               // Test it
               ByteArrayIndexOutOfBoundsException actual = assertThrows(
                 ByteArrayIndexOutOfBoundsException.class,
-                () -> testArray.write(byteIndex, control)
+                () -> testArray.copyFrom(byteIndex, control)
               );
 
               // Compare messages
@@ -348,10 +348,10 @@ public interface SelfWriteOnlyByteArrayTest extends BaseWriteOnlyByteArrayTest, 
     return tests;
   }
 
-  @DisplayName("Test invalid write(long, ReadOnlyByteArray) calls")
+  @DisplayName("Test invalid copyFrom(long, ReadOnlyByteArray) calls")
   @TestFactory
-  default Iterable<DynamicTest> testInvalidWriteCallsReadOnlyByteArray(){
-    return generateTestsInvalidWriteCallsByteArray(
+  default Iterable<DynamicTest> testInvalidCopyFromCallsReadOnlyByteArray(){
+    return generateTestsInvalidCopyFromCallsByteArray(
       this.getRNG(),
       "WriteOnlyByteArray",
       this::readTestByteArray,
@@ -361,10 +361,10 @@ public interface SelfWriteOnlyByteArrayTest extends BaseWriteOnlyByteArrayTest, 
     );
   }
 
-  @DisplayName("Test invalid write(long, ReadableWritableByteArray) calls")
+  @DisplayName("Test invalid copyFrom(long, ReadableWritableByteArray) calls")
   @TestFactory
-  default Iterable<DynamicTest> testInvalidWriteCallsReadableWritableByteArray(){
-    return generateTestsInvalidWriteCallsByteArray(
+  default Iterable<DynamicTest> testInvalidCopyFromCallsReadableWritableByteArray(){
+    return generateTestsInvalidCopyFromCallsByteArray(
       this.getRNG(),
       "ReadableWritableByteArray",
       this::readTestByteArray,
@@ -516,9 +516,9 @@ public interface SelfWriteOnlyByteArrayTest extends BaseWriteOnlyByteArrayTest, 
     return tests;
   }
 
-  @DisplayName("Test valid writeShort(long, short) calls")
+  @DisplayName("Test valid writeShortBE(long, short) calls")
   @TestFactory
-  default Iterable<DynamicTest> testValidWriteShortCalls(){
+  default Iterable<DynamicTest> testValidWriteShortBECalls(){
 
     // Set up test container
     var tests = new LinkedList<DynamicTest>();
@@ -542,7 +542,7 @@ public interface SelfWriteOnlyByteArrayTest extends BaseWriteOnlyByteArrayTest, 
       int testLocalSeed = (int) (rng.nextInt() + size);
 
       // Write test
-      tests.add(dynamicTest(f("full writeShort(long, short) on ByteArray of {}B size", size), () -> {
+      tests.add(dynamicTest(f("full writeShortBE(long, short) on ByteArray of {}B size", size), () -> {
 
         // Wrap in try and catch for possible OOM if trying to allocate max memory
         try{
@@ -588,7 +588,7 @@ public interface SelfWriteOnlyByteArrayTest extends BaseWriteOnlyByteArrayTest, 
                 val |= (0xff & controlOne.readByte(byteIndex + 1));
 
                 // Write it
-                testByteArray.writeShort(byteIndex, (short) val);
+                testByteArray.writeShortBE(byteIndex, (short) val);
 
                 // Add to written set
                 written.add(byteIndex);
@@ -633,7 +633,7 @@ public interface SelfWriteOnlyByteArrayTest extends BaseWriteOnlyByteArrayTest, 
                 val |= (0xff & controlTwo.readByte(byteIndex + 1));
 
                 // Write it
-                testByteArray.writeShort(byteIndex, (short) val);
+                testByteArray.writeShortBE(byteIndex, (short) val);
 
                 // Add to written set
                 written.add(byteIndex);
@@ -668,9 +668,9 @@ public interface SelfWriteOnlyByteArrayTest extends BaseWriteOnlyByteArrayTest, 
     return tests;
   }
 
-  @DisplayName("Test valid writeInt(long, int) calls")
+  @DisplayName("Test valid writeIntBE(long, int) calls")
   @TestFactory
-  default Iterable<DynamicTest> testValidWriteIntCalls(){
+  default Iterable<DynamicTest> testValidWriteIntBECalls(){
 
     // Set up test container
     var tests = new LinkedList<DynamicTest>();
@@ -694,7 +694,7 @@ public interface SelfWriteOnlyByteArrayTest extends BaseWriteOnlyByteArrayTest, 
       int testLocalSeed = (int) (rng.nextInt() + size);
 
       // Write test
-      tests.add(dynamicTest(f("full writeInt(long, int) on ByteArray of {}B size", size), () -> {
+      tests.add(dynamicTest(f("full writeIntBE(long, int) on ByteArray of {}B size", size), () -> {
 
         // Wrap in try and catch for possible OOM if trying to allocate max memory
         try{
@@ -742,7 +742,7 @@ public interface SelfWriteOnlyByteArrayTest extends BaseWriteOnlyByteArrayTest, 
                 val |= (0xff & controlOne.readByte(byteIndex + 3));
 
                 // Write it
-                testByteArray.writeInt(byteIndex, val);
+                testByteArray.writeIntBE(byteIndex, val);
 
                 // Add to written set
                 written.add(byteIndex);
@@ -791,7 +791,7 @@ public interface SelfWriteOnlyByteArrayTest extends BaseWriteOnlyByteArrayTest, 
                 val |= (0xff & controlTwo.readByte(byteIndex + 3));
 
                 // Write it
-                testByteArray.writeInt(byteIndex, val);
+                testByteArray.writeIntBE(byteIndex, val);
 
                 // Add to written set
                 written.add(byteIndex);
@@ -828,9 +828,9 @@ public interface SelfWriteOnlyByteArrayTest extends BaseWriteOnlyByteArrayTest, 
     return tests;
   }
 
-  @DisplayName("Test valid writeLong(long, long) calls")
+  @DisplayName("Test valid writeLongBE(long, long) calls")
   @TestFactory
-  default Iterable<DynamicTest> testValidWriteLongCalls(){
+  default Iterable<DynamicTest> testValidWriteLongBECalls(){
 
     // Set up test container
     var tests = new LinkedList<DynamicTest>();
@@ -854,7 +854,7 @@ public interface SelfWriteOnlyByteArrayTest extends BaseWriteOnlyByteArrayTest, 
       int testLocalSeed = (int) (rng.nextInt() + size);
 
       // Write test
-      tests.add(dynamicTest(f("full writeLong(long, long) on ByteArray of {}B size", size), () -> {
+      tests.add(dynamicTest(f("full writeLongBE(long, long) on ByteArray of {}B size", size), () -> {
 
         // Wrap in try and catch for possible OOM if trying to allocate max memory
         try{
@@ -906,7 +906,7 @@ public interface SelfWriteOnlyByteArrayTest extends BaseWriteOnlyByteArrayTest, 
                 val |= (0xff & controlOne.readByte(byteIndex + 7));
 
                 // Write it
-                testByteArray.writeLong(byteIndex, val);
+                testByteArray.writeLongBE(byteIndex, val);
 
                 // Add to written set
                 written.add(byteIndex);
@@ -963,7 +963,7 @@ public interface SelfWriteOnlyByteArrayTest extends BaseWriteOnlyByteArrayTest, 
                 val |= (0xff & controlTwo.readByte(byteIndex + 7));
 
                 // Write it
-                testByteArray.writeLong(byteIndex, val);
+                testByteArray.writeLongBE(byteIndex, val);
 
                 // Add to written set
                 written.add(byteIndex);
@@ -1004,9 +1004,9 @@ public interface SelfWriteOnlyByteArrayTest extends BaseWriteOnlyByteArrayTest, 
     return tests;
   }
 
-  @DisplayName("Test valid writeFloat(long, float) calls")
+  @DisplayName("Test valid writeFloatBE(long, float) calls")
   @TestFactory
-  default Iterable<DynamicTest> testValidWriteFloatCalls(){
+  default Iterable<DynamicTest> testValidWriteFloatBECalls(){
 
     // Set up test container
     var tests = new LinkedList<DynamicTest>();
@@ -1030,7 +1030,7 @@ public interface SelfWriteOnlyByteArrayTest extends BaseWriteOnlyByteArrayTest, 
       int testLocalSeed = (int) (rng.nextInt() + size);
 
       // Write test
-      tests.add(dynamicTest(f("full writeFloat(long, float) on ByteArray of {}B size", size), () -> {
+      tests.add(dynamicTest(f("full writeFloatBE(long, float) on ByteArray of {}B size", size), () -> {
 
         // Wrap in try and catch for possible OOM if trying to allocate max memory
         try{
@@ -1051,7 +1051,7 @@ public interface SelfWriteOnlyByteArrayTest extends BaseWriteOnlyByteArrayTest, 
             {
               var testRNG = new Random(testLocalSeed);
               for(long index = 0; index < size / 4; index++){
-                controlOne.writeFloat(index * 4, testRNG.nextInt() * testRNG.nextFloat());
+                controlOne.writeFloatBE(index * 4, testRNG.nextInt() * testRNG.nextFloat());
               }
             }
 
@@ -1080,7 +1080,7 @@ public interface SelfWriteOnlyByteArrayTest extends BaseWriteOnlyByteArrayTest, 
                 val |= (0xff & controlOne.readByte(byteIndex + 3));
 
                 // Write it
-                testByteArray.writeFloat(byteIndex, Float.intBitsToFloat(val));
+                testByteArray.writeFloatBE(byteIndex, Float.intBitsToFloat(val));
 
                 // Add to written set
                 written.add(byteIndex);
@@ -1102,7 +1102,7 @@ public interface SelfWriteOnlyByteArrayTest extends BaseWriteOnlyByteArrayTest, 
             {
               Random testRNG = new Random(testLocalSeed + 342);
               for(long index = 0; index < size / 4; index++){
-                controlTwo.writeFloat(index * 4, testRNG.nextInt() * testRNG.nextFloat());
+                controlTwo.writeFloatBE(index * 4, testRNG.nextInt() * testRNG.nextFloat());
               }
             }
 
@@ -1130,7 +1130,7 @@ public interface SelfWriteOnlyByteArrayTest extends BaseWriteOnlyByteArrayTest, 
                 val |= (0xff & controlTwo.readByte(byteIndex + 3));
 
                 // Write it
-                testByteArray.writeFloat(byteIndex, Float.intBitsToFloat(val));
+                testByteArray.writeFloatBE(byteIndex, Float.intBitsToFloat(val));
 
                 // Add to written set
                 written.add(byteIndex);
@@ -1167,9 +1167,9 @@ public interface SelfWriteOnlyByteArrayTest extends BaseWriteOnlyByteArrayTest, 
     return tests;
   }
 
-  @DisplayName("Test valid writeDouble(long, double) calls")
+  @DisplayName("Test valid writeDoubleBE(long, double) calls")
   @TestFactory
-  default Iterable<DynamicTest> testValidWriteDoubleCalls(){
+  default Iterable<DynamicTest> testValidWriteDoubleBECalls(){
 
     // Set up test container
     var tests = new LinkedList<DynamicTest>();
@@ -1193,7 +1193,7 @@ public interface SelfWriteOnlyByteArrayTest extends BaseWriteOnlyByteArrayTest, 
       int testLocalSeed = (int) (rng.nextInt() + size);
 
       // Write test
-      tests.add(dynamicTest(f("full writeDouble(long, double) on ByteArray of {}B size", size), () -> {
+      tests.add(dynamicTest(f("full writeDoubleBE(long, double) on ByteArray of {}B size", size), () -> {
 
         // Wrap in try and catch for possible OOM if trying to allocate max memory
         try{
@@ -1214,7 +1214,7 @@ public interface SelfWriteOnlyByteArrayTest extends BaseWriteOnlyByteArrayTest, 
             {
               var testRNG = new Random(testLocalSeed);
               for(long index = 0; index < size / 8; index++){
-                controlOne.writeDouble(index * 8, testRNG.nextLong() * testRNG.nextDouble());
+                controlOne.writeDoubleBE(index * 8, testRNG.nextLong() * testRNG.nextDouble());
               }
             }
 
@@ -1247,7 +1247,7 @@ public interface SelfWriteOnlyByteArrayTest extends BaseWriteOnlyByteArrayTest, 
                 val |= (0xff & controlOne.readByte(byteIndex + 7));
 
                 // Write it
-                testByteArray.writeDouble(byteIndex, Double.longBitsToDouble(val));
+                testByteArray.writeDoubleBE(byteIndex, Double.longBitsToDouble(val));
 
                 // Add to written set
                 written.add(byteIndex);
@@ -1273,7 +1273,7 @@ public interface SelfWriteOnlyByteArrayTest extends BaseWriteOnlyByteArrayTest, 
             {
               Random testRNG = new Random(testLocalSeed + 342);
               for(long index = 0; index < size / 8; index++){
-                controlTwo.writeDouble(index * 8, testRNG.nextLong() * testRNG.nextDouble());
+                controlTwo.writeDoubleBE(index * 8, testRNG.nextLong() * testRNG.nextDouble());
               }
             }
 
@@ -1306,7 +1306,7 @@ public interface SelfWriteOnlyByteArrayTest extends BaseWriteOnlyByteArrayTest, 
                 val |= (0xff & controlTwo.readByte(byteIndex + 7));
 
                 // Write it
-                testByteArray.writeDouble(byteIndex, Double.longBitsToDouble(val));
+                testByteArray.writeDoubleBE(byteIndex, Double.longBitsToDouble(val));
 
                 // Add to written set
                 written.add(byteIndex);
@@ -1565,9 +1565,9 @@ public interface SelfWriteOnlyByteArrayTest extends BaseWriteOnlyByteArrayTest, 
     return tests;
   }
 
-  @DisplayName("Test bad writeShort(long, short) calls")
+  @DisplayName("Test bad writeShortBE(long, short) calls")
   @TestFactory
-  default Iterable<DynamicTest> testInvalidWriteShortCalls(){
+  default Iterable<DynamicTest> testInvalidWriteShortBECalls(){
 
     // Set up test container
     List<DynamicTest> tests = new LinkedList<>();
@@ -1587,7 +1587,7 @@ public interface SelfWriteOnlyByteArrayTest extends BaseWriteOnlyByteArrayTest, 
     for(long size : sizesToTest){
 
       // Write test for negative index (-1)
-      tests.add(dynamicTest(f("writeShort(-1,short) on ByteArray of {}B size", size), () -> {
+      tests.add(dynamicTest(f("writeShortBE(-1,short) on ByteArray of {}B size", size), () -> {
 
         // Wrap in try and catch for possible OOM if trying to allocate max memory
         try{
@@ -1606,13 +1606,13 @@ public interface SelfWriteOnlyByteArrayTest extends BaseWriteOnlyByteArrayTest, 
             // Get the expected exception
             ByteArrayIndexOutOfBoundsException expectedEx = assertThrows(
               ByteArrayIndexOutOfBoundsException.class,
-              () -> IndexingUtility.checkReadWrite(-1, 2, size)
+              () -> IndexingUtility.checkReadcopyFrom(-1, 2, size)
             );
 
             // Now test the byte array
             ByteArrayIndexOutOfBoundsException actualEx = assertThrows(
               ByteArrayIndexOutOfBoundsException.class,
-              () -> testByteArray.writeShort(-1, (byte) 0)
+              () -> testByteArray.writeShortBE(-1, (byte) 0)
             );
 
             // Check the message
@@ -1636,7 +1636,7 @@ public interface SelfWriteOnlyByteArrayTest extends BaseWriteOnlyByteArrayTest, 
       // Write test for negative indices (random)
       for(int trial = 0; trial < TRIALS; trial++){
         long index = -Math.abs(rng.nextInt() + 500_000);
-        tests.add(dynamicTest(f("writeShort({},short) on ByteArray of {}B size", index, size), () -> {
+        tests.add(dynamicTest(f("writeShortBE({},short) on ByteArray of {}B size", index, size), () -> {
 
           // Wrap in try and catch for possible OOM if trying to allocate max memory
           try{
@@ -1655,13 +1655,13 @@ public interface SelfWriteOnlyByteArrayTest extends BaseWriteOnlyByteArrayTest, 
               // Get the expected exception
               ByteArrayIndexOutOfBoundsException expectedEx = assertThrows(
                 ByteArrayIndexOutOfBoundsException.class,
-                () -> IndexingUtility.checkReadWrite(index, 2, size)
+                () -> IndexingUtility.checkReadcopyFrom(index, 2, size)
               );
 
               // Now test the byte array
               ByteArrayIndexOutOfBoundsException actualEx = assertThrows(
                 ByteArrayIndexOutOfBoundsException.class,
-                () -> testByteArray.writeShort(index, (byte) 0)
+                () -> testByteArray.writeShortBE(index, (byte) 0)
               );
 
               // Check the message
@@ -1683,7 +1683,7 @@ public interface SelfWriteOnlyByteArrayTest extends BaseWriteOnlyByteArrayTest, 
       }
 
       // Write test for index that exceeds capacity (Throws ByteArrayIndexOutOfBoundsException)
-      tests.add(dynamicTest(f("writeShort({},short) on ByteArray of {}B size", size, size), () -> {
+      tests.add(dynamicTest(f("writeShortBE({},short) on ByteArray of {}B size", size, size), () -> {
 
         // Wrap in try and catch for possible OOM if trying to allocate max memory
         try{
@@ -1702,13 +1702,13 @@ public interface SelfWriteOnlyByteArrayTest extends BaseWriteOnlyByteArrayTest, 
             // Get the expected exception
             var expectedEx = assertThrows(
               ByteArrayIndexOutOfBoundsException.class,
-              () -> IndexingUtility.checkReadWrite(size, 2, size)
+              () -> IndexingUtility.checkReadcopyFrom(size, 2, size)
             );
 
             // Now test the byte array
             var actualEx = assertThrows(
               ByteArrayIndexOutOfBoundsException.class,
-              () -> testByteArray.writeShort(size, (byte) 0)
+              () -> testByteArray.writeShortBE(size, (byte) 0)
             );
 
             // Check the message
@@ -1730,7 +1730,7 @@ public interface SelfWriteOnlyByteArrayTest extends BaseWriteOnlyByteArrayTest, 
       }));
 
       // Write test for index that exceeds capacity (Throws ByteArrayLengthOverBoundsException)
-      tests.add(dynamicTest(f("writeShort({},short) on ByteArray of {}B size", size - 1, size), () -> {
+      tests.add(dynamicTest(f("writeShortBE({},short) on ByteArray of {}B size", size - 1, size), () -> {
 
         // Wrap in try and catch for possible OOM if trying to allocate max memory
         try{
@@ -1749,13 +1749,13 @@ public interface SelfWriteOnlyByteArrayTest extends BaseWriteOnlyByteArrayTest, 
             // Get the expected exception
             var expectedEx = assertThrows(
               ByteArrayLengthOverBoundsException.class,
-              () -> IndexingUtility.checkReadWrite(size - 1, 2, size)
+              () -> IndexingUtility.checkReadcopyFrom(size - 1, 2, size)
             );
 
             // Now test the byte array
             var actualEx = assertThrows(
               ByteArrayLengthOverBoundsException.class,
-              () -> testByteArray.writeShort(size - 1, (byte) 0)
+              () -> testByteArray.writeShortBE(size - 1, (byte) 0)
             );
 
             // Check the message
@@ -1779,7 +1779,7 @@ public interface SelfWriteOnlyByteArrayTest extends BaseWriteOnlyByteArrayTest, 
       // Write test for index that exceeds capacity (random)
       for(int trial = 0; trial < TRIALS; trial++){
         long index = size + Math.abs(rng.nextInt());
-        tests.add(dynamicTest(f("writeShort({},short) on ByteArray of {}B size", index, size), () -> {
+        tests.add(dynamicTest(f("writeShortBE({},short) on ByteArray of {}B size", index, size), () -> {
 
           // Wrap in try and catch for possible OOM if trying to allocate max memory
           try{
@@ -1798,13 +1798,13 @@ public interface SelfWriteOnlyByteArrayTest extends BaseWriteOnlyByteArrayTest, 
               // Get the expected exception
               ByteArrayIndexOutOfBoundsException expectedEx = assertThrows(
                 ByteArrayIndexOutOfBoundsException.class,
-                () -> IndexingUtility.checkReadWrite(index, 2, size)
+                () -> IndexingUtility.checkReadcopyFrom(index, 2, size)
               );
 
               // Now test the byte array
               ByteArrayIndexOutOfBoundsException actualEx = assertThrows(
                 ByteArrayIndexOutOfBoundsException.class,
-                () -> testByteArray.writeShort(index, (byte) 0)
+                () -> testByteArray.writeShortBE(index, (byte) 0)
               );
 
               // Check the message
@@ -1830,9 +1830,9 @@ public interface SelfWriteOnlyByteArrayTest extends BaseWriteOnlyByteArrayTest, 
     return tests;
   }
 
-  @DisplayName("Test bad writeInt(long, int) calls")
+  @DisplayName("Test bad writeIntBE(long, int) calls")
   @TestFactory
-  default Iterable<DynamicTest> testInvalidWriteIntCalls(){
+  default Iterable<DynamicTest> testInvalidWriteIntBECalls(){
 
     // Set up test container
     List<DynamicTest> tests = new LinkedList<>();
@@ -1852,7 +1852,7 @@ public interface SelfWriteOnlyByteArrayTest extends BaseWriteOnlyByteArrayTest, 
     for(long size : sizesToTest){
 
       // Write test for negative index (-1)
-      tests.add(dynamicTest(f("writeInt(-1,int) on ByteArray of {}B size", size), () -> {
+      tests.add(dynamicTest(f("writeIntBE(-1,int) on ByteArray of {}B size", size), () -> {
 
         // Wrap in try and catch for possible OOM if trying to allocate max memory
         try{
@@ -1871,13 +1871,13 @@ public interface SelfWriteOnlyByteArrayTest extends BaseWriteOnlyByteArrayTest, 
             // Get the expected exception
             ByteArrayIndexOutOfBoundsException expectedEx = assertThrows(
               ByteArrayIndexOutOfBoundsException.class,
-              () -> IndexingUtility.checkReadWrite(-1, 4, size)
+              () -> IndexingUtility.checkReadcopyFrom(-1, 4, size)
             );
 
             // Now test the byte array
             ByteArrayIndexOutOfBoundsException actualEx = assertThrows(
               ByteArrayIndexOutOfBoundsException.class,
-              () -> testByteArray.writeInt(-1, (byte) 0)
+              () -> testByteArray.writeIntBE(-1, (byte) 0)
             );
 
             // Check the message
@@ -1901,7 +1901,7 @@ public interface SelfWriteOnlyByteArrayTest extends BaseWriteOnlyByteArrayTest, 
       // Write test for negative indices (random)
       for(int trial = 0; trial < TRIALS; trial++){
         long index = -Math.abs(rng.nextInt() + 500_000);
-        tests.add(dynamicTest(f("writeInt({},int) on ByteArray of {}B size", index, size), () -> {
+        tests.add(dynamicTest(f("writeIntBE({},int) on ByteArray of {}B size", index, size), () -> {
 
           // Wrap in try and catch for possible OOM if trying to allocate max memory
           try{
@@ -1920,13 +1920,13 @@ public interface SelfWriteOnlyByteArrayTest extends BaseWriteOnlyByteArrayTest, 
               // Get the expected exception
               ByteArrayIndexOutOfBoundsException expectedEx = assertThrows(
                 ByteArrayIndexOutOfBoundsException.class,
-                () -> IndexingUtility.checkReadWrite(index, 4, size)
+                () -> IndexingUtility.checkReadcopyFrom(index, 4, size)
               );
 
               // Now test the byte array
               ByteArrayIndexOutOfBoundsException actualEx = assertThrows(
                 ByteArrayIndexOutOfBoundsException.class,
-                () -> testByteArray.writeInt(index, (byte) 0)
+                () -> testByteArray.writeIntBE(index, (byte) 0)
               );
 
               // Check the message
@@ -1948,7 +1948,7 @@ public interface SelfWriteOnlyByteArrayTest extends BaseWriteOnlyByteArrayTest, 
       }
 
       // Write test for index that exceeds capacity (Throws ByteArrayIndexOutOfBoundsException)
-      tests.add(dynamicTest(f("writeInt({},int) on ByteArray of {}B size", size, size), () -> {
+      tests.add(dynamicTest(f("writeIntBE({},int) on ByteArray of {}B size", size, size), () -> {
 
         // Wrap in try and catch for possible OOM if trying to allocate max memory
         try{
@@ -1967,13 +1967,13 @@ public interface SelfWriteOnlyByteArrayTest extends BaseWriteOnlyByteArrayTest, 
             // Get the expected exception
             var expectedEx = assertThrows(
               ByteArrayIndexOutOfBoundsException.class,
-              () -> IndexingUtility.checkReadWrite(size, 4, size)
+              () -> IndexingUtility.checkReadcopyFrom(size, 4, size)
             );
 
             // Now test the byte array
             var actualEx = assertThrows(
               ByteArrayIndexOutOfBoundsException.class,
-              () -> testByteArray.writeInt(size, (byte) 0)
+              () -> testByteArray.writeIntBE(size, (byte) 0)
             );
 
             // Check the message
@@ -1997,7 +1997,7 @@ public interface SelfWriteOnlyByteArrayTest extends BaseWriteOnlyByteArrayTest, 
       // Write test for index that exceeds capacity (Throws ByteArrayLengthOverBoundsException)
       for(int offset = 1; offset < 4; offset++){
         int finalOffset = offset;
-        tests.add(dynamicTest(f("writeInt({},int) on ByteArray of {}B size", size - offset, size), () -> {
+        tests.add(dynamicTest(f("writeIntBE({},int) on ByteArray of {}B size", size - offset, size), () -> {
 
           // Wrap in try and catch for possible OOM if trying to allocate max memory
           try{
@@ -2016,13 +2016,13 @@ public interface SelfWriteOnlyByteArrayTest extends BaseWriteOnlyByteArrayTest, 
               // Get the expected exception
               var expectedEx = assertThrows(
                 ByteArrayLengthOverBoundsException.class,
-                () -> IndexingUtility.checkReadWrite(size - finalOffset, 4, size)
+                () -> IndexingUtility.checkReadcopyFrom(size - finalOffset, 4, size)
               );
 
               // Now test the byte array
               var actualEx = assertThrows(
                 ByteArrayLengthOverBoundsException.class,
-                () -> testByteArray.writeInt(size - finalOffset, (byte) 0)
+                () -> testByteArray.writeIntBE(size - finalOffset, (byte) 0)
               );
 
               // Check the message
@@ -2047,7 +2047,7 @@ public interface SelfWriteOnlyByteArrayTest extends BaseWriteOnlyByteArrayTest, 
       // Write test for index that exceeds capacity (random)
       for(int trial = 0; trial < TRIALS; trial++){
         long index = size + Math.abs(rng.nextInt());
-        tests.add(dynamicTest(f("writeInt({},int) on ByteArray of {}B size", index, size), () -> {
+        tests.add(dynamicTest(f("writeIntBE({},int) on ByteArray of {}B size", index, size), () -> {
 
           // Wrap in try and catch for possible OOM if trying to allocate max memory
           try{
@@ -2066,13 +2066,13 @@ public interface SelfWriteOnlyByteArrayTest extends BaseWriteOnlyByteArrayTest, 
               // Get the expected exception
               ByteArrayIndexOutOfBoundsException expectedEx = assertThrows(
                 ByteArrayIndexOutOfBoundsException.class,
-                () -> IndexingUtility.checkReadWrite(index, 4, size)
+                () -> IndexingUtility.checkReadcopyFrom(index, 4, size)
               );
 
               // Now test the byte array
               ByteArrayIndexOutOfBoundsException actualEx = assertThrows(
                 ByteArrayIndexOutOfBoundsException.class,
-                () -> testByteArray.writeInt(index, (byte) 0)
+                () -> testByteArray.writeIntBE(index, (byte) 0)
               );
 
               // Check the message
@@ -2098,9 +2098,9 @@ public interface SelfWriteOnlyByteArrayTest extends BaseWriteOnlyByteArrayTest, 
     return tests;
   }
 
-  @DisplayName("Test bad writeLong(long, long) calls")
+  @DisplayName("Test bad writeLongBE(long, long) calls")
   @TestFactory
-  default Iterable<DynamicTest> testInvalidWriteLongCalls(){
+  default Iterable<DynamicTest> testInvalidWriteLongBECalls(){
 
     // Set up test container
     List<DynamicTest> tests = new LinkedList<>();
@@ -2120,7 +2120,7 @@ public interface SelfWriteOnlyByteArrayTest extends BaseWriteOnlyByteArrayTest, 
     for(long size : sizesToTest){
 
       // Write test for negative index (-1)
-      tests.add(dynamicTest(f("writeLong(-1,long) on ByteArray of {}B size", size), () -> {
+      tests.add(dynamicTest(f("writeLongBE(-1,long) on ByteArray of {}B size", size), () -> {
 
         // Wrap in try and catch for possible OOM if trying to allocate max memory
         try{
@@ -2139,13 +2139,13 @@ public interface SelfWriteOnlyByteArrayTest extends BaseWriteOnlyByteArrayTest, 
             // Get the expected exception
             var expectedEx = assertThrows(
               ByteArrayIndexOutOfBoundsException.class,
-              () -> IndexingUtility.checkReadWrite(-1, 8, size)
+              () -> IndexingUtility.checkReadcopyFrom(-1, 8, size)
             );
 
             // Now test the byte array
             var actualEx = assertThrows(
               ByteArrayIndexOutOfBoundsException.class,
-              () -> testByteArray.writeLong(-1, (byte) 0)
+              () -> testByteArray.writeLongBE(-1, (byte) 0)
             );
 
             // Check the message
@@ -2169,7 +2169,7 @@ public interface SelfWriteOnlyByteArrayTest extends BaseWriteOnlyByteArrayTest, 
       // Write test for negative indices (random)
       for(int trial = 0; trial < TRIALS; trial++){
         long index = -Math.abs(rng.nextInt() + 500_000);
-        tests.add(dynamicTest(f("writeLong({},long) on ByteArray of {}B size", index, size), () -> {
+        tests.add(dynamicTest(f("writeLongBE({},long) on ByteArray of {}B size", index, size), () -> {
 
           // Wrap in try and catch for possible OOM if trying to allocate max memory
           try{
@@ -2188,13 +2188,13 @@ public interface SelfWriteOnlyByteArrayTest extends BaseWriteOnlyByteArrayTest, 
               // Get the expected exception
               var expectedEx = assertThrows(
                 ByteArrayIndexOutOfBoundsException.class,
-                () -> IndexingUtility.checkReadWrite(index, 8, size)
+                () -> IndexingUtility.checkReadcopyFrom(index, 8, size)
               );
 
               // Now test the byte array
               var actualEx = assertThrows(
                 ByteArrayIndexOutOfBoundsException.class,
-                () -> testByteArray.writeLong(index, (byte) 0)
+                () -> testByteArray.writeLongBE(index, (byte) 0)
               );
 
               // Check the message
@@ -2216,7 +2216,7 @@ public interface SelfWriteOnlyByteArrayTest extends BaseWriteOnlyByteArrayTest, 
       }
 
       // Write test for index that exceeds capacity (Throws ByteArrayIndexOutOfBoundsException)
-      tests.add(dynamicTest(f("writeLong({},long) on ByteArray of {}B size", size, size), () -> {
+      tests.add(dynamicTest(f("writeLongBE({},long) on ByteArray of {}B size", size, size), () -> {
 
         // Wrap in try and catch for possible OOM if trying to allocate max memory
         try{
@@ -2235,13 +2235,13 @@ public interface SelfWriteOnlyByteArrayTest extends BaseWriteOnlyByteArrayTest, 
             // Get the expected exception
             var expectedEx = assertThrows(
               ByteArrayIndexOutOfBoundsException.class,
-              () -> IndexingUtility.checkReadWrite(size, 8, size)
+              () -> IndexingUtility.checkReadcopyFrom(size, 8, size)
             );
 
             // Now test the byte array
             var actualEx = assertThrows(
               ByteArrayIndexOutOfBoundsException.class,
-              () -> testByteArray.writeLong(size, (byte) 0)
+              () -> testByteArray.writeLongBE(size, (byte) 0)
             );
 
             // Check the message
@@ -2265,7 +2265,7 @@ public interface SelfWriteOnlyByteArrayTest extends BaseWriteOnlyByteArrayTest, 
       // Write test for index that exceeds capacity (Throws ByteArrayLengthOverBoundsException)
       for(int offset = 1; offset < 8; offset++){
         int finalOffset = offset;
-        tests.add(dynamicTest(f("writeLong({},long) on ByteArray of {}B size", size - offset, size), () -> {
+        tests.add(dynamicTest(f("writeLongBE({},long) on ByteArray of {}B size", size - offset, size), () -> {
 
           // Wrap in try and catch for possible OOM if trying to allocate max memory
           try{
@@ -2284,13 +2284,13 @@ public interface SelfWriteOnlyByteArrayTest extends BaseWriteOnlyByteArrayTest, 
               // Get the expected exception
               var expectedEx = assertThrows(
                 ByteArrayLengthOverBoundsException.class,
-                () -> IndexingUtility.checkReadWrite(size - finalOffset, 8, size)
+                () -> IndexingUtility.checkReadcopyFrom(size - finalOffset, 8, size)
               );
 
               // Now test the byte array
               var actualEx = assertThrows(
                 ByteArrayLengthOverBoundsException.class,
-                () -> testByteArray.writeLong(size - finalOffset, (byte) 0)
+                () -> testByteArray.writeLongBE(size - finalOffset, (byte) 0)
               );
 
               // Check the message
@@ -2315,7 +2315,7 @@ public interface SelfWriteOnlyByteArrayTest extends BaseWriteOnlyByteArrayTest, 
       // Write test for index that exceeds capacity (random)
       for(int trial = 0; trial < TRIALS; trial++){
         long index = size + Math.abs(rng.nextInt());
-        tests.add(dynamicTest(f("writeLong({},long) on ByteArray of {}B size", index, size), () -> {
+        tests.add(dynamicTest(f("writeLongBE({},long) on ByteArray of {}B size", index, size), () -> {
 
           // Wrap in try and catch for possible OOM if trying to allocate max memory
           try{
@@ -2334,13 +2334,13 @@ public interface SelfWriteOnlyByteArrayTest extends BaseWriteOnlyByteArrayTest, 
               // Get the expected exception
               var expectedEx = assertThrows(
                 ByteArrayIndexOutOfBoundsException.class,
-                () -> IndexingUtility.checkReadWrite(index, 8, size)
+                () -> IndexingUtility.checkReadcopyFrom(index, 8, size)
               );
 
               // Now test the byte array
               var actualEx = assertThrows(
                 ByteArrayIndexOutOfBoundsException.class,
-                () -> testByteArray.writeLong(index, (byte) 0)
+                () -> testByteArray.writeLongBE(index, (byte) 0)
               );
 
               // Check the message
@@ -2366,9 +2366,9 @@ public interface SelfWriteOnlyByteArrayTest extends BaseWriteOnlyByteArrayTest, 
     return tests;
   }
 
-  @DisplayName("Test bad writeFloat(long, float) calls")
+  @DisplayName("Test bad writeFloatBE(long, float) calls")
   @TestFactory
-  default Iterable<DynamicTest> testInvalidWriteFloatCalls(){
+  default Iterable<DynamicTest> testInvalidWriteFloatBECalls(){
 
     // Set up test container
     List<DynamicTest> tests = new LinkedList<>();
@@ -2388,7 +2388,7 @@ public interface SelfWriteOnlyByteArrayTest extends BaseWriteOnlyByteArrayTest, 
     for(long size : sizesToTest){
 
       // Write test for negative index (-1)
-      tests.add(dynamicTest(f("writeFloat(-1,float) on ByteArray of {}B size", size), () -> {
+      tests.add(dynamicTest(f("writeFloatBE(-1,float) on ByteArray of {}B size", size), () -> {
 
         // Wrap in try and catch for possible OOM if trying to allocate max memory
         try{
@@ -2407,13 +2407,13 @@ public interface SelfWriteOnlyByteArrayTest extends BaseWriteOnlyByteArrayTest, 
             // Get the expected exception
             ByteArrayIndexOutOfBoundsException expectedEx = assertThrows(
               ByteArrayIndexOutOfBoundsException.class,
-              () -> IndexingUtility.checkReadWrite(-1, 4, size)
+              () -> IndexingUtility.checkReadcopyFrom(-1, 4, size)
             );
 
             // Now test the byte array
             ByteArrayIndexOutOfBoundsException actualEx = assertThrows(
               ByteArrayIndexOutOfBoundsException.class,
-              () -> testByteArray.writeFloat(-1, (byte) 0)
+              () -> testByteArray.writeFloatBE(-1, (byte) 0)
             );
 
             // Check the message
@@ -2437,7 +2437,7 @@ public interface SelfWriteOnlyByteArrayTest extends BaseWriteOnlyByteArrayTest, 
       // Write test for negative indices (random)
       for(int trial = 0; trial < TRIALS; trial++){
         long index = -Math.abs(rng.nextInt() + 500_000);
-        tests.add(dynamicTest(f("writeFloat({},float) on ByteArray of {}B size", index, size), () -> {
+        tests.add(dynamicTest(f("writeFloatBE({},float) on ByteArray of {}B size", index, size), () -> {
 
           // Wrap in try and catch for possible OOM if trying to allocate max memory
           try{
@@ -2456,13 +2456,13 @@ public interface SelfWriteOnlyByteArrayTest extends BaseWriteOnlyByteArrayTest, 
               // Get the expected exception
               ByteArrayIndexOutOfBoundsException expectedEx = assertThrows(
                 ByteArrayIndexOutOfBoundsException.class,
-                () -> IndexingUtility.checkReadWrite(index, 4, size)
+                () -> IndexingUtility.checkReadcopyFrom(index, 4, size)
               );
 
               // Now test the byte array
               ByteArrayIndexOutOfBoundsException actualEx = assertThrows(
                 ByteArrayIndexOutOfBoundsException.class,
-                () -> testByteArray.writeFloat(index, (byte) 0)
+                () -> testByteArray.writeFloatBE(index, (byte) 0)
               );
 
               // Check the message
@@ -2484,7 +2484,7 @@ public interface SelfWriteOnlyByteArrayTest extends BaseWriteOnlyByteArrayTest, 
       }
 
       // Write test for index that exceeds capacity (Throws ByteArrayIndexOutOfBoundsException)
-      tests.add(dynamicTest(f("writeFloat({},float) on ByteArray of {}B size", size, size), () -> {
+      tests.add(dynamicTest(f("writeFloatBE({},float) on ByteArray of {}B size", size, size), () -> {
 
         // Wrap in try and catch for possible OOM if trying to allocate max memory
         try{
@@ -2503,13 +2503,13 @@ public interface SelfWriteOnlyByteArrayTest extends BaseWriteOnlyByteArrayTest, 
             // Get the expected exception
             var expectedEx = assertThrows(
               ByteArrayIndexOutOfBoundsException.class,
-              () -> IndexingUtility.checkReadWrite(size, 4, size)
+              () -> IndexingUtility.checkReadcopyFrom(size, 4, size)
             );
 
             // Now test the byte array
             var actualEx = assertThrows(
               ByteArrayIndexOutOfBoundsException.class,
-              () -> testByteArray.writeFloat(size, (byte) 0)
+              () -> testByteArray.writeFloatBE(size, (byte) 0)
             );
 
             // Check the message
@@ -2533,7 +2533,7 @@ public interface SelfWriteOnlyByteArrayTest extends BaseWriteOnlyByteArrayTest, 
       // Write test for index that exceeds capacity (Throws ByteArrayLengthOverBoundsException)
       for(int offset = 1; offset < 4; offset++){
         int finalOffset = offset;
-        tests.add(dynamicTest(f("writeFloat({},float) on ByteArray of {}B size", size - offset, size), () -> {
+        tests.add(dynamicTest(f("writeFloatBE({},float) on ByteArray of {}B size", size - offset, size), () -> {
 
           // Wrap in try and catch for possible OOM if trying to allocate max memory
           try{
@@ -2552,13 +2552,13 @@ public interface SelfWriteOnlyByteArrayTest extends BaseWriteOnlyByteArrayTest, 
               // Get the expected exception
               var expectedEx = assertThrows(
                 ByteArrayLengthOverBoundsException.class,
-                () -> IndexingUtility.checkReadWrite(size - finalOffset, 4, size)
+                () -> IndexingUtility.checkReadcopyFrom(size - finalOffset, 4, size)
               );
 
               // Now test the byte array
               var actualEx = assertThrows(
                 ByteArrayLengthOverBoundsException.class,
-                () -> testByteArray.writeFloat(size - finalOffset, (byte) 0)
+                () -> testByteArray.writeFloatBE(size - finalOffset, (byte) 0)
               );
 
               // Check the message
@@ -2583,7 +2583,7 @@ public interface SelfWriteOnlyByteArrayTest extends BaseWriteOnlyByteArrayTest, 
       // Write test for index that exceeds capacity (random)
       for(int trial = 0; trial < TRIALS; trial++){
         long index = size + Math.abs(rng.nextInt());
-        tests.add(dynamicTest(f("writeFloat({},float) on ByteArray of {}B size", index, size), () -> {
+        tests.add(dynamicTest(f("writeFloatBE({},float) on ByteArray of {}B size", index, size), () -> {
 
           // Wrap in try and catch for possible OOM if trying to allocate max memory
           try{
@@ -2602,13 +2602,13 @@ public interface SelfWriteOnlyByteArrayTest extends BaseWriteOnlyByteArrayTest, 
               // Get the expected exception
               ByteArrayIndexOutOfBoundsException expectedEx = assertThrows(
                 ByteArrayIndexOutOfBoundsException.class,
-                () -> IndexingUtility.checkReadWrite(index, 4, size)
+                () -> IndexingUtility.checkReadcopyFrom(index, 4, size)
               );
 
               // Now test the byte array
               ByteArrayIndexOutOfBoundsException actualEx = assertThrows(
                 ByteArrayIndexOutOfBoundsException.class,
-                () -> testByteArray.writeFloat(index, (byte) 0)
+                () -> testByteArray.writeFloatBE(index, (byte) 0)
               );
 
               // Check the message
@@ -2634,9 +2634,9 @@ public interface SelfWriteOnlyByteArrayTest extends BaseWriteOnlyByteArrayTest, 
     return tests;
   }
 
-  @DisplayName("Test bad writeDouble(long, double) calls")
+  @DisplayName("Test bad writeDoubleBE(long, double) calls")
   @TestFactory
-  default Iterable<DynamicTest> testInvalidWriteDoubleCalls(){
+  default Iterable<DynamicTest> testInvalidWriteDoubleBECalls(){
 
     // Set up test container
     List<DynamicTest> tests = new LinkedList<>();
@@ -2656,7 +2656,7 @@ public interface SelfWriteOnlyByteArrayTest extends BaseWriteOnlyByteArrayTest, 
     for(long size : sizesToTest){
 
       // Write test for negative index (-1)
-      tests.add(dynamicTest(f("writeDouble(-1,double) on ByteArray of {}B size", size), () -> {
+      tests.add(dynamicTest(f("writeDoubleBE(-1,double) on ByteArray of {}B size", size), () -> {
 
         // Wrap in try and catch for possible OOM if trying to allocate max memory
         try{
@@ -2675,13 +2675,13 @@ public interface SelfWriteOnlyByteArrayTest extends BaseWriteOnlyByteArrayTest, 
             // Get the expected exception
             var expectedEx = assertThrows(
               ByteArrayIndexOutOfBoundsException.class,
-              () -> IndexingUtility.checkReadWrite(-1, 8, size)
+              () -> IndexingUtility.checkReadcopyFrom(-1, 8, size)
             );
 
             // Now test the byte array
             var actualEx = assertThrows(
               ByteArrayIndexOutOfBoundsException.class,
-              () -> testByteArray.writeDouble(-1, (byte) 0)
+              () -> testByteArray.writeDoubleBE(-1, (byte) 0)
             );
 
             // Check the message
@@ -2705,7 +2705,7 @@ public interface SelfWriteOnlyByteArrayTest extends BaseWriteOnlyByteArrayTest, 
       // Write test for negative indices (random)
       for(int trial = 0; trial < TRIALS; trial++){
         long index = -Math.abs(rng.nextInt() + 500_000);
-        tests.add(dynamicTest(f("writeDouble({},double) on ByteArray of {}B size", index, size), () -> {
+        tests.add(dynamicTest(f("writeDoubleBE({},double) on ByteArray of {}B size", index, size), () -> {
 
           // Wrap in try and catch for possible OOM if trying to allocate max memory
           try{
@@ -2724,13 +2724,13 @@ public interface SelfWriteOnlyByteArrayTest extends BaseWriteOnlyByteArrayTest, 
               // Get the expected exception
               var expectedEx = assertThrows(
                 ByteArrayIndexOutOfBoundsException.class,
-                () -> IndexingUtility.checkReadWrite(index, 8, size)
+                () -> IndexingUtility.checkReadcopyFrom(index, 8, size)
               );
 
               // Now test the byte array
               var actualEx = assertThrows(
                 ByteArrayIndexOutOfBoundsException.class,
-                () -> testByteArray.writeDouble(index, (byte) 0)
+                () -> testByteArray.writeDoubleBE(index, (byte) 0)
               );
 
               // Check the message
@@ -2752,7 +2752,7 @@ public interface SelfWriteOnlyByteArrayTest extends BaseWriteOnlyByteArrayTest, 
       }
 
       // Write test for index that exceeds capacity (Throws ByteArrayIndexOutOfBoundsException)
-      tests.add(dynamicTest(f("writeDouble({},double) on ByteArray of {}B size", size, size), () -> {
+      tests.add(dynamicTest(f("writeDoubleBE({},double) on ByteArray of {}B size", size, size), () -> {
 
         // Wrap in try and catch for possible OOM if trying to allocate max memory
         try{
@@ -2771,13 +2771,13 @@ public interface SelfWriteOnlyByteArrayTest extends BaseWriteOnlyByteArrayTest, 
             // Get the expected exception
             var expectedEx = assertThrows(
               ByteArrayIndexOutOfBoundsException.class,
-              () -> IndexingUtility.checkReadWrite(size, 8, size)
+              () -> IndexingUtility.checkReadcopyFrom(size, 8, size)
             );
 
             // Now test the byte array
             var actualEx = assertThrows(
               ByteArrayIndexOutOfBoundsException.class,
-              () -> testByteArray.writeDouble(size, (byte) 0)
+              () -> testByteArray.writeDoubleBE(size, (byte) 0)
             );
 
             // Check the message
@@ -2801,7 +2801,7 @@ public interface SelfWriteOnlyByteArrayTest extends BaseWriteOnlyByteArrayTest, 
       // Write test for index that exceeds capacity (Throws ByteArrayLengthOverBoundsException)
       for(int offset = 1; offset < 8; offset++){
         int finalOffset = offset;
-        tests.add(dynamicTest(f("writeDouble({},double) on ByteArray of {}B size", size - offset, size), () -> {
+        tests.add(dynamicTest(f("writeDoubleBE({},double) on ByteArray of {}B size", size - offset, size), () -> {
 
           // Wrap in try and catch for possible OOM if trying to allocate max memory
           try{
@@ -2820,13 +2820,13 @@ public interface SelfWriteOnlyByteArrayTest extends BaseWriteOnlyByteArrayTest, 
               // Get the expected exception
               var expectedEx = assertThrows(
                 ByteArrayLengthOverBoundsException.class,
-                () -> IndexingUtility.checkReadWrite(size - finalOffset, 8, size)
+                () -> IndexingUtility.checkReadcopyFrom(size - finalOffset, 8, size)
               );
 
               // Now test the byte array
               var actualEx = assertThrows(
                 ByteArrayLengthOverBoundsException.class,
-                () -> testByteArray.writeDouble(size - finalOffset, (byte) 0)
+                () -> testByteArray.writeDoubleBE(size - finalOffset, (byte) 0)
               );
 
               // Check the message
@@ -2851,7 +2851,7 @@ public interface SelfWriteOnlyByteArrayTest extends BaseWriteOnlyByteArrayTest, 
       // Write test for index that exceeds capacity (random)
       for(int trial = 0; trial < TRIALS; trial++){
         long index = size + Math.abs(rng.nextInt());
-        tests.add(dynamicTest(f("writeDouble({},double) on ByteArray of {}B size", index, size), () -> {
+        tests.add(dynamicTest(f("writeDoubleBE({},double) on ByteArray of {}B size", index, size), () -> {
 
           // Wrap in try and catch for possible OOM if trying to allocate max memory
           try{
@@ -2870,13 +2870,13 @@ public interface SelfWriteOnlyByteArrayTest extends BaseWriteOnlyByteArrayTest, 
               // Get the expected exception
               var expectedEx = assertThrows(
                 ByteArrayIndexOutOfBoundsException.class,
-                () -> IndexingUtility.checkReadWrite(index, 8, size)
+                () -> IndexingUtility.checkReadcopyFrom(index, 8, size)
               );
 
               // Now test the byte array
               var actualEx = assertThrows(
                 ByteArrayIndexOutOfBoundsException.class,
-                () -> testByteArray.writeDouble(index, (byte) 0)
+                () -> testByteArray.writeDoubleBE(index, (byte) 0)
               );
 
               // Check the message

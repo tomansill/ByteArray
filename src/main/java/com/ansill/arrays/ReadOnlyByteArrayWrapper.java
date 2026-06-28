@@ -29,35 +29,61 @@ final class ReadOnlyByteArrayWrapper implements ReadOnlyByteArray{
   }
 
   @Override
-  public short readShort(long byteIndex) throws ByteArrayIndexOutOfBoundsException, ByteArrayLengthOverBoundsException{
-    return original.readShort(byteIndex);
+  public short readShortBE(long byteIndex) throws ByteArrayIndexOutOfBoundsException, ByteArrayLengthOverBoundsException{
+    return original.readShortBE(byteIndex);
   }
 
   @Override
-  public int readInt(long byteIndex) throws ByteArrayIndexOutOfBoundsException, ByteArrayLengthOverBoundsException{
-    return original.readInt(byteIndex);
+  public short readShortLE(long byteIndex) throws ByteArrayIndexOutOfBoundsException, ByteArrayLengthOverBoundsException{
+    return original.readShortBE(byteIndex);
   }
 
   @Override
-  public long readLong(long byteIndex) throws ByteArrayIndexOutOfBoundsException, ByteArrayLengthOverBoundsException{
-    return original.readLong(byteIndex);
+  public int readIntBE(long byteIndex) throws ByteArrayIndexOutOfBoundsException, ByteArrayLengthOverBoundsException{
+    return original.readIntBE(byteIndex);
   }
 
   @Override
-  public float readFloat(long byteIndex) throws ByteArrayIndexOutOfBoundsException, ByteArrayLengthOverBoundsException{
-    return original.readFloat(byteIndex);
+  public int readIntLE(long byteIndex) throws ByteArrayIndexOutOfBoundsException, ByteArrayLengthOverBoundsException{
+    return original.readIntBE(byteIndex);
   }
 
   @Override
-  public double readDouble(long byteIndex)
+  public long readLongBE(long byteIndex) throws ByteArrayIndexOutOfBoundsException, ByteArrayLengthOverBoundsException{
+    return original.readLongBE(byteIndex);
+  }
+
+  @Override
+  public long readLongLE(long byteIndex) throws ByteArrayIndexOutOfBoundsException, ByteArrayLengthOverBoundsException{
+    return original.readLongBE(byteIndex);
+  }
+
+  @Override
+  public float readFloatBE(long byteIndex) throws ByteArrayIndexOutOfBoundsException, ByteArrayLengthOverBoundsException{
+    return original.readFloatBE(byteIndex);
+  }
+
+  @Override
+  public float readFloatLE(long byteIndex) throws ByteArrayIndexOutOfBoundsException, ByteArrayLengthOverBoundsException{
+    return original.readFloatBE(byteIndex);
+  }
+
+  @Override
+  public double readDoubleBE(long byteIndex)
   throws ByteArrayIndexOutOfBoundsException, ByteArrayLengthOverBoundsException{
-    return original.readDouble(byteIndex);
+    return original.readDoubleBE(byteIndex);
   }
 
   @Override
-  public void read(long byteIndex, @Nonnull WriteOnlyByteArray destination)
+  public double readDoubleLE(long byteIndex)
+          throws ByteArrayIndexOutOfBoundsException, ByteArrayLengthOverBoundsException{
+    return original.readDoubleBE(byteIndex);
+  }
+
+  @Override
+  public void copyTo(long byteIndex, @Nonnull WriteOnlyByteArray destination)
   throws ByteArrayIndexOutOfBoundsException, ByteArrayLengthOverBoundsException{
-    original.read(byteIndex, destination);
+    original.copyTo(byteIndex, destination);
   }
 
   @Nonnull

@@ -86,7 +86,7 @@ public interface ReadOnlyByteArrayWithOtherByteArray64BitTest extends BaseReadOn
           assertEquals(outSize, destination.size());
 
           // Read it
-          testByteArray.read(byteIndex, destination);
+          testByteArray.copyTo(byteIndex, destination);
 
           // Check destination BA
           for(long index = 0; index < outSize; index++){
@@ -118,8 +118,8 @@ public interface ReadOnlyByteArrayWithOtherByteArray64BitTest extends BaseReadOn
   }
 
   @Test
-  @DisplayName("Test read(long, WriteOnlyByteArray) on 64-bit addressable data")
-  default void testReadWriteOnly64(){
+  @DisplayName("Test copyTo(long, WriteOnlyByteArray) on 64-bit addressable data")
+  default void testCopyToWriteOnly64(){
     testReadOn64BitData(
       getRNG(),
       this::writeTestByteArray,
@@ -133,8 +133,8 @@ public interface ReadOnlyByteArrayWithOtherByteArray64BitTest extends BaseReadOn
   }
 
   @Test
-  @DisplayName("Test read(long, ReadableWritableByteArray) on 64-bit addressable data")
-  default void testReadReadableWritable64(){
+  @DisplayName("Test copyTo(long, ReadableWritableByteArray) on 64-bit addressable data")
+  default void testCopyToReadableWritable64(){
     testReadOn64BitData(
       getRNG(),
       this::writeTestByteArray,

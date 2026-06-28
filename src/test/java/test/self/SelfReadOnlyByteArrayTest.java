@@ -33,7 +33,7 @@ import static org.junit.jupiter.api.DynamicTest.dynamicTest;
 public interface SelfReadOnlyByteArrayTest extends BaseReadOnlyByteArrayTest, SelfByteArrayTest{
 
   @Nonnull
-  static Iterable<DynamicTest> generateTestsInvalidReadCallsByteArray(
+  static Iterable<DynamicTest> generateTestsInvalidCopyToCallsByteArray(
     @Nonnull Random rng,
     @Nonnull String type,
     @Nonnull TriConsumer<ReadOnlyByteArray,Long,Byte> testBAWriterFun,
@@ -62,7 +62,7 @@ public interface SelfReadOnlyByteArrayTest extends BaseReadOnlyByteArrayTest, Se
 
       // Test null bytearray
       tests.add(dynamicTest(
-              f("test read(0, null) on ByteArray of {}B size", selfSize),
+              f("test copyTo(0, null) on ByteArray of {}B size", selfSize),
               () -> {
 
                 // Wrap in try to make sure memory gets cleaned up
@@ -80,14 +80,14 @@ public interface SelfReadOnlyByteArrayTest extends BaseReadOnlyByteArrayTest, Se
                     // Build the expected exception
                     IllegalArgumentException expected = assertThrows(
                             IllegalArgumentException.class,
-                            () -> IndexingUtility.checkRead(0, null, selfSize)
+                            () -> IndexingUtility.checkcopyTo(0, null, selfSize)
                     );
 
                     // Test it
                     //noinspection DataFlowIssue
                     IllegalArgumentException actual = assertThrows(
                             IllegalArgumentException.class,
-                            () -> testArray.read(0, null)
+                            () -> testArray.copyTo(0, null)
                     );
 
                     // Compare messages
@@ -114,7 +114,7 @@ public interface SelfReadOnlyByteArrayTest extends BaseReadOnlyByteArrayTest, Se
 
       // Test too-large bytearray
       tests.add(dynamicTest(
-        f("test read(0, {}(size={})) on ByteArray of {}B size", type, selfSize + 1, selfSize),
+        f("test copyTo(0, {}(size={})) on ByteArray of {}B size", type, selfSize + 1, selfSize),
         () -> {
 
           // Wrap in try to make sure memory gets cleaned up
@@ -144,13 +144,13 @@ public interface SelfReadOnlyByteArrayTest extends BaseReadOnlyByteArrayTest, Se
               // Build the expected exception
               ByteArrayLengthOverBoundsException expected = assertThrows(
                 ByteArrayLengthOverBoundsException.class,
-                () -> IndexingUtility.checkRead(0, control, selfSize)
+                () -> IndexingUtility.checkcopyTo(0, control, selfSize)
               );
 
               // Test it
               ByteArrayLengthOverBoundsException actual = assertThrows(
                 ByteArrayLengthOverBoundsException.class,
-                () -> testArray.read(0, control)
+                () -> testArray.copyTo(0, control)
               );
 
               // Compare messages
@@ -183,7 +183,7 @@ public interface SelfReadOnlyByteArrayTest extends BaseReadOnlyByteArrayTest, Se
         int byteIndex = -Integer.max(rng.nextInt((int) selfSize), 1);
         int len = Integer.max(1, rng.nextInt((int) selfSize));
         tests.add(dynamicTest(f(
-          "test read({}, {}(size={})) on ByteArray of {}B size",
+          "test copyTo({}, {}(size={})) on ByteArray of {}B size",
           byteIndex,
           type,
           len,
@@ -217,13 +217,13 @@ public interface SelfReadOnlyByteArrayTest extends BaseReadOnlyByteArrayTest, Se
               // Build the expected exception
               ByteArrayIndexOutOfBoundsException expected = assertThrows(
                 ByteArrayIndexOutOfBoundsException.class,
-                () -> IndexingUtility.checkRead(byteIndex, control, selfSize)
+                () -> IndexingUtility.checkcopyTo(byteIndex, control, selfSize)
               );
 
               // Test it
               ByteArrayIndexOutOfBoundsException actual = assertThrows(
                 ByteArrayIndexOutOfBoundsException.class,
-                () -> testArray.read(byteIndex, control)
+                () -> testArray.copyTo(byteIndex, control)
               );
 
               // Compare messages
@@ -258,7 +258,7 @@ public interface SelfReadOnlyByteArrayTest extends BaseReadOnlyByteArrayTest, Se
         int byteIndex = (int) (selfSize + rng.nextInt((int) selfSize) + 1);
         int len = Integer.max(1, rng.nextInt((int) selfSize));
         tests.add(dynamicTest(f(
-          "test read({}, {}(size={})) on ByteArray of {}B size",
+          "test copyTo({}, {}(size={})) on ByteArray of {}B size",
           byteIndex,
           type,
           len,
@@ -292,13 +292,13 @@ public interface SelfReadOnlyByteArrayTest extends BaseReadOnlyByteArrayTest, Se
               // Build the expected exception
               ByteArrayIndexOutOfBoundsException expected = assertThrows(
                 ByteArrayIndexOutOfBoundsException.class,
-                () -> IndexingUtility.checkRead(byteIndex, control, selfSize)
+                () -> IndexingUtility.checkcopyTo(byteIndex, control, selfSize)
               );
 
               // Test it
               ByteArrayIndexOutOfBoundsException actual = assertThrows(
                 ByteArrayIndexOutOfBoundsException.class,
-                () -> testArray.read(byteIndex, control)
+                () -> testArray.copyTo(byteIndex, control)
               );
 
               // Compare messages
@@ -333,10 +333,10 @@ public interface SelfReadOnlyByteArrayTest extends BaseReadOnlyByteArrayTest, Se
     return tests;
   }
 
-  @DisplayName("Test invalid read(long, WriteOnlyByteArray) calls")
+  @DisplayName("Test invalid copyTo(long, WriteOnlyByteArray) calls")
   @TestFactory
-  default Iterable<DynamicTest> testInvalidReadCallsWriteOnlyByteArray(){
-    return generateTestsInvalidReadCallsByteArray(
+  default Iterable<DynamicTest> testInvalidCopyToCallsWriteOnlyByteArray(){
+    return generateTestsInvalidCopyToCallsByteArray(
       this.getRNG(),
       "WriteOnlyByteArray",
       this::writeTestByteArray,
@@ -346,10 +346,10 @@ public interface SelfReadOnlyByteArrayTest extends BaseReadOnlyByteArrayTest, Se
     );
   }
 
-  @DisplayName("Test invalid read(long, ReadableWritableByteArray) calls")
+  @DisplayName("Test invalid copyTo(long, ReadableWritableByteArray) calls")
   @TestFactory
-  default Iterable<DynamicTest> testInvalidReadCallsReadableWritableByteArray(){
-    return generateTestsInvalidReadCallsByteArray(
+  default Iterable<DynamicTest> testInvalidCopyToCallsReadableWritableByteArray(){
+    return generateTestsInvalidCopyToCallsByteArray(
       this.getRNG(),
       "ReadableWritableByteArray",
       this::writeTestByteArray,
@@ -436,9 +436,9 @@ public interface SelfReadOnlyByteArrayTest extends BaseReadOnlyByteArrayTest, Se
     return tests;
   }
 
-  @DisplayName("Test valid readShort(long) calls")
+  @DisplayName("Test valid readShortBE(long) calls")
   @TestFactory
-  default Iterable<DynamicTest> testValidReadShortCalls(){
+  default Iterable<DynamicTest> testValidReadShortBECalls(){
 
     // Set up test container
     var tests = new LinkedList<DynamicTest>();
@@ -462,7 +462,7 @@ public interface SelfReadOnlyByteArrayTest extends BaseReadOnlyByteArrayTest, Se
       int testLocalSeed = (int) (rng.nextInt() + size);
 
       // Write test
-      tests.add(dynamicTest(f("full readShort(long) on ByteArray of {}B size", size), () -> {
+      tests.add(dynamicTest(f("full readShortBE(long) on ByteArray of {}B size", size), () -> {
 
         // Wrap in try and catch for possible OOM if trying to allocate max memory
         try{
@@ -494,7 +494,7 @@ public interface SelfReadOnlyByteArrayTest extends BaseReadOnlyByteArrayTest, Se
                 randBuf <<= 8;
                 randBuf |= (0xff & testRNG.nextInt());
                 short expected = (short) (0xffff & randBuf);
-                assertEquals(expected, testByteArray.readShort(index), "Index: " + index);
+                assertEquals(expected, testByteArray.readShortBE(index), "Index: " + index);
               }
             }
           }finally{
@@ -517,9 +517,9 @@ public interface SelfReadOnlyByteArrayTest extends BaseReadOnlyByteArrayTest, Se
     return tests;
   }
 
-  @DisplayName("Test valid readInt(long) calls")
+  @DisplayName("Test valid readIntBE(long) calls")
   @TestFactory
-  default Iterable<DynamicTest> testValidReadIntCalls(){
+  default Iterable<DynamicTest> testValidReadIntBECalls(){
 
     // Set up test container
     var tests = new LinkedList<DynamicTest>();
@@ -543,7 +543,7 @@ public interface SelfReadOnlyByteArrayTest extends BaseReadOnlyByteArrayTest, Se
       int testLocalSeed = (int) (rng.nextInt() + size);
 
       // Write test
-      tests.add(dynamicTest(f("full readInt(long) on ByteArray of {}B size", size), () -> {
+      tests.add(dynamicTest(f("full readIntBE(long) on ByteArray of {}B size", size), () -> {
 
         // Wrap in try and catch for possible OOM if trying to allocate max memory
         try{
@@ -576,7 +576,7 @@ public interface SelfReadOnlyByteArrayTest extends BaseReadOnlyByteArrayTest, Se
               for(long index = 0; index < size - 3; index++){
                 randBuf <<= 8;
                 randBuf |= (0xff & testRNG.nextInt());
-                assertEquals(randBuf, testByteArray.readInt(index), "Index: " + index);
+                assertEquals(randBuf, testByteArray.readIntBE(index), "Index: " + index);
               }
             }
           }finally{
@@ -599,9 +599,9 @@ public interface SelfReadOnlyByteArrayTest extends BaseReadOnlyByteArrayTest, Se
     return tests;
   }
 
-  @DisplayName("Test valid readLong(long) calls")
+  @DisplayName("Test valid readLongBE(long) calls")
   @TestFactory
-  default Iterable<DynamicTest> testValidReadLongCalls(){
+  default Iterable<DynamicTest> testValidReadLongBECalls(){
 
     // Set up test container
     var tests = new LinkedList<DynamicTest>();
@@ -625,7 +625,7 @@ public interface SelfReadOnlyByteArrayTest extends BaseReadOnlyByteArrayTest, Se
       int testLocalSeed = (int) (rng.nextInt() + size);
 
       // Write test
-      tests.add(dynamicTest(f("full readLong(long) on ByteArray of {}B size", size), () -> {
+      tests.add(dynamicTest(f("full readLongBE(long) on ByteArray of {}B size", size), () -> {
 
         // Wrap in try and catch for possible OOM if trying to allocate max memory
         try{
@@ -662,7 +662,7 @@ public interface SelfReadOnlyByteArrayTest extends BaseReadOnlyByteArrayTest, Se
               for(long index = 0; index < size - 7; index++){
                 randBuf <<= 8;
                 randBuf |= (0xff & testRNG.nextInt());
-                assertEquals(randBuf, testByteArray.readLong(index), "Index: " + index);
+                assertEquals(randBuf, testByteArray.readLongBE(index), "Index: " + index);
               }
             }
           }finally{
@@ -685,9 +685,9 @@ public interface SelfReadOnlyByteArrayTest extends BaseReadOnlyByteArrayTest, Se
     return tests;
   }
 
-  @DisplayName("Test valid readFloat(long) calls")
+  @DisplayName("Test valid readFloatBE(long) calls")
   @TestFactory
-  default Iterable<DynamicTest> testValidReadFloatCalls(){
+  default Iterable<DynamicTest> testValidReadFloatBECalls(){
 
     // Set up test container
     var tests = new LinkedList<DynamicTest>();
@@ -711,7 +711,7 @@ public interface SelfReadOnlyByteArrayTest extends BaseReadOnlyByteArrayTest, Se
       int testLocalSeed = (int) (rng.nextInt() + size);
 
       // Write test
-      tests.add(dynamicTest(f("full readFloat(long) on ByteArray of {}B size", size), () -> {
+      tests.add(dynamicTest(f("full readFloatBE(long) on ByteArray of {}B size", size), () -> {
 
         // Wrap in try and catch for possible OOM if trying to allocate max memory
         try{
@@ -744,7 +744,7 @@ public interface SelfReadOnlyByteArrayTest extends BaseReadOnlyByteArrayTest, Se
               for(long index = 0; index < size - 3; index++){
                 randBuf <<= 8;
                 randBuf |= (0xff & testRNG.nextInt());
-                assertEquals(Float.intBitsToFloat(randBuf), testByteArray.readFloat(index), "Index: " + index);
+                assertEquals(Float.intBitsToFloat(randBuf), testByteArray.readFloatBE(index), "Index: " + index);
               }
             }
           }finally{
@@ -767,9 +767,9 @@ public interface SelfReadOnlyByteArrayTest extends BaseReadOnlyByteArrayTest, Se
     return tests;
   }
 
-  @DisplayName("Test valid readDouble(long) calls")
+  @DisplayName("Test valid readDoubleBE(long) calls")
   @TestFactory
-  default Iterable<DynamicTest> testValidReadDoubleCalls(){
+  default Iterable<DynamicTest> testValidReadDoubleBECalls(){
 
     // Set up test container
     var tests = new LinkedList<DynamicTest>();
@@ -793,7 +793,7 @@ public interface SelfReadOnlyByteArrayTest extends BaseReadOnlyByteArrayTest, Se
       int testLocalSeed = (int) (rng.nextInt() + size);
 
       // Write test
-      tests.add(dynamicTest(f("full readDouble(long) on ByteArray of {}B size", size), () -> {
+      tests.add(dynamicTest(f("full readDoubleBE(long) on ByteArray of {}B size", size), () -> {
 
         // Wrap in try and catch for possible OOM if trying to allocate max memory
         try{
@@ -830,7 +830,7 @@ public interface SelfReadOnlyByteArrayTest extends BaseReadOnlyByteArrayTest, Se
               for(long index = 0; index < size - 7; index++){
                 randBuf <<= 8;
                 randBuf |= (0xff & testRNG.nextInt());
-                assertEquals(Double.longBitsToDouble(randBuf), testByteArray.readDouble(index), "Index: " + index);
+                assertEquals(Double.longBitsToDouble(randBuf), testByteArray.readDoubleBE(index), "Index: " + index);
               }
             }
           }finally{
@@ -1258,9 +1258,9 @@ public interface SelfReadOnlyByteArrayTest extends BaseReadOnlyByteArrayTest, Se
     return tests;
   }
 
-  @DisplayName("Test bad readShort(long) calls")
+  @DisplayName("Test bad readShortBE(long) calls")
   @TestFactory
-  default Iterable<DynamicTest> testInvalidReadShortCalls(){
+  default Iterable<DynamicTest> testInvalidReadShortBECalls(){
 
     // Set up test container
     var tests = new LinkedList<DynamicTest>();
@@ -1280,7 +1280,7 @@ public interface SelfReadOnlyByteArrayTest extends BaseReadOnlyByteArrayTest, Se
     for(long size : sizesToTest){
 
       // Write test for negative index (-1)
-      tests.add(dynamicTest(f("readShort(-1) on ByteArray of {}B size", size), () -> {
+      tests.add(dynamicTest(f("readShortBE(-1) on ByteArray of {}B size", size), () -> {
 
         // Wrap in try and catch for possible OOM if trying to allocate max memory
         try{
@@ -1329,7 +1329,7 @@ public interface SelfReadOnlyByteArrayTest extends BaseReadOnlyByteArrayTest, Se
       // Write test for negative indices (random)
       for(int trial = 0; trial < TRIALS; trial++){
         long index = -Math.abs(rng.nextInt() + 500_000);
-        tests.add(dynamicTest(f("readShort({}) on ByteArray of {}B size", index, size), () -> {
+        tests.add(dynamicTest(f("readShortBE({}) on ByteArray of {}B size", index, size), () -> {
 
           // Wrap in try and catch for possible OOM if trying to allocate max memory
           try{
@@ -1376,7 +1376,7 @@ public interface SelfReadOnlyByteArrayTest extends BaseReadOnlyByteArrayTest, Se
       }
 
       // Write test for index that exceeds capacity
-      tests.add(dynamicTest(f("readShort({}) on ByteArray of {}B size", size, size), () -> {
+      tests.add(dynamicTest(f("readShortBE({}) on ByteArray of {}B size", size, size), () -> {
 
         // Wrap in try and catch for possible OOM if trying to allocate max memory
         try{
@@ -1425,7 +1425,7 @@ public interface SelfReadOnlyByteArrayTest extends BaseReadOnlyByteArrayTest, Se
       // Write test for index that exceeds capacity (random)
       for(int trial = 0; trial < TRIALS; trial++){
         long index = size + Math.abs(rng.nextInt());
-        tests.add(dynamicTest(f("readShort({}) on ByteArray of {}B size", index, size), () -> {
+        tests.add(dynamicTest(f("readShortBE({}) on ByteArray of {}B size", index, size), () -> {
 
           // Wrap in try and catch for possible OOM if trying to allocate max memory
           try{
@@ -1472,7 +1472,7 @@ public interface SelfReadOnlyByteArrayTest extends BaseReadOnlyByteArrayTest, Se
       }
 
       // Write test for length that exceeds capacity
-      tests.add(dynamicTest(f("readShort({}) on ByteArray of {}B size", size - 1, size), () -> {
+      tests.add(dynamicTest(f("readShortBE({}) on ByteArray of {}B size", size - 1, size), () -> {
 
         // Wrap in try and catch for possible OOM if trying to allocate max memory
         try{
@@ -1491,13 +1491,13 @@ public interface SelfReadOnlyByteArrayTest extends BaseReadOnlyByteArrayTest, Se
             // Get the expected exception
             var expectedEx = assertThrows(
               ByteArrayLengthOverBoundsException.class,
-              () -> IndexingUtility.checkReadWrite(size - 1, 2, size)
+              () -> IndexingUtility.checkReadcopyFrom(size - 1, 2, size)
             );
 
             // Now test the byte array
             var actualEx = assertThrows(
               ByteArrayLengthOverBoundsException.class,
-              () -> testByteArray.readShort(size - 1)
+              () -> testByteArray.readShortBE(size - 1)
             );
 
             // Check the message
@@ -1523,9 +1523,9 @@ public interface SelfReadOnlyByteArrayTest extends BaseReadOnlyByteArrayTest, Se
     return tests;
   }
 
-  @DisplayName("Test bad readInt(long) calls")
+  @DisplayName("Test bad readIntBE(long) calls")
   @TestFactory
-  default Iterable<DynamicTest> testInvalidReadIntCalls(){
+  default Iterable<DynamicTest> testInvalidReadIntBECalls(){
 
     // Set up test container
     var tests = new LinkedList<DynamicTest>();
@@ -1545,7 +1545,7 @@ public interface SelfReadOnlyByteArrayTest extends BaseReadOnlyByteArrayTest, Se
     for(long size : sizesToTest){
 
       // Write test for negative index (-1)
-      tests.add(dynamicTest(f("readInt(-1) on ByteArray of {}B size", size), () -> {
+      tests.add(dynamicTest(f("readIntBE(-1) on ByteArray of {}B size", size), () -> {
 
         // Wrap in try and catch for possible OOM if trying to allocate max memory
         try{
@@ -1594,7 +1594,7 @@ public interface SelfReadOnlyByteArrayTest extends BaseReadOnlyByteArrayTest, Se
       // Write test for negative indices (random)
       for(int trial = 0; trial < TRIALS; trial++){
         long index = -Math.abs(rng.nextInt() + 500_000);
-        tests.add(dynamicTest(f("readInt({}) on ByteArray of {}B size", index, size), () -> {
+        tests.add(dynamicTest(f("readIntBE({}) on ByteArray of {}B size", index, size), () -> {
 
           // Wrap in try and catch for possible OOM if trying to allocate max memory
           try{
@@ -1641,7 +1641,7 @@ public interface SelfReadOnlyByteArrayTest extends BaseReadOnlyByteArrayTest, Se
       }
 
       // Write test for index that exceeds capacity
-      tests.add(dynamicTest(f("readInt({}) on ByteArray of {}B size", size, size), () -> {
+      tests.add(dynamicTest(f("readIntBE({}) on ByteArray of {}B size", size, size), () -> {
 
         // Wrap in try and catch for possible OOM if trying to allocate max memory
         try{
@@ -1690,7 +1690,7 @@ public interface SelfReadOnlyByteArrayTest extends BaseReadOnlyByteArrayTest, Se
       // Write test for index that exceeds capacity (random)
       for(int trial = 0; trial < TRIALS; trial++){
         long index = size + Math.abs(rng.nextInt());
-        tests.add(dynamicTest(f("readInt({}) on ByteArray of {}B size", index, size), () -> {
+        tests.add(dynamicTest(f("readIntBE({}) on ByteArray of {}B size", index, size), () -> {
 
           // Wrap in try and catch for possible OOM if trying to allocate max memory
           try{
@@ -1737,7 +1737,7 @@ public interface SelfReadOnlyByteArrayTest extends BaseReadOnlyByteArrayTest, Se
       }
 
       // Write test for length that exceeds capacity
-      tests.add(dynamicTest(f("readInt({}) on ByteArray of {}B size", size - 1, size), () -> {
+      tests.add(dynamicTest(f("readIntBE({}) on ByteArray of {}B size", size - 1, size), () -> {
 
         // Wrap in try and catch for possible OOM if trying to allocate max memory
         try{
@@ -1756,13 +1756,13 @@ public interface SelfReadOnlyByteArrayTest extends BaseReadOnlyByteArrayTest, Se
             // Get the expected exception
             var expectedEx = assertThrows(
               ByteArrayLengthOverBoundsException.class,
-              () -> IndexingUtility.checkReadWrite(size - 1, 4, size)
+              () -> IndexingUtility.checkReadcopyFrom(size - 1, 4, size)
             );
 
             // Now test the byte array
             var actualEx = assertThrows(
               ByteArrayLengthOverBoundsException.class,
-              () -> testByteArray.readInt(size - 1)
+              () -> testByteArray.readIntBE(size - 1)
             );
 
             // Check the message
@@ -1788,9 +1788,9 @@ public interface SelfReadOnlyByteArrayTest extends BaseReadOnlyByteArrayTest, Se
     return tests;
   }
 
-  @DisplayName("Test bad readLong(long) calls")
+  @DisplayName("Test bad readLongBE(long) calls")
   @TestFactory
-  default Iterable<DynamicTest> testInvalidReadLongCalls(){
+  default Iterable<DynamicTest> testInvalidReadLongBECalls(){
 
     // Set up test container
     var tests = new LinkedList<DynamicTest>();
@@ -1810,7 +1810,7 @@ public interface SelfReadOnlyByteArrayTest extends BaseReadOnlyByteArrayTest, Se
     for(long size : sizesToTest){
 
       // Write test for negative index (-1)
-      tests.add(dynamicTest(f("readLong(-1) on ByteArray of {}B size", size), () -> {
+      tests.add(dynamicTest(f("readLongBE(-1) on ByteArray of {}B size", size), () -> {
 
         // Wrap in try and catch for possible OOM if trying to allocate max memory
         try{
@@ -1859,7 +1859,7 @@ public interface SelfReadOnlyByteArrayTest extends BaseReadOnlyByteArrayTest, Se
       // Write test for negative indices (random)
       for(int trial = 0; trial < TRIALS; trial++){
         long index = -Math.abs(rng.nextInt() + 500_000);
-        tests.add(dynamicTest(f("readLong({}) on ByteArray of {}B size", index, size), () -> {
+        tests.add(dynamicTest(f("readLongBE({}) on ByteArray of {}B size", index, size), () -> {
 
           // Wrap in try and catch for possible OOM if trying to allocate max memory
           try{
@@ -1906,7 +1906,7 @@ public interface SelfReadOnlyByteArrayTest extends BaseReadOnlyByteArrayTest, Se
       }
 
       // Write test for index that exceeds capacity
-      tests.add(dynamicTest(f("readLong({}) on ByteArray of {}B size", size, size), () -> {
+      tests.add(dynamicTest(f("readLongBE({}) on ByteArray of {}B size", size, size), () -> {
 
         // Wrap in try and catch for possible OOM if trying to allocate max memory
         try{
@@ -1955,7 +1955,7 @@ public interface SelfReadOnlyByteArrayTest extends BaseReadOnlyByteArrayTest, Se
       // Write test for index that exceeds capacity (random)
       for(int trial = 0; trial < TRIALS; trial++){
         long index = size + Math.abs(rng.nextInt());
-        tests.add(dynamicTest(f("readLong({}) on ByteArray of {}B size", index, size), () -> {
+        tests.add(dynamicTest(f("readLongBE({}) on ByteArray of {}B size", index, size), () -> {
 
           // Wrap in try and catch for possible OOM if trying to allocate max memory
           try{
@@ -2002,7 +2002,7 @@ public interface SelfReadOnlyByteArrayTest extends BaseReadOnlyByteArrayTest, Se
       }
 
       // Write test for length that exceeds capacity
-      tests.add(dynamicTest(f("readLong({}) on ByteArray of {}B size", size - 1, size), () -> {
+      tests.add(dynamicTest(f("readLongBE({}) on ByteArray of {}B size", size - 1, size), () -> {
 
         // Wrap in try and catch for possible OOM if trying to allocate max memory
         try{
@@ -2021,13 +2021,13 @@ public interface SelfReadOnlyByteArrayTest extends BaseReadOnlyByteArrayTest, Se
             // Get the expected exception
             var expectedEx = assertThrows(
               ByteArrayLengthOverBoundsException.class,
-              () -> IndexingUtility.checkReadWrite(size - 1, 8, size)
+              () -> IndexingUtility.checkReadcopyFrom(size - 1, 8, size)
             );
 
             // Now test the byte array
             var actualEx = assertThrows(
               ByteArrayLengthOverBoundsException.class,
-              () -> testByteArray.readLong(size - 1)
+              () -> testByteArray.readLongBE(size - 1)
             );
 
             // Check the message
@@ -2053,9 +2053,9 @@ public interface SelfReadOnlyByteArrayTest extends BaseReadOnlyByteArrayTest, Se
     return tests;
   }
 
-  @DisplayName("Test bad readFloat(long) calls")
+  @DisplayName("Test bad readFloatBE(long) calls")
   @TestFactory
-  default Iterable<DynamicTest> testInvalidReadFloatCalls(){
+  default Iterable<DynamicTest> testInvalidReadFloatBECalls(){
 
     // Set up test container
     var tests = new LinkedList<DynamicTest>();
@@ -2075,7 +2075,7 @@ public interface SelfReadOnlyByteArrayTest extends BaseReadOnlyByteArrayTest, Se
     for(long size : sizesToTest){
 
       // Write test for negative index (-1)
-      tests.add(dynamicTest(f("readFloat(-1) on ByteArray of {}B size", size), () -> {
+      tests.add(dynamicTest(f("readFloatBE(-1) on ByteArray of {}B size", size), () -> {
 
         // Wrap in try and catch for possible OOM if trying to allocate max memory
         try{
@@ -2124,7 +2124,7 @@ public interface SelfReadOnlyByteArrayTest extends BaseReadOnlyByteArrayTest, Se
       // Write test for negative indices (random)
       for(int trial = 0; trial < TRIALS; trial++){
         long index = -Math.abs(rng.nextInt() + 500_000);
-        tests.add(dynamicTest(f("readFloat({}) on ByteArray of {}B size", index, size), () -> {
+        tests.add(dynamicTest(f("readFloatBE({}) on ByteArray of {}B size", index, size), () -> {
 
           // Wrap in try and catch for possible OOM if trying to allocate max memory
           try{
@@ -2171,7 +2171,7 @@ public interface SelfReadOnlyByteArrayTest extends BaseReadOnlyByteArrayTest, Se
       }
 
       // Write test for index that exceeds capacity
-      tests.add(dynamicTest(f("readFloat({}) on ByteArray of {}B size", size, size), () -> {
+      tests.add(dynamicTest(f("readFloatBE({}) on ByteArray of {}B size", size, size), () -> {
 
         // Wrap in try and catch for possible OOM if trying to allocate max memory
         try{
@@ -2220,7 +2220,7 @@ public interface SelfReadOnlyByteArrayTest extends BaseReadOnlyByteArrayTest, Se
       // Write test for index that exceeds capacity (random)
       for(int trial = 0; trial < TRIALS; trial++){
         long index = size + Math.abs(rng.nextInt());
-        tests.add(dynamicTest(f("readFloat({}) on ByteArray of {}B size", index, size), () -> {
+        tests.add(dynamicTest(f("readFloatBE({}) on ByteArray of {}B size", index, size), () -> {
 
           // Wrap in try and catch for possible OOM if trying to allocate max memory
           try{
@@ -2267,7 +2267,7 @@ public interface SelfReadOnlyByteArrayTest extends BaseReadOnlyByteArrayTest, Se
       }
 
       // Write test for length that exceeds capacity
-      tests.add(dynamicTest(f("readFloat({}) on ByteArray of {}B size", size - 1, size), () -> {
+      tests.add(dynamicTest(f("readFloatBE({}) on ByteArray of {}B size", size - 1, size), () -> {
 
         // Wrap in try and catch for possible OOM if trying to allocate max memory
         try{
@@ -2286,13 +2286,13 @@ public interface SelfReadOnlyByteArrayTest extends BaseReadOnlyByteArrayTest, Se
             // Get the expected exception
             var expectedEx = assertThrows(
               ByteArrayLengthOverBoundsException.class,
-              () -> IndexingUtility.checkReadWrite(size - 1, 4, size)
+              () -> IndexingUtility.checkReadcopyFrom(size - 1, 4, size)
             );
 
             // Now test the byte array
             var actualEx = assertThrows(
               ByteArrayLengthOverBoundsException.class,
-              () -> testByteArray.readFloat(size - 1)
+              () -> testByteArray.readFloatBE(size - 1)
             );
 
             // Check the message
@@ -2318,9 +2318,9 @@ public interface SelfReadOnlyByteArrayTest extends BaseReadOnlyByteArrayTest, Se
     return tests;
   }
 
-  @DisplayName("Test bad readDouble(long) calls")
+  @DisplayName("Test bad readDoubleBE(long) calls")
   @TestFactory
-  default Iterable<DynamicTest> testInvalidReadDoubleCalls(){
+  default Iterable<DynamicTest> testInvalidReadDoubleBECalls(){
 
     // Set up test container
     var tests = new LinkedList<DynamicTest>();
@@ -2340,7 +2340,7 @@ public interface SelfReadOnlyByteArrayTest extends BaseReadOnlyByteArrayTest, Se
     for(long size : sizesToTest){
 
       // Write test for negative index (-1)
-      tests.add(dynamicTest(f("readDouble(-1) on ByteArray of {}B size", size), () -> {
+      tests.add(dynamicTest(f("readDoubleBE(-1) on ByteArray of {}B size", size), () -> {
 
         // Wrap in try and catch for possible OOM if trying to allocate max memory
         try{
@@ -2389,7 +2389,7 @@ public interface SelfReadOnlyByteArrayTest extends BaseReadOnlyByteArrayTest, Se
       // Write test for negative indices (random)
       for(int trial = 0; trial < TRIALS; trial++){
         long index = -Math.abs(rng.nextInt() + 500_000);
-        tests.add(dynamicTest(f("readDouble({}) on ByteArray of {}B size", index, size), () -> {
+        tests.add(dynamicTest(f("readDoubleBE({}) on ByteArray of {}B size", index, size), () -> {
 
           // Wrap in try and catch for possible OOM if trying to allocate max memory
           try{
@@ -2436,7 +2436,7 @@ public interface SelfReadOnlyByteArrayTest extends BaseReadOnlyByteArrayTest, Se
       }
 
       // Write test for index that exceeds capacity
-      tests.add(dynamicTest(f("readDouble({}) on ByteArray of {}B size", size, size), () -> {
+      tests.add(dynamicTest(f("readDoubleBE({}) on ByteArray of {}B size", size, size), () -> {
 
         // Wrap in try and catch for possible OOM if trying to allocate max memory
         try{
@@ -2485,7 +2485,7 @@ public interface SelfReadOnlyByteArrayTest extends BaseReadOnlyByteArrayTest, Se
       // Write test for index that exceeds capacity (random)
       for(int trial = 0; trial < TRIALS; trial++){
         long index = size + Math.abs(rng.nextInt());
-        tests.add(dynamicTest(f("readDouble({}) on ByteArray of {}B size", index, size), () -> {
+        tests.add(dynamicTest(f("readDoubleBE({}) on ByteArray of {}B size", index, size), () -> {
 
           // Wrap in try and catch for possible OOM if trying to allocate max memory
           try{
@@ -2532,7 +2532,7 @@ public interface SelfReadOnlyByteArrayTest extends BaseReadOnlyByteArrayTest, Se
       }
 
       // Write test for length that exceeds capacity
-      tests.add(dynamicTest(f("readDouble({}) on ByteArray of {}B size", size - 1, size), () -> {
+      tests.add(dynamicTest(f("readDoubleBE({}) on ByteArray of {}B size", size - 1, size), () -> {
 
         // Wrap in try and catch for possible OOM if trying to allocate max memory
         try{
@@ -2551,13 +2551,13 @@ public interface SelfReadOnlyByteArrayTest extends BaseReadOnlyByteArrayTest, Se
             // Get the expected exception
             var expectedEx = assertThrows(
               ByteArrayLengthOverBoundsException.class,
-              () -> IndexingUtility.checkReadWrite(size - 1, 8, size)
+              () -> IndexingUtility.checkReadcopyFrom(size - 1, 8, size)
             );
 
             // Now test the byte array
             var actualEx = assertThrows(
               ByteArrayLengthOverBoundsException.class,
-              () -> testByteArray.readDouble(size - 1)
+              () -> testByteArray.readDoubleBE(size - 1)
             );
 
             // Check the message

@@ -97,7 +97,7 @@ public interface WriteOnlyByteArrayWithOtherByteArrayTest extends BaseWriteOnlyB
           // Write test
           final int byteIndex = tempByteIndex;
           tests.add(dynamicTest(
-            f("full write({}, {}(size={})) on ByteArray of {}B size", byteIndex, type, sourceSize, selfSize),
+            f("full copyFrom({}, {}(size={})) on ByteArray of {}B size", byteIndex, type, sourceSize, selfSize),
             () -> {
 
               // Wrap in try and catch for possible OOM if trying to allocate max memory
@@ -139,7 +139,7 @@ public interface WriteOnlyByteArrayWithOtherByteArrayTest extends BaseWriteOnlyB
                     T source = rwbaToROConverter.apply(sourceRWBA);
 
                     // Call it
-                    testByteArray.write(byteIndex, source);
+                    testByteArray.copyFrom(byteIndex, source);
 
                     // Check the source bytearray to make sure nothing is mutated (check for side effects)
                     {
@@ -194,9 +194,9 @@ public interface WriteOnlyByteArrayWithOtherByteArrayTest extends BaseWriteOnlyB
     return tests;
   }
 
-  @DisplayName("Test valid write(long, ReadOnlyByteArray) calls")
+  @DisplayName("Test valid copyFrom(long, ReadOnlyByteArray) calls")
   @TestFactory
-  default Iterable<DynamicTest> testValidWriteCallsReadOnlyByteArray(){
+  default Iterable<DynamicTest> testValidCopyFromCallsReadOnlyByteArray(){
     return generateWriteByteArrayTests(
       getRNG(),
       "ReadOnlyByteArray",
@@ -210,9 +210,9 @@ public interface WriteOnlyByteArrayWithOtherByteArrayTest extends BaseWriteOnlyB
     );
   }
 
-  @DisplayName("Test valid write(long, ReadableWritableByteArray) calls")
+  @DisplayName("Test valid copyFrom(long, ReadableWritableByteArray) calls")
   @TestFactory
-  default Iterable<DynamicTest> testValidWriteCallsReadableWritableByteArray(){
+  default Iterable<DynamicTest> testValidCopyFromCallsReadableWritableByteArray(){
     return generateWriteByteArrayTests(
       getRNG(),
       "ReadableWritableByteArray",

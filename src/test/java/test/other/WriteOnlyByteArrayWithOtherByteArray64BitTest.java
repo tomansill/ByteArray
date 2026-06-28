@@ -84,7 +84,7 @@ public interface WriteOnlyByteArrayWithOtherByteArray64BitTest
           }
 
           // Write it
-          testByteArray.write(byteIndex, source);
+          testByteArray.copyFrom(byteIndex, source);
 
           // Check test BA
           for(long index = byteIndex - 200; index < testByteArray.size(); index++){
@@ -116,8 +116,8 @@ public interface WriteOnlyByteArrayWithOtherByteArray64BitTest
   }
 
   @Test
-  @DisplayName("Test write(long, ReadOnlyByteArray) on 64-bit addressable data")
-  default void testWriteWriteOnly64(){
+  @DisplayName("Test copyFrom(long, ReadOnlyByteArray) on 64-bit addressable data")
+  default void testWriteCopyFromOnly64(){
     testWriteOn64BitData(
       getRNG(),
       this::readTestByteArray,
@@ -131,8 +131,8 @@ public interface WriteOnlyByteArrayWithOtherByteArray64BitTest
   }
 
   @Test
-  @DisplayName("Test write(long, ReadableWritableByteArray) on 64-bit addressable data")
-  default void testWriteReadableWritable64(){
+  @DisplayName("Test copyFrom(long, ReadableWritableByteArray) on 64-bit addressable data")
+  default void testCopyFromReadableWritable64(){
     testWriteOn64BitData(
       getRNG(),
       this::readTestByteArray,

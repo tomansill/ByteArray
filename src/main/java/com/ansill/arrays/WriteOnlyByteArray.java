@@ -22,14 +22,14 @@ public interface WriteOnlyByteArray extends ByteArray{
   void writeByte(@Nonnegative long byteIndex, byte value) throws ByteArrayIndexOutOfBoundsException;
 
   /**
-   * Writes a short at a specified byte index on this {@link WriteOnlyByteArray}
+   * Writes a short at a specified byte index on this {@link WriteOnlyByteArray} using big endian byte order
    *
    * @param byteIndex non-negative index on this {@link WriteOnlyByteArray}
-   * @param value     short value to be written to this {@link WriteOnlyByteArray}
+   * @param value     short value to be written to this {@link WriteOnlyByteArray} using big endian byte order
    * @throws ByteArrayIndexOutOfBoundsException thrown if byteIndex is out of bounds
    * @throws ByteArrayLengthOverBoundsException thrown if the value cannot be fully written as it goes over the length of the byte array
    */
-  default void writeShort(@Nonnegative long byteIndex, short value)
+  default void writeShortBE(@Nonnegative long byteIndex, short value)
   throws ByteArrayIndexOutOfBoundsException, ByteArrayLengthOverBoundsException{
 
     // Check
@@ -41,14 +41,33 @@ public interface WriteOnlyByteArray extends ByteArray{
   }
 
   /**
-   * Writes an int at a specified byte index on this {@link WriteOnlyByteArray}
+   * Writes a short at a specified byte index on this {@link WriteOnlyByteArray} using little endian byte order
    *
    * @param byteIndex non-negative index on this {@link WriteOnlyByteArray}
-   * @param value     int value to be written to this {@link WriteOnlyByteArray}
+   * @param value     short value to be written to this {@link WriteOnlyByteArray} using little endian byte order
    * @throws ByteArrayIndexOutOfBoundsException thrown if byteIndex is out of bounds
    * @throws ByteArrayLengthOverBoundsException thrown if the value cannot be fully written as it goes over the length of the byte array
    */
-  default void writeInt(@Nonnegative long byteIndex, int value)
+  default void writeShortLE(@Nonnegative long byteIndex, short value)
+          throws ByteArrayIndexOutOfBoundsException, ByteArrayLengthOverBoundsException{
+
+    // Check
+    IndexingUtility.checkReadWrite(byteIndex, 2, this.size());
+
+    // Two write calls
+    writeByte(byteIndex, (byte) (0xff & value));
+    writeByte(byteIndex + 1, (byte) ((0xff00 & value) >> 8));
+  }
+
+  /**
+   * Writes an int at a specified byte index on this {@link WriteOnlyByteArray} using big endian byte order
+   *
+   * @param byteIndex non-negative index on this {@link WriteOnlyByteArray}
+   * @param value     int value to be written to this {@link WriteOnlyByteArray} using big endian byte order
+   * @throws ByteArrayIndexOutOfBoundsException thrown if byteIndex is out of bounds
+   * @throws ByteArrayLengthOverBoundsException thrown if the value cannot be fully written as it goes over the length of the byte array
+   */
+  default void writeIntBE(@Nonnegative long byteIndex, int value)
   throws ByteArrayIndexOutOfBoundsException, ByteArrayLengthOverBoundsException{
 
     // Check
@@ -62,14 +81,35 @@ public interface WriteOnlyByteArray extends ByteArray{
   }
 
   /**
-   * Writes a long at a specified byte index on this {@link WriteOnlyByteArray}
+   * Writes an int at a specified byte index on this {@link WriteOnlyByteArray} using little endian byte order
    *
    * @param byteIndex non-negative index on this {@link WriteOnlyByteArray}
-   * @param value     long value to be written to this {@link WriteOnlyByteArray}
+   * @param value     int value to be written to this {@link WriteOnlyByteArray} using little endian byte order
    * @throws ByteArrayIndexOutOfBoundsException thrown if byteIndex is out of bounds
    * @throws ByteArrayLengthOverBoundsException thrown if the value cannot be fully written as it goes over the length of the byte array
    */
-  default void writeLong(@Nonnegative long byteIndex, long value)
+  default void writeIntLE(@Nonnegative long byteIndex, int value)
+          throws ByteArrayIndexOutOfBoundsException, ByteArrayLengthOverBoundsException{
+
+    // Check
+    IndexingUtility.checkReadWrite(byteIndex, 4, this.size());
+
+    // Four write calls
+    writeByte(byteIndex, (byte) value);
+    writeByte(byteIndex + 1, (byte) (value >>> 8));
+    writeByte(byteIndex + 2, (byte) (value >>> 16));
+    writeByte(byteIndex + 3, (byte) (value >>> 24));
+  }
+
+  /**
+   * Writes a long at a specified byte index on this {@link WriteOnlyByteArray} using big endian byte order
+   *
+   * @param byteIndex non-negative index on this {@link WriteOnlyByteArray}
+   * @param value     long value to be written to this {@link WriteOnlyByteArray} using big endian byte order
+   * @throws ByteArrayIndexOutOfBoundsException thrown if byteIndex is out of bounds
+   * @throws ByteArrayLengthOverBoundsException thrown if the value cannot be fully written as it goes over the length of the byte array
+   */
+  default void writeLongBE(@Nonnegative long byteIndex, long value)
   throws ByteArrayIndexOutOfBoundsException, ByteArrayLengthOverBoundsException{
 
     // Check
@@ -87,40 +127,91 @@ public interface WriteOnlyByteArray extends ByteArray{
   }
 
   /**
-   * Writes a float at a specified byte index on this {@link WriteOnlyByteArray}
+   * Writes a long at a specified byte index on this {@link WriteOnlyByteArray} using little endian byte order
    *
    * @param byteIndex non-negative index on this {@link WriteOnlyByteArray}
-   * @param value     float value to be written to this {@link WriteOnlyByteArray}
+   * @param value     long value to be written to this {@link WriteOnlyByteArray} using little endian byte order
    * @throws ByteArrayIndexOutOfBoundsException thrown if byteIndex is out of bounds
    * @throws ByteArrayLengthOverBoundsException thrown if the value cannot be fully written as it goes over the length of the byte array
    */
-  default void writeFloat(@Nonnegative long byteIndex, float value)
-  throws ByteArrayIndexOutOfBoundsException, ByteArrayLengthOverBoundsException{
-    writeInt(byteIndex, Float.floatToIntBits(value));
+  default void writeLongLE(@Nonnegative long byteIndex, long value)
+          throws ByteArrayIndexOutOfBoundsException, ByteArrayLengthOverBoundsException{
+
+    // Check
+    IndexingUtility.checkReadWrite(byteIndex, 8, this.size());
+
+    // Eight write calls
+    writeByte(byteIndex, (byte) value);
+    writeByte(byteIndex + 1, (byte) (value >>> 8));
+    writeByte(byteIndex + 2, (byte) (value >>> 16));
+    writeByte(byteIndex + 3, (byte) (value >>> 24));
+    writeByte(byteIndex + 4, (byte) (value >>> 32));
+    writeByte(byteIndex + 5, (byte) (value >>> 40));
+    writeByte(byteIndex + 6, (byte) (value >>> 48));
+    writeByte(byteIndex + 7, (byte) (value >>> 56));
   }
 
   /**
-   * Writes a double at a specified byte index on this {@link WriteOnlyByteArray}
+   * Writes a float at a specified byte index on this {@link WriteOnlyByteArray} using big endian byte order
    *
    * @param byteIndex non-negative index on this {@link WriteOnlyByteArray}
-   * @param value     double value to be written to this {@link WriteOnlyByteArray}
+   * @param value     float value to be written to this {@link WriteOnlyByteArray} using big endian byte order
    * @throws ByteArrayIndexOutOfBoundsException thrown if byteIndex is out of bounds
    * @throws ByteArrayLengthOverBoundsException thrown if the value cannot be fully written as it goes over the length of the byte array
    */
-  default void writeDouble(@Nonnegative long byteIndex, double value)
+  default void writeFloatBE(@Nonnegative long byteIndex, float value)
   throws ByteArrayIndexOutOfBoundsException, ByteArrayLengthOverBoundsException{
-    writeLong(byteIndex, Double.doubleToLongBits(value));
+    writeIntBE(byteIndex, Float.floatToIntBits(value));
   }
 
   /**
-   * Writes bytes from source {@link ReadOnlyByteArray} to this {@link WriteOnlyByteArray} starting at specified byte index on {@link WriteOnlyByteArray}
+   * Writes a float at a specified byte index on this {@link WriteOnlyByteArray} using little endian byte order
+   *
+   * @param byteIndex non-negative index on this {@link WriteOnlyByteArray}
+   * @param value     float value to be written to this {@link WriteOnlyByteArray} using little endian byte order
+   * @throws ByteArrayIndexOutOfBoundsException thrown if byteIndex is out of bounds
+   * @throws ByteArrayLengthOverBoundsException thrown if the value cannot be fully written as it goes over the length of the byte array
+   */
+  default void writeFloatLE(@Nonnegative long byteIndex, float value)
+          throws ByteArrayIndexOutOfBoundsException, ByteArrayLengthOverBoundsException{
+    writeIntLE(byteIndex, Float.floatToIntBits(value));
+  }
+
+  /**
+   * Writes a double at a specified byte index on this {@link WriteOnlyByteArray} using big endian byte order
+   *
+   * @param byteIndex non-negative index on this {@link WriteOnlyByteArray}
+   * @param value     double value to be written to this {@link WriteOnlyByteArray} using big endian byte order
+   * @throws ByteArrayIndexOutOfBoundsException thrown if byteIndex is out of bounds
+   * @throws ByteArrayLengthOverBoundsException thrown if the value cannot be fully written as it goes over the length of the byte array
+   */
+  default void writeDoubleBE(@Nonnegative long byteIndex, double value)
+  throws ByteArrayIndexOutOfBoundsException, ByteArrayLengthOverBoundsException{
+    writeLongBE(byteIndex, Double.doubleToLongBits(value));
+  }
+
+  /**
+   * Writes a double at a specified byte index on this {@link WriteOnlyByteArray} using little endian byte order
+   *
+   * @param byteIndex non-negative index on this {@link WriteOnlyByteArray}
+   * @param value     double value to be written to this {@link WriteOnlyByteArray} using little endian byte order
+   * @throws ByteArrayIndexOutOfBoundsException thrown if byteIndex is out of bounds
+   * @throws ByteArrayLengthOverBoundsException thrown if the value cannot be fully written as it goes over the length of the byte array
+   */
+  default void writeDoubleLE(@Nonnegative long byteIndex, double value)
+          throws ByteArrayIndexOutOfBoundsException, ByteArrayLengthOverBoundsException{
+    writeLongLE(byteIndex, Double.doubleToLongBits(value));
+  }
+
+  /**
+   * Copies bytes from source {@link ReadOnlyByteArray} to this {@link WriteOnlyByteArray} starting at specified byte index on {@link WriteOnlyByteArray}
    *
    * @param byteIndex non-negative index on this {@link WriteOnlyByteArray}
    * @param source    source {@link ReadOnlyByteArray} to copy bytes to this {@link WriteOnlyByteArray}
    * @throws ByteArrayIndexOutOfBoundsException thrown if byteIndex is out of bounds or if source {@link ReadOnlyByteArray} is too large
    * @throws ByteArrayLengthOverBoundsException thrown if length goes over the bounds
    */
-  default void write(@Nonnegative long byteIndex, @Nonnull ReadOnlyByteArray source)
+  default void copyFrom(@Nonnegative long byteIndex, @Nonnull ReadOnlyByteArray source)
   throws ByteArrayIndexOutOfBoundsException, ByteArrayLengthOverBoundsException{
 
     // Check parameters

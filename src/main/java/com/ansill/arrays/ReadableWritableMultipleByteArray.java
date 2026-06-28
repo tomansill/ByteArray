@@ -3,6 +3,7 @@ package com.ansill.arrays;
 import javax.annotation.Nonnegative;
 import javax.annotation.Nonnull;
 import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -130,7 +131,7 @@ final class ReadableWritableMultipleByteArray implements ReadableWritableByteArr
   }
 
   @Override
-  public short readShort(long byteIndex) throws ByteArrayIndexOutOfBoundsException, ByteArrayLengthOverBoundsException{
+  public short readShortBE(long byteIndex) throws ByteArrayIndexOutOfBoundsException, ByteArrayLengthOverBoundsException{
 
     // Check
     checkReadWrite(byteIndex, 2, size);
@@ -142,11 +143,27 @@ final class ReadableWritableMultipleByteArray implements ReadableWritableByteArr
     ReadOnlyMultipleByteArray.innerRead(indexMap, byteIndex, new ByteBufferByteArray(bb));
 
     // Read the results
-    return bb.getShort();
+    return bb.order(ByteOrder.BIG_ENDIAN).getShort();
   }
 
   @Override
-  public int readInt(long byteIndex) throws ByteArrayIndexOutOfBoundsException, ByteArrayLengthOverBoundsException{
+  public short readShortLE(long byteIndex) throws ByteArrayIndexOutOfBoundsException, ByteArrayLengthOverBoundsException{
+
+    // Check
+    checkReadWrite(byteIndex, 2, size);
+
+    // Use ByteBuffer
+    var bb = ByteBuffer.allocate(2);
+
+    // Read
+    ReadOnlyMultipleByteArray.innerRead(indexMap, byteIndex, new ByteBufferByteArray(bb));
+
+    // Read the results
+    return bb.order(ByteOrder.LITTLE_ENDIAN).getShort();
+  }
+
+  @Override
+  public int readIntBE(long byteIndex) throws ByteArrayIndexOutOfBoundsException, ByteArrayLengthOverBoundsException{
 
     // Check
     checkReadWrite(byteIndex, 4, size);
@@ -158,11 +175,27 @@ final class ReadableWritableMultipleByteArray implements ReadableWritableByteArr
     ReadOnlyMultipleByteArray.innerRead(indexMap, byteIndex, new ByteBufferByteArray(bb));
 
     // Read the results
-    return bb.getInt();
+    return bb.order(ByteOrder.BIG_ENDIAN).getInt();
   }
 
   @Override
-  public long readLong(long byteIndex) throws ByteArrayIndexOutOfBoundsException, ByteArrayLengthOverBoundsException{
+  public int readIntLE(long byteIndex) throws ByteArrayIndexOutOfBoundsException, ByteArrayLengthOverBoundsException{
+
+    // Check
+    checkReadWrite(byteIndex, 4, size);
+
+    // Use ByteBuffer
+    var bb = ByteBuffer.allocate(4);
+
+    // Read
+    ReadOnlyMultipleByteArray.innerRead(indexMap, byteIndex, new ByteBufferByteArray(bb));
+
+    // Read the results
+    return bb.order(ByteOrder.LITTLE_ENDIAN).getInt();
+  }
+
+  @Override
+  public long readLongBE(long byteIndex) throws ByteArrayIndexOutOfBoundsException, ByteArrayLengthOverBoundsException{
 
     // Check
     checkReadWrite(byteIndex, 8, size);
@@ -174,11 +207,27 @@ final class ReadableWritableMultipleByteArray implements ReadableWritableByteArr
     ReadOnlyMultipleByteArray.innerRead(indexMap, byteIndex, new ByteBufferByteArray(bb));
 
     // Read the results
-    return bb.getLong();
+    return bb.order(ByteOrder.BIG_ENDIAN).getLong();
   }
 
   @Override
-  public float readFloat(long byteIndex) throws ByteArrayIndexOutOfBoundsException, ByteArrayLengthOverBoundsException{
+  public long readLongLE(long byteIndex) throws ByteArrayIndexOutOfBoundsException, ByteArrayLengthOverBoundsException{
+
+    // Check
+    checkReadWrite(byteIndex, 8, size);
+
+    // Use ByteBuffer
+    var bb = ByteBuffer.allocate(8);
+
+    // Read
+    ReadOnlyMultipleByteArray.innerRead(indexMap, byteIndex, new ByteBufferByteArray(bb));
+
+    // Read the results
+    return bb.order(ByteOrder.LITTLE_ENDIAN).getLong();
+  }
+
+  @Override
+  public float readFloatBE(long byteIndex) throws ByteArrayIndexOutOfBoundsException, ByteArrayLengthOverBoundsException{
 
     // Check
     checkReadWrite(byteIndex, 4, size);
@@ -190,11 +239,27 @@ final class ReadableWritableMultipleByteArray implements ReadableWritableByteArr
     ReadOnlyMultipleByteArray.innerRead(indexMap, byteIndex, new ByteBufferByteArray(bb));
 
     // Read the results
-    return bb.getFloat();
+    return bb.order(ByteOrder.BIG_ENDIAN).getFloat();
   }
 
   @Override
-  public double readDouble(long byteIndex)
+  public float readFloatLE(long byteIndex) throws ByteArrayIndexOutOfBoundsException, ByteArrayLengthOverBoundsException{
+
+    // Check
+    checkReadWrite(byteIndex, 4, size);
+
+    // Use ByteBuffer
+    var bb = ByteBuffer.allocate(4);
+
+    // Read
+    ReadOnlyMultipleByteArray.innerRead(indexMap, byteIndex, new ByteBufferByteArray(bb));
+
+    // Read the results
+    return bb.order(ByteOrder.LITTLE_ENDIAN).getFloat();
+  }
+
+  @Override
+  public double readDoubleBE(long byteIndex)
   throws ByteArrayIndexOutOfBoundsException, ByteArrayLengthOverBoundsException{
 
     // Check
@@ -207,7 +272,24 @@ final class ReadableWritableMultipleByteArray implements ReadableWritableByteArr
     ReadOnlyMultipleByteArray.innerRead(indexMap, byteIndex, new ByteBufferByteArray(bb));
 
     // Read the results
-    return bb.getDouble();
+    return bb.order(ByteOrder.BIG_ENDIAN).getDouble();
+  }
+
+  @Override
+  public double readDoubleLE(long byteIndex)
+          throws ByteArrayIndexOutOfBoundsException, ByteArrayLengthOverBoundsException{
+
+    // Check
+    checkReadWrite(byteIndex, 8, size);
+
+    // Use ByteBuffer
+    var bb = ByteBuffer.allocate(8);
+
+    // Read
+    ReadOnlyMultipleByteArray.innerRead(indexMap, byteIndex, new ByteBufferByteArray(bb));
+
+    // Read the results
+    return bb.order(ByteOrder.LITTLE_ENDIAN).getDouble();
   }
 
   @Override
@@ -233,7 +315,7 @@ final class ReadableWritableMultipleByteArray implements ReadableWritableByteArr
   }
 
   @Override
-  public void writeShort(long byteIndex, short value)
+  public void writeShortBE(long byteIndex, short value)
   throws ByteArrayIndexOutOfBoundsException, ByteArrayLengthOverBoundsException{
 
     // Check
@@ -243,14 +325,31 @@ final class ReadableWritableMultipleByteArray implements ReadableWritableByteArr
     var bb = ByteBuffer.allocate(2);
 
     // Write value on it
-    bb.putShort(value).flip();
+    bb.order(ByteOrder.BIG_ENDIAN).putShort(value).flip();
 
     // Write
-    innerWrite(byteIndex, new ByteBufferByteArray(bb));
+    innerCopyFrom(byteIndex, new ByteBufferByteArray(bb));
   }
 
   @Override
-  public void writeInt(long byteIndex, int value)
+  public void writeShortLE(long byteIndex, short value)
+          throws ByteArrayIndexOutOfBoundsException, ByteArrayLengthOverBoundsException{
+
+    // Check
+    checkReadWrite(byteIndex, 2, size);
+
+    // Use ByteBuffer
+    var bb = ByteBuffer.allocate(2);
+
+    // Write value on it
+    bb.order(ByteOrder.LITTLE_ENDIAN).putShort(value).flip();
+
+    // Write
+    innerCopyFrom(byteIndex, new ByteBufferByteArray(bb));
+  }
+
+  @Override
+  public void writeIntBE(long byteIndex, int value)
   throws ByteArrayIndexOutOfBoundsException, ByteArrayLengthOverBoundsException{
 
     // Check
@@ -260,14 +359,31 @@ final class ReadableWritableMultipleByteArray implements ReadableWritableByteArr
     var bb = ByteBuffer.allocate(4);
 
     // Write value on it
-    bb.putInt(value).flip();
+    bb.order(ByteOrder.BIG_ENDIAN).putInt(value).flip();
 
     // Write
-    innerWrite(byteIndex, new ByteBufferByteArray(bb));
+    innerCopyFrom(byteIndex, new ByteBufferByteArray(bb));
   }
 
   @Override
-  public void writeLong(long byteIndex, long value)
+  public void writeIntLE(long byteIndex, int value)
+          throws ByteArrayIndexOutOfBoundsException, ByteArrayLengthOverBoundsException{
+
+    // Check
+    checkReadWrite(byteIndex, 4, size);
+
+    // Use ByteBuffer
+    var bb = ByteBuffer.allocate(4);
+
+    // Write value on it
+    bb.order(ByteOrder.LITTLE_ENDIAN).putInt(value).flip();
+
+    // Write
+    innerCopyFrom(byteIndex, new ByteBufferByteArray(bb));
+  }
+
+  @Override
+  public void writeLongBE(long byteIndex, long value)
   throws ByteArrayIndexOutOfBoundsException, ByteArrayLengthOverBoundsException{
 
     // Check
@@ -277,14 +393,31 @@ final class ReadableWritableMultipleByteArray implements ReadableWritableByteArr
     var bb = ByteBuffer.allocate(8);
 
     // Write value on it
-    bb.putLong(value).flip();
+    bb.order(ByteOrder.BIG_ENDIAN).putLong(value).flip();
 
     // Write
-    innerWrite(byteIndex, new ByteBufferByteArray(bb));
+    innerCopyFrom(byteIndex, new ByteBufferByteArray(bb));
   }
 
   @Override
-  public void writeFloat(long byteIndex, float value)
+  public void writeLongLE(long byteIndex, long value)
+          throws ByteArrayIndexOutOfBoundsException, ByteArrayLengthOverBoundsException{
+
+    // Check
+    checkReadWrite(byteIndex, 8, size);
+
+    // Use ByteBuffer
+    var bb = ByteBuffer.allocate(8);
+
+    // Write value on it
+    bb.order(ByteOrder.LITTLE_ENDIAN).putLong(value).flip();
+
+    // Write
+    innerCopyFrom(byteIndex, new ByteBufferByteArray(bb));
+  }
+
+  @Override
+  public void writeFloatBE(long byteIndex, float value)
   throws ByteArrayIndexOutOfBoundsException, ByteArrayLengthOverBoundsException{
 
     // Check
@@ -294,14 +427,31 @@ final class ReadableWritableMultipleByteArray implements ReadableWritableByteArr
     var bb = ByteBuffer.allocate(4);
 
     // Write value on it
-    bb.putFloat(value).flip();
+    bb.order(ByteOrder.BIG_ENDIAN).putFloat(value).flip();
 
     // Write
-    innerWrite(byteIndex, new ByteBufferByteArray(bb));
+    innerCopyFrom(byteIndex, new ByteBufferByteArray(bb));
   }
 
   @Override
-  public void writeDouble(long byteIndex, double value)
+  public void writeFloatLE(long byteIndex, float value)
+          throws ByteArrayIndexOutOfBoundsException, ByteArrayLengthOverBoundsException{
+
+    // Check
+    checkReadWrite(byteIndex, 4, size);
+
+    // Use ByteBuffer
+    var bb = ByteBuffer.allocate(4);
+
+    // Write value on it
+    bb.order(ByteOrder.LITTLE_ENDIAN).putFloat(value).flip();
+
+    // Write
+    innerCopyFrom(byteIndex, new ByteBufferByteArray(bb));
+  }
+
+  @Override
+  public void writeDoubleBE(long byteIndex, double value)
   throws ByteArrayIndexOutOfBoundsException, ByteArrayLengthOverBoundsException{
 
     // Check
@@ -311,14 +461,31 @@ final class ReadableWritableMultipleByteArray implements ReadableWritableByteArr
     var bb = ByteBuffer.allocate(8);
 
     // Write value on it
-    bb.putDouble(value).flip();
+    bb.order(ByteOrder.BIG_ENDIAN).putDouble(value).flip();
 
     // Write
-    innerWrite(byteIndex, new ByteBufferByteArray(bb));
+    innerCopyFrom(byteIndex, new ByteBufferByteArray(bb));
   }
 
   @Override
-  public void read(long byteIndex, @Nonnull WriteOnlyByteArray destination)
+  public void writeDoubleLE(long byteIndex, double value)
+          throws ByteArrayIndexOutOfBoundsException, ByteArrayLengthOverBoundsException{
+
+    // Check
+    checkReadWrite(byteIndex, 8, size);
+
+    // Use ByteBuffer
+    var bb = ByteBuffer.allocate(8);
+
+    // Write value on it
+    bb.order(ByteOrder.LITTLE_ENDIAN).putDouble(value).flip();
+
+    // Write
+    innerCopyFrom(byteIndex, new ByteBufferByteArray(bb));
+  }
+
+  @Override
+  public void copyTo(long byteIndex, @Nonnull WriteOnlyByteArray destination)
   throws ByteArrayIndexOutOfBoundsException, ByteArrayLengthOverBoundsException{
 
     // Check parameters
@@ -329,14 +496,14 @@ final class ReadableWritableMultipleByteArray implements ReadableWritableByteArr
   }
 
   @Override
-  public void write(long byteIndex, @Nonnull ReadOnlyByteArray source)
+  public void copyFrom(long byteIndex, @Nonnull ReadOnlyByteArray source)
   throws ByteArrayIndexOutOfBoundsException, ByteArrayLengthOverBoundsException{
 
     // Check parameters
     checkWrite(byteIndex, source, size);
 
     // Pass it over
-    innerWrite(byteIndex, source);
+    innerCopyFrom(byteIndex, source);
   }
 
   /**
@@ -347,7 +514,7 @@ final class ReadableWritableMultipleByteArray implements ReadableWritableByteArr
    * @throws ByteArrayIndexOutOfBoundsException thrown if the index is out of bounds
    * @throws ByteArrayLengthOverBoundsException thrown if the length is over the bounds
    */
-  private void innerWrite(final long byteIndex, @Nonnull ReadOnlyByteArray source)
+  private void innerCopyFrom(final long byteIndex, @Nonnull ReadOnlyByteArray source)
   throws ByteArrayIndexOutOfBoundsException, ByteArrayLengthOverBoundsException, ByteArrayInvalidLengthException{
 
     // Get floor index
@@ -367,7 +534,7 @@ final class ReadableWritableMultipleByteArray implements ReadableWritableByteArr
       long lenToCopy = Long.min(byteArray.size() - relativeByteIndex, remainingLength);
 
       // Subset and write
-      byteArray.write(relativeByteIndex, source.subsetOf(source.size() - remainingLength, lenToCopy));
+      byteArray.copyFrom(relativeByteIndex, source.subsetOf(source.size() - remainingLength, lenToCopy));
 
       // Adjust relative byte index and remaining length
       relativeByteIndex = Long.max(0, relativeByteIndex - byteArray.size() - lenToCopy);

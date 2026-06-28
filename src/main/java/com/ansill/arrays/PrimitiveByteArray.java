@@ -105,7 +105,7 @@ final class PrimitiveByteArray implements ReadableWritableByteArray, ReadOnlyByt
   }
 
   @Override
-  public short readShort(long byteIndex) throws ByteArrayIndexOutOfBoundsException, ByteArrayLengthOverBoundsException{
+  public short readShortBE(long byteIndex) throws ByteArrayIndexOutOfBoundsException, ByteArrayLengthOverBoundsException{
     checkReadWrite(byteIndex, 2, this.size());
     int value = (0xff & data[(int) (start + byteIndex)]) << 8;
     value |= (0xff & data[(int) (start + byteIndex + 1)]);
@@ -113,7 +113,7 @@ final class PrimitiveByteArray implements ReadableWritableByteArray, ReadOnlyByt
   }
 
   @Override
-  public int readInt(long byteIndex) throws ByteArrayIndexOutOfBoundsException, ByteArrayLengthOverBoundsException{
+  public int readIntBE(long byteIndex) throws ByteArrayIndexOutOfBoundsException, ByteArrayLengthOverBoundsException{
     checkReadWrite(byteIndex, 4, this.size());
     int value = (0xff & data[(int) (start + byteIndex)]) << 8;
     value = (value | (0xff & data[(int) (start + byteIndex + 1)])) << 8;
@@ -123,7 +123,7 @@ final class PrimitiveByteArray implements ReadableWritableByteArray, ReadOnlyByt
   }
 
   @Override
-  public long readLong(long byteIndex) throws ByteArrayIndexOutOfBoundsException, ByteArrayLengthOverBoundsException{
+  public long readLongBE(long byteIndex) throws ByteArrayIndexOutOfBoundsException, ByteArrayLengthOverBoundsException{
     checkReadWrite(byteIndex, 8, this.size());
     long value = (0xff & data[(int) (start + byteIndex)]) << 8;
     value = (value | (0xff & data[(int) (start + byteIndex + 1)])) << 8;
@@ -141,7 +141,7 @@ final class PrimitiveByteArray implements ReadableWritableByteArray, ReadOnlyByt
    * {@inheritDoc}
    */
   @Override
-  public void read(
+  public void copyTo(
     @Nonnegative long byteIndex,
     @Nonnull WriteOnlyByteArray destination
   ) throws ByteArrayIndexOutOfBoundsException, ByteArrayLengthOverBoundsException{
@@ -184,7 +184,7 @@ final class PrimitiveByteArray implements ReadableWritableByteArray, ReadOnlyByt
       var subsetted = this.subsetOf(byteIndex, destination.size());
 
       // use MBA's write function
-      destination.write(0, subsetted);
+      destination.copyFrom(0, subsetted);
     }else{
 
       // Otherwise, use manual copy. Warn about it through logger
@@ -211,7 +211,7 @@ final class PrimitiveByteArray implements ReadableWritableByteArray, ReadOnlyByt
   }
 
   @Override
-  public void writeShort(long byteIndex, short value)
+  public void writeShortBE(long byteIndex, short value)
   throws ByteArrayIndexOutOfBoundsException, ByteArrayLengthOverBoundsException{
     checkReadWrite(byteIndex, 2, size);
     data[(int) (start + byteIndex)] = (byte) (value >>> 8);
@@ -219,7 +219,7 @@ final class PrimitiveByteArray implements ReadableWritableByteArray, ReadOnlyByt
   }
 
   @Override
-  public void writeInt(long byteIndex, int value)
+  public void writeIntBE(long byteIndex, int value)
   throws ByteArrayIndexOutOfBoundsException, ByteArrayLengthOverBoundsException{
     checkReadWrite(byteIndex, 4, size);
     data[(int) (start + byteIndex)] = (byte) (value >>> 24);
@@ -229,7 +229,7 @@ final class PrimitiveByteArray implements ReadableWritableByteArray, ReadOnlyByt
   }
 
   @Override
-  public void writeLong(long byteIndex, long value)
+  public void writeLongBE(long byteIndex, long value)
   throws ByteArrayIndexOutOfBoundsException, ByteArrayLengthOverBoundsException{
     checkReadWrite(byteIndex, 8, size);
     data[(int) (start + byteIndex)] = (byte) (value >>> 56);
@@ -246,7 +246,7 @@ final class PrimitiveByteArray implements ReadableWritableByteArray, ReadOnlyByt
    * {@inheritDoc}
    */
   @Override
-  public void write(@Nonnegative long byteIndex, @Nonnull ReadOnlyByteArray source)
+  public void copyFrom(@Nonnegative long byteIndex, @Nonnull ReadOnlyByteArray source)
   throws ByteArrayIndexOutOfBoundsException, ByteArrayLengthOverBoundsException{
 
     // Check parameters
@@ -281,7 +281,7 @@ final class PrimitiveByteArray implements ReadableWritableByteArray, ReadOnlyByt
       var subsetted = this.subsetOf(byteIndex, source.size());
 
       // use MBA's read function
-      source.read(0, subsetted);
+      source.copyTo(0, subsetted);
     }else{
 
       // Otherwise, use manual copy. Warn about it through logger

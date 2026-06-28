@@ -62,7 +62,7 @@ public interface ReadOnlyByteArrayWithOtherByteArrayTest extends BaseReadOnlyByt
 
       // Self-test
       tests.add(dynamicTest(f(
-        "subset({}, {}) on ByteArray of {}B size - then checked with read(long,{}) calls",
+        "subset({}, {}) on ByteArray of {}B size - then checked with copyTo(long,{}) calls",
         0,
         size,
         size,
@@ -108,7 +108,7 @@ public interface ReadOnlyByteArrayWithOtherByteArrayTest extends BaseReadOnlyByt
               var control = controlRWBAAllocator.apply(size);
               try{
                 var adj = rwbaToWOConverter.apply(control);
-                subset.read(0, adj);
+                subset.copyTo(0, adj);
                 Random testRNG = new Random(testLocalSeed);
                 long innerByteIndex = 0;
                 for(long index = 0; index < size; index++){
@@ -150,7 +150,7 @@ public interface ReadOnlyByteArrayWithOtherByteArrayTest extends BaseReadOnlyByt
 
         // Write test
         tests.add(dynamicTest(f(
-          "subset({}, {}) on ByteArray of {}B size - then checked with read(long,{}) calls",
+          "subset({}, {}) on ByteArray of {}B size - then checked with copyTo(long,{}) calls",
           byteIndex,
           subSize,
           size,
@@ -193,7 +193,7 @@ public interface ReadOnlyByteArrayWithOtherByteArrayTest extends BaseReadOnlyByt
                 var control = controlRWBAAllocator.apply(subSize);
                 try{
                   var adj = rwbaToWOConverter.apply(control);
-                  subset.read(0, adj);
+                  subset.copyTo(0, adj);
                   Random testRNG = new Random(testLocalSeed);
                   long innerByteIndex = 0;
                   for(long index = 0; index < size; index++){
@@ -221,7 +221,7 @@ public interface ReadOnlyByteArrayWithOtherByteArrayTest extends BaseReadOnlyByt
                 ReadableWritableByteArray control = controlRWBAAllocator.apply(subSize);
                 try{
                   var adj = rwbaToWOConverter.apply(control);
-                  subset.read(0, adj);
+                  subset.copyTo(0, adj);
                   Random testRNG = new Random(diffTestLocalSeed);
                   long innerByteIndex = 0;
                   for(long index = 0; index < size; index++){
@@ -324,7 +324,7 @@ public interface ReadOnlyByteArrayWithOtherByteArrayTest extends BaseReadOnlyByt
           // Write test
           final int byteIndex = tempByteIndex;
           tests.add(dynamicTest(
-            f("full read({}, {}(size={})) on ByteArray of {}B size", byteIndex, type, destSize, selfSize),
+            f("full copyTo({}, {}(size={})) on ByteArray of {}B size", byteIndex, type, destSize, selfSize),
             () -> {
 
               // Wrap in try and catch for possible OOM if trying to allocate max memory
@@ -356,7 +356,7 @@ public interface ReadOnlyByteArrayWithOtherByteArrayTest extends BaseReadOnlyByt
                     T destination = rwbaToWOConverter.apply(destinationRWBA);
 
                     // Call it
-                    testByteArray.read(byteIndex, destination);
+                    testByteArray.copyTo(byteIndex, destination);
 
                     // Check the destination bytearray
                     {
@@ -404,7 +404,7 @@ public interface ReadOnlyByteArrayWithOtherByteArrayTest extends BaseReadOnlyByt
     return tests;
   }
 
-  @DisplayName("Test valid subsetOf(long, long) with read(long,WriteOnlyByteArray) calls")
+  @DisplayName("Test valid subsetOf(long, long) with copyTo(long,WriteOnlyByteArray) calls")
   @TestFactory
   default Iterable<DynamicTest> testValidSubsetOfCallsWriteOnlyByteArray(){
     return generateValidSubsetOfByteArrayTests(
@@ -420,7 +420,7 @@ public interface ReadOnlyByteArrayWithOtherByteArrayTest extends BaseReadOnlyByt
     );
   }
 
-  @DisplayName("Test valid subsetOf(long, long) with read(long,ReadableWritableByteArray) calls")
+  @DisplayName("Test valid subsetOf(long, long) with copyTo(long,ReadableWritableByteArray) calls")
   @TestFactory
   default Iterable<DynamicTest> testValidSubsetOfCallsReadableWritableByteArray(){
     return generateValidSubsetOfByteArrayTests(
@@ -436,9 +436,9 @@ public interface ReadOnlyByteArrayWithOtherByteArrayTest extends BaseReadOnlyByt
     );
   }
 
-  @DisplayName("Test valid read(long, WriteOnlyByteArray) calls")
+  @DisplayName("Test valid copyTo(long, WriteOnlyByteArray) calls")
   @TestFactory
-  default Iterable<DynamicTest> testValidReadCallsWriteOnlyByteArray(){
+  default Iterable<DynamicTest> testValidCopyToCallsWriteOnlyByteArray(){
     return generateReadByteArrayTests(
       getRNG(),
       "WriteOnlyByteArray",
@@ -452,9 +452,9 @@ public interface ReadOnlyByteArrayWithOtherByteArrayTest extends BaseReadOnlyByt
     );
   }
 
-  @DisplayName("Test valid read(long, ReadableWritableByteArray) calls")
+  @DisplayName("Test valid copyTo(long, ReadableWritableByteArray) calls")
   @TestFactory
-  default Iterable<DynamicTest> testValidReadCallsReadableWritableByteArray(){
+  default Iterable<DynamicTest> testValidCopyToCallsReadableWritableByteArray(){
     return generateReadByteArrayTests(
       getRNG(),
       "ReadableWritableByteArray",
