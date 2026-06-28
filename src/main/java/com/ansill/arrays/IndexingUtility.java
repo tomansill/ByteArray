@@ -121,7 +121,7 @@ public final class IndexingUtility{
    * @throws ByteArrayIndexOutOfBoundsException thrown if index out of bounds
    * @throws ByteArrayLengthOverBoundsException thrown if size of byte array exceeds
    */
-  public static void checkRead(
+  public static void checkCopyTo(
     long byteIndex,
     @Nullable WriteOnlyByteArray destination,
     @Nonnegative long sizeOfByteArray
@@ -194,7 +194,7 @@ public final class IndexingUtility{
    * @throws ByteArrayIndexOutOfBoundsException thrown if index is out of bounds
    * @throws ByteArrayLengthOverBoundsException thrown if the length is overlapping.
    */
-  public static void checkWrite(
+  public static void checkCopyFrom(
     long byteIndex,
     @Nullable ReadOnlyByteArray source,
     @Nonnegative long sizeOfByteArray

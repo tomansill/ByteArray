@@ -22,6 +22,32 @@ public final class TestUtility{
     }
   }
 
+  public static short flipEndian(short value){
+    int b1 = (value >> 8) & 0xff;
+    int b0 = value & 0xff;
+    return (short) ((b0 << 8) | b1);
+  }
+
+  public static int flipEndian(int value) {
+    return Integer.reverseBytes(value);
+  }
+
+  public static long flipEndian(long value) {
+    return Long.reverseBytes(value);
+  }
+
+  public static float flipEndian(float value) {
+    int bits = Float.floatToRawIntBits(value);
+    bits = Integer.reverseBytes(bits);
+    return Float.intBitsToFloat(bits);
+  }
+
+  public static double flipEndian(double value) {
+    long bits = Double.doubleToRawLongBits(value);
+    bits = Long.reverseBytes(bits);
+    return Double.longBitsToDouble(bits);
+  }
+
   @Nonnull
   public static String f(@Nonnull String message, @Nullable Object object, @Nonnull Object... objects){
     return format(message, object, objects);

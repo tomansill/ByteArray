@@ -8,11 +8,11 @@ import javax.annotation.Nonnull;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 
-import static com.ansill.arrays.IndexingUtility.checkRead;
+import static com.ansill.arrays.IndexingUtility.checkCopyTo;
 import static com.ansill.arrays.IndexingUtility.checkReadWrite;
 import static com.ansill.arrays.IndexingUtility.checkReadWriteByte;
 import static com.ansill.arrays.IndexingUtility.checkSubsetOf;
-import static com.ansill.arrays.IndexingUtility.checkWrite;
+import static com.ansill.arrays.IndexingUtility.checkCopyFrom;
 
 /** {@link ReadableWritableByteArray} implementation using {@link ByteBuffer} as the backing data */
 final class ByteBufferByteArray implements ReadableWritableByteArray, ReadOnlyByteArray, WriteOnlyByteArray{
@@ -99,7 +99,7 @@ final class ByteBufferByteArray implements ReadableWritableByteArray, ReadOnlyBy
   @Override
   public short readShortBE(long byteIndex) throws ByteArrayIndexOutOfBoundsException, ByteArrayLengthOverBoundsException{
     checkReadWrite(byteIndex, 2, this.size());
-    return this.data.order(ByteOrder.BIG_ENDIAN).getShort((int) (this.data.position() + byteIndex));
+    return this.data.duplicate().order(ByteOrder.BIG_ENDIAN).getShort((int) (this.data.position() + byteIndex));
   }
 
   /**
@@ -108,7 +108,7 @@ final class ByteBufferByteArray implements ReadableWritableByteArray, ReadOnlyBy
   @Override
   public short readShortLE(long byteIndex) throws ByteArrayIndexOutOfBoundsException, ByteArrayLengthOverBoundsException{
     checkReadWrite(byteIndex, 2, this.size());
-    return this.data.order(ByteOrder.LITTLE_ENDIAN).getShort((int) (this.data.position() + byteIndex));
+    return this.data.duplicate().order(ByteOrder.LITTLE_ENDIAN).getShort((int) (this.data.position() + byteIndex));
   }
 
   /**
@@ -117,7 +117,7 @@ final class ByteBufferByteArray implements ReadableWritableByteArray, ReadOnlyBy
   @Override
   public int readIntBE(long byteIndex) throws ByteArrayIndexOutOfBoundsException, ByteArrayLengthOverBoundsException{
     checkReadWrite(byteIndex, 4, this.size());
-    return this.data.order(ByteOrder.BIG_ENDIAN).getInt((int) (this.data.position() + byteIndex));
+    return this.data.duplicate().order(ByteOrder.BIG_ENDIAN).getInt((int) (this.data.position() + byteIndex));
   }
 
   /**
@@ -126,7 +126,7 @@ final class ByteBufferByteArray implements ReadableWritableByteArray, ReadOnlyBy
   @Override
   public int readIntLE(long byteIndex) throws ByteArrayIndexOutOfBoundsException, ByteArrayLengthOverBoundsException{
     checkReadWrite(byteIndex, 4, this.size());
-    return this.data.order(ByteOrder.LITTLE_ENDIAN).getInt((int) (this.data.position() + byteIndex));
+    return this.data.duplicate().order(ByteOrder.LITTLE_ENDIAN).getInt((int) (this.data.position() + byteIndex));
   }
 
   /**
@@ -135,7 +135,7 @@ final class ByteBufferByteArray implements ReadableWritableByteArray, ReadOnlyBy
   @Override
   public long readLongBE(long byteIndex) throws ByteArrayIndexOutOfBoundsException, ByteArrayLengthOverBoundsException{
     checkReadWrite(byteIndex, 8, this.size());
-    return this.data.order(ByteOrder.BIG_ENDIAN).getLong((int) (this.data.position() + byteIndex));
+    return this.data.duplicate().order(ByteOrder.BIG_ENDIAN).getLong((int) (this.data.position() + byteIndex));
   }
 
   /**
@@ -144,7 +144,7 @@ final class ByteBufferByteArray implements ReadableWritableByteArray, ReadOnlyBy
   @Override
   public long readLongLE(long byteIndex) throws ByteArrayIndexOutOfBoundsException, ByteArrayLengthOverBoundsException{
     checkReadWrite(byteIndex, 8, this.size());
-    return this.data.order(ByteOrder.LITTLE_ENDIAN).getLong((int) (this.data.position() + byteIndex));
+    return this.data.duplicate().order(ByteOrder.LITTLE_ENDIAN).getLong((int) (this.data.position() + byteIndex));
   }
 
   /**
@@ -153,7 +153,7 @@ final class ByteBufferByteArray implements ReadableWritableByteArray, ReadOnlyBy
   @Override
   public float readFloatBE(long byteIndex) throws ByteArrayIndexOutOfBoundsException, ByteArrayLengthOverBoundsException{
     checkReadWrite(byteIndex, 4, this.size());
-    return this.data.order(ByteOrder.BIG_ENDIAN).getFloat((int) (this.data.position() + byteIndex));
+    return this.data.duplicate().order(ByteOrder.BIG_ENDIAN).getFloat((int) (this.data.position() + byteIndex));
   }
 
   /**
@@ -162,7 +162,7 @@ final class ByteBufferByteArray implements ReadableWritableByteArray, ReadOnlyBy
   @Override
   public float readFloatLE(long byteIndex) throws ByteArrayIndexOutOfBoundsException, ByteArrayLengthOverBoundsException{
     checkReadWrite(byteIndex, 4, this.size());
-    return this.data.order(ByteOrder.LITTLE_ENDIAN).getFloat((int) (this.data.position() + byteIndex));
+    return this.data.duplicate().order(ByteOrder.LITTLE_ENDIAN).getFloat((int) (this.data.position() + byteIndex));
   }
 
   /**
@@ -172,7 +172,7 @@ final class ByteBufferByteArray implements ReadableWritableByteArray, ReadOnlyBy
   public double readDoubleBE(long byteIndex)
   throws ByteArrayIndexOutOfBoundsException, ByteArrayLengthOverBoundsException{
     checkReadWrite(byteIndex, 8, this.size());
-    return this.data.order(ByteOrder.BIG_ENDIAN).getDouble((int) (this.data.position() + byteIndex));
+    return this.data.duplicate().order(ByteOrder.BIG_ENDIAN).getDouble((int) (this.data.position() + byteIndex));
   }
 
   /**
@@ -182,7 +182,7 @@ final class ByteBufferByteArray implements ReadableWritableByteArray, ReadOnlyBy
   public double readDoubleLE(long byteIndex)
           throws ByteArrayIndexOutOfBoundsException, ByteArrayLengthOverBoundsException{
     checkReadWrite(byteIndex, 8, this.size());
-    return this.data.order(ByteOrder.LITTLE_ENDIAN).getDouble((int) (this.data.position() + byteIndex));
+    return this.data.duplicate().order(ByteOrder.LITTLE_ENDIAN).getDouble((int) (this.data.position() + byteIndex));
   }
 
   /**
@@ -201,7 +201,7 @@ final class ByteBufferByteArray implements ReadableWritableByteArray, ReadOnlyBy
   public void writeShortBE(long byteIndex, short value)
   throws ByteArrayIndexOutOfBoundsException, ByteArrayLengthOverBoundsException{
     checkReadWrite(byteIndex, 2, this.size());
-    this.data.order(ByteOrder.BIG_ENDIAN).putShort((int) (this.data.position() + byteIndex), value);
+    this.data.duplicate().order(ByteOrder.BIG_ENDIAN).putShort((int) (this.data.position() + byteIndex), value);
   }
 
   /**
@@ -211,7 +211,7 @@ final class ByteBufferByteArray implements ReadableWritableByteArray, ReadOnlyBy
   public void writeShortLE(long byteIndex, short value)
           throws ByteArrayIndexOutOfBoundsException, ByteArrayLengthOverBoundsException{
     checkReadWrite(byteIndex, 2, this.size());
-    this.data.order(ByteOrder.LITTLE_ENDIAN).putShort((int) (this.data.position() + byteIndex), value);
+    this.data.duplicate().order(ByteOrder.LITTLE_ENDIAN).putShort((int) (this.data.position() + byteIndex), value);
   }
 
   /**
@@ -221,7 +221,7 @@ final class ByteBufferByteArray implements ReadableWritableByteArray, ReadOnlyBy
   public void writeIntBE(long byteIndex, int value)
   throws ByteArrayIndexOutOfBoundsException, ByteArrayLengthOverBoundsException{
     checkReadWrite(byteIndex, 4, this.size());
-    this.data.order(ByteOrder.BIG_ENDIAN).putInt((int) (this.data.position() + byteIndex), value);
+    this.data.duplicate().order(ByteOrder.BIG_ENDIAN).putInt((int) (this.data.position() + byteIndex), value);
   }
 
   /**
@@ -231,7 +231,7 @@ final class ByteBufferByteArray implements ReadableWritableByteArray, ReadOnlyBy
   public void writeIntLE(long byteIndex, int value)
           throws ByteArrayIndexOutOfBoundsException, ByteArrayLengthOverBoundsException{
     checkReadWrite(byteIndex, 4, this.size());
-    this.data.order(ByteOrder.LITTLE_ENDIAN).putInt((int) (this.data.position() + byteIndex), value);
+    this.data.duplicate().order(ByteOrder.LITTLE_ENDIAN).putInt((int) (this.data.position() + byteIndex), value);
   }
 
   /**
@@ -241,7 +241,7 @@ final class ByteBufferByteArray implements ReadableWritableByteArray, ReadOnlyBy
   public void writeLongBE(long byteIndex, long value)
   throws ByteArrayIndexOutOfBoundsException, ByteArrayLengthOverBoundsException{
     checkReadWrite(byteIndex, 8, this.size());
-    this.data.order(ByteOrder.BIG_ENDIAN).putLong((int) (this.data.position() + byteIndex), value);
+    this.data.duplicate().order(ByteOrder.BIG_ENDIAN).putLong((int) (this.data.position() + byteIndex), value);
   }
 
   /**
@@ -251,7 +251,7 @@ final class ByteBufferByteArray implements ReadableWritableByteArray, ReadOnlyBy
   public void writeLongLE(long byteIndex, long value)
           throws ByteArrayIndexOutOfBoundsException, ByteArrayLengthOverBoundsException{
     checkReadWrite(byteIndex, 8, this.size());
-    this.data.order(ByteOrder.LITTLE_ENDIAN).putLong((int) (this.data.position() + byteIndex), value);
+    this.data.duplicate().order(ByteOrder.LITTLE_ENDIAN).putLong((int) (this.data.position() + byteIndex), value);
   }
 
   /**
@@ -261,7 +261,7 @@ final class ByteBufferByteArray implements ReadableWritableByteArray, ReadOnlyBy
   public void writeFloatBE(long byteIndex, float value)
   throws ByteArrayIndexOutOfBoundsException, ByteArrayLengthOverBoundsException{
     checkReadWrite(byteIndex, 4, this.size());
-    this.data.order(ByteOrder.BIG_ENDIAN).putFloat((int) (this.data.position() + byteIndex), value);
+    this.data.duplicate().order(ByteOrder.BIG_ENDIAN).putFloat((int) (this.data.position() + byteIndex), value);
   }
 
   /**
@@ -271,7 +271,7 @@ final class ByteBufferByteArray implements ReadableWritableByteArray, ReadOnlyBy
   public void writeFloatLE(long byteIndex, float value)
           throws ByteArrayIndexOutOfBoundsException, ByteArrayLengthOverBoundsException{
     checkReadWrite(byteIndex, 4, this.size());
-    this.data.order(ByteOrder.LITTLE_ENDIAN).putFloat((int) (this.data.position() + byteIndex), value);
+    this.data.duplicate().order(ByteOrder.LITTLE_ENDIAN).putFloat((int) (this.data.position() + byteIndex), value);
   }
 
   /**
@@ -281,7 +281,7 @@ final class ByteBufferByteArray implements ReadableWritableByteArray, ReadOnlyBy
   public void writeDoubleBE(long byteIndex, double value)
   throws ByteArrayIndexOutOfBoundsException, ByteArrayLengthOverBoundsException{
     checkReadWrite(byteIndex, 8, this.size());
-    this.data.order(ByteOrder.BIG_ENDIAN).putDouble((int) (this.data.position() + byteIndex), value);
+    this.data.duplicate().order(ByteOrder.BIG_ENDIAN).putDouble((int) (this.data.position() + byteIndex), value);
   }
 
   /**
@@ -291,7 +291,7 @@ final class ByteBufferByteArray implements ReadableWritableByteArray, ReadOnlyBy
   public void writeDoubleLE(long byteIndex, double value)
           throws ByteArrayIndexOutOfBoundsException, ByteArrayLengthOverBoundsException{
     checkReadWrite(byteIndex, 8, this.size());
-    this.data.order(ByteOrder.LITTLE_ENDIAN).putDouble((int) (this.data.position() + byteIndex), value);
+    this.data.duplicate().order(ByteOrder.LITTLE_ENDIAN).putDouble((int) (this.data.position() + byteIndex), value);
   }
 
   /**
@@ -310,7 +310,7 @@ final class ByteBufferByteArray implements ReadableWritableByteArray, ReadOnlyBy
   throws ByteArrayIndexOutOfBoundsException, ByteArrayLengthOverBoundsException{
 
     // Check parameters
-    checkRead(byteIndex, destination, this.size());
+    checkCopyTo(byteIndex, destination, this.size());
 
     // If wrapper, unwrap it
     while(destination instanceof WriteOnlyByteArrayWrapper){
@@ -362,7 +362,7 @@ final class ByteBufferByteArray implements ReadableWritableByteArray, ReadOnlyBy
   throws ByteArrayIndexOutOfBoundsException, ByteArrayLengthOverBoundsException{
 
     // Check parameters
-    checkWrite(byteIndex, source, this.size());
+    checkCopyFrom(byteIndex, source, this.size());
 
     // Check if source is a wrapper, unwrap it if it is a wrapper
     while(source instanceof ReadOnlyByteArrayWrapper){

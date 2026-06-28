@@ -35,7 +35,7 @@ final class ReadOnlyByteArrayWrapper implements ReadOnlyByteArray{
 
   @Override
   public short readShortLE(long byteIndex) throws ByteArrayIndexOutOfBoundsException, ByteArrayLengthOverBoundsException{
-    return original.readShortBE(byteIndex);
+    return original.readShortLE(byteIndex);
   }
 
   @Override
@@ -45,7 +45,7 @@ final class ReadOnlyByteArrayWrapper implements ReadOnlyByteArray{
 
   @Override
   public int readIntLE(long byteIndex) throws ByteArrayIndexOutOfBoundsException, ByteArrayLengthOverBoundsException{
-    return original.readIntBE(byteIndex);
+    return original.readIntLE(byteIndex);
   }
 
   @Override
@@ -55,7 +55,7 @@ final class ReadOnlyByteArrayWrapper implements ReadOnlyByteArray{
 
   @Override
   public long readLongLE(long byteIndex) throws ByteArrayIndexOutOfBoundsException, ByteArrayLengthOverBoundsException{
-    return original.readLongBE(byteIndex);
+    return original.readLongLE(byteIndex);
   }
 
   @Override
@@ -65,7 +65,7 @@ final class ReadOnlyByteArrayWrapper implements ReadOnlyByteArray{
 
   @Override
   public float readFloatLE(long byteIndex) throws ByteArrayIndexOutOfBoundsException, ByteArrayLengthOverBoundsException{
-    return original.readFloatBE(byteIndex);
+    return original.readFloatLE(byteIndex);
   }
 
   @Override
@@ -77,7 +77,7 @@ final class ReadOnlyByteArrayWrapper implements ReadOnlyByteArray{
   @Override
   public double readDoubleLE(long byteIndex)
           throws ByteArrayIndexOutOfBoundsException, ByteArrayLengthOverBoundsException{
-    return original.readDoubleBE(byteIndex);
+    return original.readDoubleLE(byteIndex);
   }
 
   @Override

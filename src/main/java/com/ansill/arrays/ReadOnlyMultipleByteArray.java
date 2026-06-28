@@ -7,7 +7,7 @@ import java.nio.ByteOrder;
 import java.util.List;
 import java.util.TreeMap;
 
-import static com.ansill.arrays.IndexingUtility.checkRead;
+import static com.ansill.arrays.IndexingUtility.checkCopyTo;
 import static com.ansill.arrays.IndexingUtility.checkReadWrite;
 import static com.ansill.arrays.IndexingUtility.checkReadWriteByte;
 import static com.ansill.arrays.IndexingUtility.checkSubsetOf;
@@ -295,7 +295,7 @@ final class ReadOnlyMultipleByteArray implements ReadOnlyByteArray{
   throws ByteArrayIndexOutOfBoundsException, ByteArrayLengthOverBoundsException{
 
     // Check parameters
-    checkRead(byteIndex, destination, size);
+    checkCopyTo(byteIndex, destination, size);
 
     // Pass it over
     innerRead(indexMap, byteIndex, destination);

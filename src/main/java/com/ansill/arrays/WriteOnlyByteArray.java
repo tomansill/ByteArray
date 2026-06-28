@@ -3,7 +3,7 @@ package com.ansill.arrays;
 import javax.annotation.Nonnegative;
 import javax.annotation.Nonnull;
 
-import static com.ansill.arrays.IndexingUtility.checkWrite;
+import static com.ansill.arrays.IndexingUtility.checkCopyFrom;
 
 /**
  * Write-only interface of {@link ByteArray}
@@ -67,7 +67,7 @@ public interface WriteOnlyByteArray extends ByteArray{
    * @throws ByteArrayIndexOutOfBoundsException thrown if byteIndex is out of bounds
    * @throws ByteArrayLengthOverBoundsException thrown if the value cannot be fully written as it goes over the length of the byte array
    */
-  default void writeIntBE(@Nonnegative long byteIndex, int value)
+  default void writeIntBE(@Nonnegative long byteIndex, final int value)
   throws ByteArrayIndexOutOfBoundsException, ByteArrayLengthOverBoundsException{
 
     // Check
@@ -88,7 +88,7 @@ public interface WriteOnlyByteArray extends ByteArray{
    * @throws ByteArrayIndexOutOfBoundsException thrown if byteIndex is out of bounds
    * @throws ByteArrayLengthOverBoundsException thrown if the value cannot be fully written as it goes over the length of the byte array
    */
-  default void writeIntLE(@Nonnegative long byteIndex, int value)
+  default void writeIntLE(@Nonnegative long byteIndex, final int value)
           throws ByteArrayIndexOutOfBoundsException, ByteArrayLengthOverBoundsException{
 
     // Check
@@ -215,7 +215,7 @@ public interface WriteOnlyByteArray extends ByteArray{
   throws ByteArrayIndexOutOfBoundsException, ByteArrayLengthOverBoundsException{
 
     // Check parameters
-    checkWrite(byteIndex, source, this.size());
+    checkCopyFrom(byteIndex, source, this.size());
 
     // Manual copy
     for(long index = 0; index < source.size(); index++){

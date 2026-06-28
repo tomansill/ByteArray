@@ -3,7 +3,7 @@ package com.ansill.arrays;
 import javax.annotation.Nonnegative;
 import javax.annotation.Nonnull;
 
-import static com.ansill.arrays.IndexingUtility.checkRead;
+import static com.ansill.arrays.IndexingUtility.checkCopyTo;
 
 /**
  * Read-only interface of {@link ByteArray}
@@ -161,14 +161,14 @@ public interface ReadOnlyByteArray extends ByteArray{
     IndexingUtility.checkReadWrite(byteIndex, 8, this.size());
 
     // Use eight readByte calls
-    long value = (0xff & readByte(byteIndex)) << 8;
-    value = (value | (0xff & readByte(byteIndex + 1))) << 8;
-    value = (value | (0xff & readByte(byteIndex + 2))) << 8;
-    value = (value | (0xff & readByte(byteIndex + 3))) << 8;
-    value = (value | (0xff & readByte(byteIndex + 4))) << 8;
-    value = (value | (0xff & readByte(byteIndex + 5))) << 8;
+    long value = (0xff & readByte(byteIndex + 7)) << 8;
     value = (value | (0xff & readByte(byteIndex + 6))) << 8;
-    value = (value | (0xff & readByte(byteIndex + 7)));
+    value = (value | (0xff & readByte(byteIndex + 5))) << 8;
+    value = (value | (0xff & readByte(byteIndex + 4))) << 8;
+    value = (value | (0xff & readByte(byteIndex + 3))) << 8;
+    value = (value | (0xff & readByte(byteIndex + 2))) << 8;
+    value = (value | (0xff & readByte(byteIndex + 1))) << 8;
+    value = (value | (0xff & readByte(byteIndex)));
 
     // Return value
     return value;
@@ -238,7 +238,7 @@ public interface ReadOnlyByteArray extends ByteArray{
   throws ByteArrayIndexOutOfBoundsException, ByteArrayLengthOverBoundsException{
 
     // Check parameters
-    checkRead(byteIndex, destination, this.size());
+    checkCopyTo(byteIndex, destination, this.size());
 
     // Manual Copy
     for(long index = 0; index < destination.size(); index++){

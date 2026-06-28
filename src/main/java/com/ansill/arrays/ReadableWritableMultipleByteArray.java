@@ -9,11 +9,11 @@ import java.util.Collections;
 import java.util.List;
 import java.util.TreeMap;
 
-import static com.ansill.arrays.IndexingUtility.checkRead;
+import static com.ansill.arrays.IndexingUtility.checkCopyTo;
 import static com.ansill.arrays.IndexingUtility.checkReadWrite;
 import static com.ansill.arrays.IndexingUtility.checkReadWriteByte;
 import static com.ansill.arrays.IndexingUtility.checkSubsetOf;
-import static com.ansill.arrays.IndexingUtility.checkWrite;
+import static com.ansill.arrays.IndexingUtility.checkCopyFrom;
 
 /** ReadableWritableByteArray implementation that supports multiple byte arrays */
 final class ReadableWritableMultipleByteArray implements ReadableWritableByteArray, ReadOnlyByteArray, WriteOnlyByteArray{
@@ -489,7 +489,7 @@ final class ReadableWritableMultipleByteArray implements ReadableWritableByteArr
   throws ByteArrayIndexOutOfBoundsException, ByteArrayLengthOverBoundsException{
 
     // Check parameters
-    checkRead(byteIndex, destination, size);
+    checkCopyTo(byteIndex, destination, size);
 
     // Pass it over
     ReadOnlyMultipleByteArray.innerRead(indexMap, byteIndex, destination);
@@ -500,7 +500,7 @@ final class ReadableWritableMultipleByteArray implements ReadableWritableByteArr
   throws ByteArrayIndexOutOfBoundsException, ByteArrayLengthOverBoundsException{
 
     // Check parameters
-    checkWrite(byteIndex, source, size);
+    checkCopyFrom(byteIndex, source, size);
 
     // Pass it over
     innerCopyFrom(byteIndex, source);

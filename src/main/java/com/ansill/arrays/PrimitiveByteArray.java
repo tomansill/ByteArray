@@ -6,11 +6,11 @@ import org.slf4j.LoggerFactory;
 import javax.annotation.Nonnegative;
 import javax.annotation.Nonnull;
 
-import static com.ansill.arrays.IndexingUtility.checkRead;
+import static com.ansill.arrays.IndexingUtility.checkCopyTo;
 import static com.ansill.arrays.IndexingUtility.checkReadWrite;
 import static com.ansill.arrays.IndexingUtility.checkReadWriteByte;
 import static com.ansill.arrays.IndexingUtility.checkSubsetOf;
-import static com.ansill.arrays.IndexingUtility.checkWrite;
+import static com.ansill.arrays.IndexingUtility.checkCopyFrom;
 
 /** {@link ReadableWritableByteArray} implementation using primitive byte array as backing data */
 final class PrimitiveByteArray implements ReadableWritableByteArray, ReadOnlyByteArray, WriteOnlyByteArray{
@@ -113,6 +113,14 @@ final class PrimitiveByteArray implements ReadableWritableByteArray, ReadOnlyByt
   }
 
   @Override
+  public short readShortLE(long byteIndex) throws ByteArrayIndexOutOfBoundsException, ByteArrayLengthOverBoundsException{
+    checkReadWrite(byteIndex, 2, this.size());
+    int value = (0xff & data[(int) (start + byteIndex + 1)]) << 8;
+    value |= (0xff & data[(int) (start + byteIndex)]);
+    return (short) value;
+  }
+
+  @Override
   public int readIntBE(long byteIndex) throws ByteArrayIndexOutOfBoundsException, ByteArrayLengthOverBoundsException{
     checkReadWrite(byteIndex, 4, this.size());
     int value = (0xff & data[(int) (start + byteIndex)]) << 8;
@@ -136,6 +144,20 @@ final class PrimitiveByteArray implements ReadableWritableByteArray, ReadOnlyByt
     return value;
   }
 
+  @Override
+  public long readLongLE(long byteIndex) throws ByteArrayIndexOutOfBoundsException, ByteArrayLengthOverBoundsException{
+    checkReadWrite(byteIndex, 8, this.size());
+    long value = (0xff & data[(int) (start + byteIndex + 7)]) << 8;
+    value = (value | (0xff & data[(int) (start + byteIndex + 6)])) << 8;
+    value = (value | (0xff & data[(int) (start + byteIndex + 5)])) << 8;
+    value = (value | (0xff & data[(int) (start + byteIndex + 4)])) << 8;
+    value = (value | (0xff & data[(int) (start + byteIndex + 3)])) << 8;
+    value = (value | (0xff & data[(int) (start + byteIndex + 2)])) << 8;
+    value = (value | (0xff & data[(int) (start + byteIndex + 1)])) << 8;
+    value |= (0xff & data[(int) (start + byteIndex)]);
+    return value;
+  }
+
 
   /**
    * {@inheritDoc}
@@ -147,7 +169,7 @@ final class PrimitiveByteArray implements ReadableWritableByteArray, ReadOnlyByt
   ) throws ByteArrayIndexOutOfBoundsException, ByteArrayLengthOverBoundsException{
 
     // Check parameters
-    checkRead(byteIndex, destination, this.size());
+    checkCopyTo(byteIndex, destination, this.size());
 
     // Check if destination is a wrapper, if it is a wrapper, unwrap it
     while(destination instanceof WriteOnlyByteArrayWrapper){
@@ -219,6 +241,14 @@ final class PrimitiveByteArray implements ReadableWritableByteArray, ReadOnlyByt
   }
 
   @Override
+  public void writeShortLE(long byteIndex, short value)
+          throws ByteArrayIndexOutOfBoundsException, ByteArrayLengthOverBoundsException{
+    checkReadWrite(byteIndex, 2, size);
+    data[(int) (start + byteIndex + 1)] = (byte) (value >>> 8);
+    data[(int) (start + byteIndex)] = (byte) value;
+  }
+
+  @Override
   public void writeIntBE(long byteIndex, int value)
   throws ByteArrayIndexOutOfBoundsException, ByteArrayLengthOverBoundsException{
     checkReadWrite(byteIndex, 4, size);
@@ -226,6 +256,16 @@ final class PrimitiveByteArray implements ReadableWritableByteArray, ReadOnlyByt
     data[(int) (start + byteIndex + 1)] = (byte) (value >>> 16);
     data[(int) (start + byteIndex + 2)] = (byte) (value >>> 8);
     data[(int) (start + byteIndex + 3)] = (byte) value;
+  }
+
+  @Override
+  public void writeIntLE(long byteIndex, int value)
+          throws ByteArrayIndexOutOfBoundsException, ByteArrayLengthOverBoundsException{
+    checkReadWrite(byteIndex, 4, size);
+    data[(int) (start + byteIndex + 3)] = (byte) (value >>> 24);
+    data[(int) (start + byteIndex + 2)] = (byte) (value >>> 16);
+    data[(int) (start + byteIndex + 1)] = (byte) (value >>> 8);
+    data[(int) (start + byteIndex)] = (byte) value;
   }
 
   @Override
@@ -242,6 +282,20 @@ final class PrimitiveByteArray implements ReadableWritableByteArray, ReadOnlyByt
     data[(int) (start + byteIndex + 7)] = (byte) value;
   }
 
+  @Override
+  public void writeLongLE(long byteIndex, long value)
+          throws ByteArrayIndexOutOfBoundsException, ByteArrayLengthOverBoundsException{
+    checkReadWrite(byteIndex, 8, size);
+    data[(int) (start + byteIndex + 7)] = (byte) (value >>> 56);
+    data[(int) (start + byteIndex + 6)] = (byte) (value >>> 48);
+    data[(int) (start + byteIndex + 5)] = (byte) (value >>> 40);
+    data[(int) (start + byteIndex + 4)] = (byte) (value >>> 32);
+    data[(int) (start + byteIndex + 3)] = (byte) (value >>> 24);
+    data[(int) (start + byteIndex + 2)] = (byte) (value >>> 16);
+    data[(int) (start + byteIndex + 1)] = (byte) (value >>> 8);
+    data[(int) (start + byteIndex)] = (byte) value;
+  }
+
   /**
    * {@inheritDoc}
    */
@@ -250,7 +304,7 @@ final class PrimitiveByteArray implements ReadableWritableByteArray, ReadOnlyByt
   throws ByteArrayIndexOutOfBoundsException, ByteArrayLengthOverBoundsException{
 
     // Check parameters
-    checkWrite(byteIndex, source, size);
+    checkCopyFrom(byteIndex, source, size);
 
     // Check if source is a wrapper, if it is, unwrap it
     while(source instanceof ReadOnlyByteArrayWrapper) source = ((ReadOnlyByteArrayWrapper) source).original;
