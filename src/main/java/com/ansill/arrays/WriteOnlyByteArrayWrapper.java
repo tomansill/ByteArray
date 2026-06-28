@@ -3,7 +3,7 @@ package com.ansill.arrays;
 import javax.annotation.Nonnull;
 
 /** Wrapper that wraps ReadableWritableByteArray into WriteOnlyByteArray that will lock out any accesses that is not related to writing */
-class WriteOnlyByteArrayWrapper implements WriteOnlyByteArray{
+final class WriteOnlyByteArrayWrapper implements WriteOnlyByteArray{
 
   /** Original ByteArray */
   @Nonnull
@@ -71,7 +71,7 @@ class WriteOnlyByteArrayWrapper implements WriteOnlyByteArray{
     ByteArrayIndexOutOfBoundsException,
     ByteArrayLengthOverBoundsException,
     ByteArrayInvalidLengthException{
-    if(start == 0 && length == size()) return this;
+	  if (start == 0 && length == size()) return this;
     return new WriteOnlyByteArrayWrapper(original.subsetOf(start, length));
   }
 

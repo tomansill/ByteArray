@@ -18,6 +18,10 @@ final class PrimitiveByteArray implements ReadableWritableByteArray, ReadOnlyByt
   /** Logger */
   private static final Logger LOGGER = LoggerFactory.getLogger(PrimitiveByteArray.class);
 
+  private static boolean INEFFICIENT_COPY_WARN_READ_LOGGED = false;
+
+  private static boolean INEFFICIENT_COPY_WARN_WRITE_LOGGED = false;
+
   /** Starting index of byte array */
   @Nonnegative
   final int start;
@@ -46,7 +50,7 @@ final class PrimitiveByteArray implements ReadableWritableByteArray, ReadOnlyByt
   /**
    * Constructor to use input byte array as subset {@link ReadableWritableByteArray}
    * <p>
-   * <i>Note: All of the input parameters are trusted. The constructor will not perform any checks on the parameter values.</i>
+   * <i>Note: All the input parameters are trusted. The constructor will not perform any checks on the parameter values.</i>
    *
    * @param data   byte array data
    * @param start  starting index of byte array
@@ -184,10 +188,13 @@ final class PrimitiveByteArray implements ReadableWritableByteArray, ReadOnlyByt
     }else{
 
       // Otherwise, use manual copy. Warn about it through logger
-      LOGGER.warn(
-        "No implementation found to handle efficient bulk copy for {}. Using manual per-byte copy.",
-        destination.getClass().getName()
-      );
+      if(!INEFFICIENT_COPY_WARN_READ_LOGGED) {
+        INEFFICIENT_COPY_WARN_READ_LOGGED = true;
+        LOGGER.warn(
+                "No implementation found to handle efficient bulk copy for {}. Using manual per-byte copy.",
+                destination.getClass().getName()
+        );
+      }
       for(long index = 0; index < destination.size(); index++){
         destination.writeByte(index, data[(int) (start + byteIndex + index)]);
       }
@@ -278,10 +285,13 @@ final class PrimitiveByteArray implements ReadableWritableByteArray, ReadOnlyByt
     }else{
 
       // Otherwise, use manual copy. Warn about it through logger
-      LOGGER.warn(
-        "No implementation found to handle efficient bulk copy for {}. Using manual per-byte copy.",
-        source.getClass().getName()
-      );
+      if(!INEFFICIENT_COPY_WARN_WRITE_LOGGED) {
+        INEFFICIENT_COPY_WARN_WRITE_LOGGED = true;
+        LOGGER.warn(
+                "No implementation found to handle efficient bulk copy for {}. Using manual per-byte copy.",
+                source.getClass().getName()
+        );
+      }
       for(long index = 0; index < source.size(); index++){
         data[(int) (start + byteIndex + index)] = source.readByte(index);
       }

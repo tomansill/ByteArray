@@ -32,7 +32,7 @@ public interface BaseByteArrayTest{
   /**
    * Returns whether if test byte array must be ReadOnly/WriteOnly or it can be ReadableWritable
    *
-   * @return true if can be readablewritable, false if must readonly
+   * @return true if it can be readable-writable, false if must readonly
    */
   boolean isReadableWritableOK();
 

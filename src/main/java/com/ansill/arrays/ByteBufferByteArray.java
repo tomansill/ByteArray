@@ -14,10 +14,14 @@ import static com.ansill.arrays.IndexingUtility.checkSubsetOf;
 import static com.ansill.arrays.IndexingUtility.checkWrite;
 
 /** {@link ReadableWritableByteArray} implementation using {@link ByteBuffer} as the backing data */
-class ByteBufferByteArray implements ReadableWritableByteArray{
+final class ByteBufferByteArray implements ReadableWritableByteArray{
 
   /** Logger */
   private static final Logger LOGGER = LoggerFactory.getLogger(ByteBufferByteArray.class);
+
+  private static boolean INEFFICIENT_COPY_WARN_READ_LOGGED = false;
+
+  private static boolean INEFFICIENT_COPY_WARN_WRITE_LOGGED = false;
 
   /** {@link ByteBuffer} data that backs this {@link ReadableWritableByteArray} */
   @Nonnull
@@ -240,10 +244,13 @@ class ByteBufferByteArray implements ReadableWritableByteArray{
     }else{
 
       // Manual Copy (And warn about it)
-      LOGGER.warn(
-        "No implementation found to handle efficient bulk copy for {}. Using manual per-byte copy.",
-        destination.getClass().getName()
-      );
+      if(!INEFFICIENT_COPY_WARN_READ_LOGGED) {
+        INEFFICIENT_COPY_WARN_READ_LOGGED = true;
+        LOGGER.warn(
+                "No implementation found to handle efficient bulk copy for {}. Using manual per-byte copy.",
+                destination.getClass().getName()
+        );
+      }
       for(long index = 0; index < destination.size(); index++){
         destination.writeByte(index, this.data.get((int) (this.data.position() + byteIndex + index)));
       }
@@ -289,10 +296,13 @@ class ByteBufferByteArray implements ReadableWritableByteArray{
     }else{
 
       // Manual Copy (And warn about it)
-      LOGGER.warn(
-        "No implementation found to handle efficient bulk copy for {}. Using manual per-byte copy.",
-        source.getClass().getName()
-      );
+      if(!INEFFICIENT_COPY_WARN_WRITE_LOGGED) {
+        INEFFICIENT_COPY_WARN_WRITE_LOGGED = true;
+        LOGGER.warn(
+                "No implementation found to handle efficient bulk copy for {}. Using manual per-byte copy.",
+                source.getClass().getName()
+        );
+      }
       for(long index = 0; index < source.size(); index++){
         this.data.put((int) (this.data.position() + byteIndex + index), source.readByte(index));
       }

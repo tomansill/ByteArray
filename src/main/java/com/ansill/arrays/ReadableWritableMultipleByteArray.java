@@ -34,7 +34,7 @@ final class ReadableWritableMultipleByteArray implements ReadableWritableByteArr
    *
    * @param byteArrays byte arrays used to create this multiple byte arrays
    */
-  ReadableWritableMultipleByteArray(@Nonnull List<ReadableWritableByteArray> byteArrays){
+  ReadableWritableMultipleByteArray(@Nonnull List<? extends ReadableWritableByteArray> byteArrays){
 
     // Build index map
     long size = 0;

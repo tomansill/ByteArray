@@ -4,8 +4,9 @@ import javax.annotation.Nonnegative;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
+
+import static java.util.Objects.requireNonNull;
 
 /** Utility to provide convenient indexing checks functions */
 public final class IndexingUtility{
@@ -16,38 +17,6 @@ public final class IndexingUtility{
   }
 
   /**
-   * Combines variadic arguments into a list. Requires at least one argument.
-   *
-   * @param first first element
-   * @param rest  rest of variadic elements
-   * @param <T>   type of return list
-   * @return a list containing the elements present in variadic arguments
-   * @throws IllegalArgumentException thrown if any of the elements are null
-   */
-  @SafeVarargs
-  @Nonnull
-  static <T> List<T> combineVariadic(@Nonnull T first, @Nonnull T... rest) throws IllegalArgumentException{
-
-    // Check first
-    //noinspection ConstantConditions
-    if(first == null) throw new IllegalArgumentException("first element is null");
-
-    // Check rest
-    //noinspection ConstantConditions
-    if(rest == null) throw new IllegalArgumentException("rest array is null");
-    for(T t : rest) if(t == null) throw new IllegalArgumentException("null elements in rest array");
-
-    // Create list
-    ArrayList<T> list = new ArrayList<>(1 + rest.length);
-    list.add(first);
-    Collections.addAll(list, rest);
-
-    // Return list
-    return list;
-  }
-
-
-  /**
    * Combines variadic arguments into a list. Requires at least two arguments.
    *
    * @param first  first element
@@ -55,7 +24,7 @@ public final class IndexingUtility{
    * @param rest   rest of variadic elements
    * @param <T>    type of return list
    * @return a list containing the elements present in variadic arguments
-   * @throws IllegalArgumentException thrown if any of the elements are null
+   * @throws NullPointerException thrown if any of the elements are null
    */
   @SafeVarargs
   @Nonnull
@@ -63,27 +32,28 @@ public final class IndexingUtility{
   throws IllegalArgumentException{
 
     // Check first
-    //noinspection ConstantConditions
-    if(first == null) throw new IllegalArgumentException("first element is null");
+    requireNonNull(first, "first element is null");
 
     // Check second
-    //noinspection ConstantConditions
-    if(second == null) throw new IllegalArgumentException("second element is null");
+    requireNonNull(second, "second element is null");
 
     // Check rest
-    //noinspection ConstantConditions
-    if(rest == null) throw new IllegalArgumentException("rest array is null");
-    for(T t : rest) if(t == null) throw new IllegalArgumentException("null elements in rest array");
+    requireNonNull(rest, "rest array is null");
+    for(T t : rest) requireNonNull(t, "null elements in rest array");
 
     // Create list
     ArrayList<T> list = new ArrayList<>(2 + rest.length);
     list.add(first);
     list.add(second);
-    Collections.addAll(list, rest);
+    // Manual forloop to avoid that varargs error
+	  //noinspection ManualArrayToCollectionCopy
+	  for (T t : rest) {
+		  //noinspection UseBulkOperation
+		  list.add(t);
+    }
 
     // Return list
     return list;
-
   }
 
   /**

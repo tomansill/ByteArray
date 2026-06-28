@@ -1,9 +1,6 @@
 package test;
 
-import com.ansill.arrays.ByteArray;
-import com.ansill.arrays.IndexingUtility;
-import com.ansill.arrays.ReadOnlyByteArray;
-import com.ansill.arrays.ReadableWritableByteArray;
+import com.ansill.arrays.*;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.DynamicTest;
 import org.junit.jupiter.api.Test;
@@ -17,13 +14,32 @@ import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
-import static com.ansill.arrays.ByteArray.combine;
-import static com.ansill.arrays.ByteArray.wrap;
+import static com.ansill.arrays.ByteArrays.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.DynamicTest.dynamicTest;
 
 class UtilityTest{
+
+  @DisplayName("Test instantiation of ByteArrays (code coverage)")
+  @Test
+  void testInstantiateByteArrays() throws NoSuchMethodException{
+
+    // Since constructor is private, use reflection to grab it
+    Constructor<ByteArrays> constructor = ByteArrays.class.getDeclaredConstructor();
+
+    // Constructor is private, make it public and run it
+    constructor.setAccessible(true);
+
+    // Instantiate it
+    assertThrows(AssertionError.class, () -> {
+      try{
+        constructor.newInstance();
+      }catch(InvocationTargetException ite){
+        throw ite.getCause();
+      }
+    });
+  }
 
   @DisplayName("Test instantiation of IndexingUtility (code coverage)")
   @Test
@@ -343,7 +359,7 @@ class UtilityTest{
     ReadableWritableByteArray ba3 = wrap(ByteBuffer.allocate(2));
 
     // Wrap it
-    ReadableWritableByteArray ba = ByteArray.combineReadableWritable(Arrays.asList(ba1, ba2, ba3));
+    ReadableWritableByteArray ba = ByteArrays.combineReadableWritable(Arrays.asList(ba1, ba2, ba3));
 
     // Check class
     assertEquals("ReadableWritableMultipleByteArray", ba.getClass().getSimpleName());
@@ -384,6 +400,46 @@ class UtilityTest{
     assertEquals(123, ba3.readByte(1));
   }
 
+  @DisplayName("Test Combining ByteArrays using List method - singular ByteArray")
+  @Test
+  void testCombineListSingleByteArray(){
+
+    // Create arrays
+    ReadableWritableByteArray ba1 = wrap(ByteBuffer.allocate(7));
+
+    // Wrap it
+    ReadableWritableByteArray ba = ByteArrays.combineReadableWritable(List.of(ba1));
+
+    // Check class
+    assertEquals("ByteBufferByteArray", ba.getClass().getSimpleName());
+
+    // Check Size
+    assertEquals(7, ba.size());
+
+    // Check ba, should be all zero
+    for(long i = 0; i < ba.size(); i++) assertEquals(0, ba.readByte(i));
+
+    // Modify some arrays
+    ba1.writeByte(1, (byte) 20);
+
+    // Check again
+    assertEquals(0, ba.readByte(0));
+    assertEquals(ba1.readByte(1), ba.readByte(1));
+    assertEquals(0, ba.readByte(3));
+    assertEquals(0, ba.readByte(4));
+    assertEquals(0, ba.readByte(5));
+
+    // Modify byte array
+    ba.writeByte(0, (byte) 22);
+    ba.writeByte(1, (byte) 17);
+    ba.writeByte(3, (byte) -23);
+    ba.writeByte(5, (byte) 2);
+
+    // Check arrays
+    assertEquals(22, ba1.readByte(0));
+    assertEquals(17, ba1.readByte(1));
+  }
+
   @DisplayName("Test Combining Readonly ByteArrays using List method")
   @Test
   void testCombineReadOnlyList(){
@@ -394,7 +450,7 @@ class UtilityTest{
     ReadableWritableByteArray ba3 = wrap(ByteBuffer.allocate(2));
 
     // Wrap it
-    ReadOnlyByteArray ba = ByteArray.combineReadOnly(Arrays.asList(ba1, ba2.toReadOnly(), ba3.toReadOnly()));
+    ReadOnlyByteArray ba = combineReadOnly(Arrays.asList(ba1, ba2.toReadOnly(), ba3.toReadOnly()));
 
     // Check class
     assertEquals("ReadOnlyMultipleByteArray", ba.getClass().getSimpleName());
@@ -420,6 +476,66 @@ class UtilityTest{
     assertEquals(ba3.readByte(1), ba.readByte(6));
   }
 
+  @DisplayName("Test Combining Readonly ByteArrays using List method - singular ByteArray")
+  @Test
+  void testCombineReadOnlyListSingleElement(){
+
+    // Create arrays
+    ReadableWritableByteArray ba1 = wrap(ByteBuffer.allocate(7));
+
+    // Wrap it
+    ReadOnlyByteArray ba = combineReadOnly(List.of(ba1));
+
+    // Check class
+    assertEquals("ReadOnlyByteArrayWrapper", ba.getClass().getSimpleName());
+
+    // Check Size
+    assertEquals(7, ba.size());
+
+    // Check ba, should be all zero
+    for(long i = 0; i < ba.size(); i++) assertEquals(0, ba.readByte(i));
+
+    // Modify some arrays
+    ba1.writeByte(1, (byte) 20);
+
+    // Check again
+    assertEquals(0, ba.readByte(0));
+    assertEquals(ba1.readByte(1), ba.readByte(1));
+    assertEquals(0, ba.readByte(3));
+    assertEquals(0, ba.readByte(4));
+    assertEquals(0, ba.readByte(5));
+  }
+
+  @DisplayName("Test Combining Readonly ByteArrays using List method - singular ReadOnly ByteArray")
+  @Test
+  void testCombineReadOnlyListSingleElementRO(){
+
+    // Create arrays
+    ReadableWritableByteArray ba1 = wrap(ByteBuffer.allocate(7));
+
+    // Wrap it
+    ReadOnlyByteArray ba = combineReadOnly(List.of(ba1.toReadOnly()));
+
+    // Check class
+    assertEquals("ReadOnlyByteArrayWrapper", ba.getClass().getSimpleName());
+
+    // Check Size
+    assertEquals(7, ba.size());
+
+    // Check ba, should be all zero
+    for(long i = 0; i < ba.size(); i++) assertEquals(0, ba.readByte(i));
+
+    // Modify some arrays
+    ba1.writeByte(1, (byte) 20);
+
+    // Check again
+    assertEquals(0, ba.readByte(0));
+    assertEquals(ba1.readByte(1), ba.readByte(1));
+    assertEquals(0, ba.readByte(3));
+    assertEquals(0, ba.readByte(4));
+    assertEquals(0, ba.readByte(5));
+  }
+
   @DisplayName("Test invalid wrap calls")
   @SuppressWarnings("ConstantConditions")
   @TestFactory
@@ -430,68 +546,68 @@ class UtilityTest{
 
     // Create tests
     tests.add(dynamicTest("null primitive byte array", () -> {
-      IllegalArgumentException iae = assertThrows(IllegalArgumentException.class, () -> wrap((byte[]) null));
+      NullPointerException iae = assertThrows(NullPointerException.class, () -> wrap((byte[]) null));
       assertEquals("first element is null", iae.getMessage());
     }));
     tests.add(dynamicTest("null bytebuffer", () -> {
-      IllegalArgumentException iae = assertThrows(
-        IllegalArgumentException.class,
+      NullPointerException iae = assertThrows(
+              NullPointerException.class,
         () -> wrap((ByteBuffer) null)
       );
       assertEquals("first element is null", iae.getMessage());
     }));
     tests.add(dynamicTest("null primitive byte arrays", () -> {
-      IllegalArgumentException iae = assertThrows(
-        IllegalArgumentException.class,
+      NullPointerException iae = assertThrows(
+              NullPointerException.class,
         () -> wrap(null, (byte[]) null)
       );
       assertEquals("first element is null", iae.getMessage());
     }));
     tests.add(dynamicTest("null bytebuffers", () -> {
-      IllegalArgumentException iae = assertThrows(
-        IllegalArgumentException.class,
+      NullPointerException iae = assertThrows(
+              NullPointerException.class,
         () -> wrap(null, (ByteBuffer) null)
       );
       assertEquals("first element is null", iae.getMessage());
     }));
     tests.add(dynamicTest("some null primitive byte arrays variant 1", () -> {
-      IllegalArgumentException iae = assertThrows(
-        IllegalArgumentException.class,
+      NullPointerException iae = assertThrows(
+              NullPointerException.class,
         () -> wrap(new byte[2], null, null)
       );
       assertEquals("null elements in rest array", iae.getMessage());
     }));
     tests.add(dynamicTest("some null primitive byte arrays variant 2", () -> {
-      IllegalArgumentException iae = assertThrows(
-        IllegalArgumentException.class,
+      NullPointerException iae = assertThrows(
+              NullPointerException.class,
         () -> wrap(null, new byte[2])
       );
       assertEquals("first element is null", iae.getMessage());
     }));
     tests.add(dynamicTest("some null primitive byte arrays variant 3", () -> {
-      IllegalArgumentException iae = assertThrows(
-        IllegalArgumentException.class,
+      NullPointerException iae = assertThrows(
+              NullPointerException.class,
         () -> wrap(new byte[2], (byte[][]) null)
       );
       assertEquals("rest array is null", iae.getMessage());
     }));
     tests.add(dynamicTest("some null bytebuffers variant 1", () -> {
-      IllegalArgumentException iae = assertThrows(
-        IllegalArgumentException.class,
+      NullPointerException iae = assertThrows(
+              NullPointerException.class,
         () -> wrap(ByteBuffer.allocate(2), null, null)
       );
       assertEquals("null elements in rest array", iae.getMessage());
     }));
     tests.add(dynamicTest("some null bytebuffers variant 2", () -> {
-      IllegalArgumentException iae = assertThrows(
-        IllegalArgumentException.class,
+      NullPointerException iae = assertThrows(
+              NullPointerException.class,
         () -> wrap(null, ByteBuffer.allocate(2))
       );
       assertEquals("first element is null", iae.getMessage());
     }));
     tests.add(dynamicTest("some null bytebuffers variant 3", () -> {
-      IllegalArgumentException iae = assertThrows(
-        IllegalArgumentException.class,
+      NullPointerException iae = assertThrows(
+              NullPointerException.class,
         () -> wrap(ByteBuffer.allocate(2), (ByteBuffer[]) null)
       );
       assertEquals("rest array is null", iae.getMessage());
@@ -517,6 +633,28 @@ class UtilityTest{
       );
       assertEquals("ReadOnly ByteBuffer was passed in", iae.getMessage());
     }));
+    tests.add(dynamicTest("bytebuffer with zero length", () -> {
+      IllegalArgumentException iae = assertThrows(
+              IllegalArgumentException.class,
+              () -> {
+                var bb = ByteBuffer.allocate(2);
+                bb.limit(2);
+                bb.position(2);
+	              wrap(bb);
+              }
+      );
+      assertEquals("Buffer's position and limit markers amounts to zero length. This is not allowed", iae.getMessage());
+    }));
+    tests.add(dynamicTest("array with zero length", () -> {
+      IllegalArgumentException iae = assertThrows(
+              IllegalArgumentException.class,
+              () -> {
+                var arr = new byte[0];
+                wrap(arr);
+              }
+      );
+      assertEquals("The length of data is zero", iae.getMessage());
+    }));
 
     // Return tests
     return tests;
@@ -532,26 +670,26 @@ class UtilityTest{
 
     // Create tests
     tests.add(dynamicTest("null byte array (list)", () -> {
-      IllegalArgumentException iae = assertThrows(
-        IllegalArgumentException.class,
-        () -> ByteArray.combineReadableWritable(null)
+      NullPointerException iae = assertThrows(
+              NullPointerException.class,
+        () -> ByteArrays.combineReadableWritable(null)
       );
       assertEquals("ByteArrays list is null", iae.getMessage());
     }));
     tests.add(dynamicTest("null byte arrays (variadic)", () -> {
-      IllegalArgumentException iae = assertThrows(IllegalArgumentException.class, () -> combine(null, null));
+      NullPointerException iae = assertThrows(NullPointerException.class, () -> combine(null, null));
       assertEquals("first element is null", iae.getMessage());
     }));
     tests.add(dynamicTest("null readonly byte array (list)", () -> {
-      IllegalArgumentException iae = assertThrows(
-        IllegalArgumentException.class,
-        () -> ByteArray.combineReadOnly(null)
+      NullPointerException iae = assertThrows(
+              NullPointerException.class,
+        () -> combineReadOnly(null)
       );
       assertEquals("ByteArrays list is null", iae.getMessage());
     }));
     tests.add(dynamicTest("null readonly byte arrays (variadic)", () -> {
-      IllegalArgumentException iae = assertThrows(
-        IllegalArgumentException.class,
+      NullPointerException iae = assertThrows(
+              NullPointerException.class,
         () -> combine(null, null)
       );
       assertEquals("first element is null", iae.getMessage());
@@ -559,62 +697,62 @@ class UtilityTest{
     tests.add(dynamicTest("empty byte array list", () -> {
       IllegalArgumentException iae = assertThrows(
         IllegalArgumentException.class,
-        () -> ByteArray.combineReadableWritable(Collections.emptyList())
+        () -> ByteArrays.combineReadableWritable(Collections.emptyList())
       );
       assertEquals("ByteArrays list is empty", iae.getMessage());
     }));
     tests.add(dynamicTest("empty readonly byte array list", () -> {
       IllegalArgumentException iae = assertThrows(
         IllegalArgumentException.class,
-        () -> ByteArray.combineReadOnly(Collections.emptyList())
+        () -> combineReadOnly(Collections.emptyList())
       );
       assertEquals("ByteArrays list is empty", iae.getMessage());
     }));
     tests.add(dynamicTest("byte array list with some nulls variant 1", () -> {
-      IllegalArgumentException iae = assertThrows(
-        IllegalArgumentException.class,
-        () -> ByteArray.combineReadableWritable(Arrays.asList(wrap(new byte[1]), null))
+      NullPointerException iae = assertThrows(
+              NullPointerException.class,
+        () -> ByteArrays.combineReadableWritable(Arrays.asList(wrap(new byte[1]), null))
       );
       assertEquals("There is a null element in the ByteArray list", iae.getMessage());
     }));
     tests.add(dynamicTest("byte array list with some nulls variant 2", () -> {
-      IllegalArgumentException iae = assertThrows(
-        IllegalArgumentException.class,
-        () -> ByteArray.combineReadableWritable(Arrays.asList(null, wrap(new byte[1])))
+      NullPointerException iae = assertThrows(
+              NullPointerException.class,
+        () -> ByteArrays.combineReadableWritable(Arrays.asList(null, wrap(new byte[1])))
       );
       assertEquals("There is a null element in the ByteArray list", iae.getMessage());
     }));
     tests.add(dynamicTest("readonly byte array list with some nulls variant 1", () -> {
-      IllegalArgumentException iae = assertThrows(
-        IllegalArgumentException.class,
-        () -> ByteArray.combineReadOnly(Arrays.asList(wrap(new byte[1]), null))
+      NullPointerException iae = assertThrows(
+              NullPointerException.class,
+        () -> combineReadOnly(Arrays.asList(wrap(new byte[1]), null))
       );
       assertEquals("There is a null element in the ByteArray list", iae.getMessage());
     }));
     tests.add(dynamicTest("readonly byte array list with some nulls variant 2", () -> {
-      IllegalArgumentException iae = assertThrows(
-        IllegalArgumentException.class,
-        () -> ByteArray.combineReadOnly(Arrays.asList(null, wrap(new byte[1])))
+      NullPointerException iae = assertThrows(
+              NullPointerException.class,
+        () -> combineReadOnly(Arrays.asList(null, wrap(new byte[1])))
       );
       assertEquals("There is a null element in the ByteArray list", iae.getMessage());
     }));
     tests.add(dynamicTest("byte array variadic with some nulls variant 1", () -> {
-      IllegalArgumentException iae = assertThrows(
-        IllegalArgumentException.class,
+      NullPointerException iae = assertThrows(
+              NullPointerException.class,
         () -> combine(wrap(new byte[1]), null, wrap(new byte[1]))
       );
       assertEquals("second element is null", iae.getMessage());
     }));
     tests.add(dynamicTest("byte array variadic with some nulls variant 2", () -> {
-      IllegalArgumentException iae = assertThrows(
-        IllegalArgumentException.class,
+      NullPointerException iae = assertThrows(
+              NullPointerException.class,
         () -> combine(null, wrap(new byte[1]), wrap(new byte[1]))
       );
       assertEquals("first element is null", iae.getMessage());
     }));
     tests.add(dynamicTest("byte array variadic with some nulls variant 3", () -> {
-      IllegalArgumentException iae = assertThrows(
-        IllegalArgumentException.class,
+      NullPointerException iae = assertThrows(
+              NullPointerException.class,
         () -> combine(
           wrap(new byte[1]),
           wrap(new byte[1]),
@@ -625,8 +763,8 @@ class UtilityTest{
       assertEquals("null elements in rest array", iae.getMessage());
     }));
     tests.add(dynamicTest("byte array variadic with some nulls variant 4", () -> {
-      IllegalArgumentException iae = assertThrows(
-        IllegalArgumentException.class,
+      NullPointerException iae = assertThrows(
+              NullPointerException.class,
         () -> combine(
           wrap(new byte[1]),
           wrap(new byte[1]),
@@ -636,22 +774,22 @@ class UtilityTest{
       assertEquals("rest array is null", iae.getMessage());
     }));
     tests.add(dynamicTest("readonly byte array variadic with some nulls variant 1", () -> {
-      IllegalArgumentException iae = assertThrows(
-        IllegalArgumentException.class,
+      NullPointerException iae = assertThrows(
+              NullPointerException.class,
         () -> combine(wrap(new byte[1]).toReadOnly(), null, wrap(new byte[1]))
       );
       assertEquals("second element is null", iae.getMessage());
     }));
     tests.add(dynamicTest("readonly byte array variadic with some nulls variant 2", () -> {
-      IllegalArgumentException iae = assertThrows(
-        IllegalArgumentException.class,
+      NullPointerException iae = assertThrows(
+              NullPointerException.class,
         () -> combine(null, wrap(new byte[1]), wrap(new byte[1]).toReadOnly())
       );
       assertEquals("first element is null", iae.getMessage());
     }));
     tests.add(dynamicTest("readonly byte array variadic with some nulls variant 3", () -> {
-      IllegalArgumentException iae = assertThrows(
-        IllegalArgumentException.class,
+      NullPointerException iae = assertThrows(
+              NullPointerException.class,
         () -> combine(
           wrap(new byte[1]),
           wrap(new byte[1]).toReadOnly(),
@@ -662,8 +800,8 @@ class UtilityTest{
       assertEquals("null elements in rest array", iae.getMessage());
     }));
     tests.add(dynamicTest("readonly byte array variadic with some nulls variant 4", () -> {
-      IllegalArgumentException iae = assertThrows(
-        IllegalArgumentException.class,
+      NullPointerException iae = assertThrows(
+              NullPointerException.class,
         () -> combine(
           wrap(new byte[1]).toReadOnly(),
           wrap(new byte[1]),
@@ -671,6 +809,12 @@ class UtilityTest{
         )
       );
       assertEquals("rest array is null", iae.getMessage());
+    }));
+    tests.add(dynamicTest("readonly byte array list with a single null", () -> {
+      NullPointerException iae = assertThrows(
+              NullPointerException.class, () -> combineReadOnly(Collections.singletonList((ReadableWritableByteArray) null))
+      );
+      assertEquals("There is a null element in the ByteArray list", iae.getMessage());
     }));
 
     // Return tests

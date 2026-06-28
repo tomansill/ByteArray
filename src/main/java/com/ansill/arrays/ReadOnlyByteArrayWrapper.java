@@ -3,7 +3,7 @@ package com.ansill.arrays;
 import javax.annotation.Nonnull;
 
 /** Wrapper that wraps ReadableWritableByteArray into ReadOnlyByteArray that will lock out any accesses that is not related to reading */
-class ReadOnlyByteArrayWrapper implements ReadOnlyByteArray{
+final class ReadOnlyByteArrayWrapper implements ReadOnlyByteArray{
 
   /** Original ByteArray */
   @Nonnull

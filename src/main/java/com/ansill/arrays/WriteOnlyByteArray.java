@@ -8,7 +8,7 @@ import static com.ansill.arrays.IndexingUtility.checkWrite;
 /**
  * Write-only interface of {@link ByteArray}
  * <p>
- * {@link WriteOnlyByteArray} provides a write-only access of {@link ReadableWritableByteArray}.
+ * {@link WriteOnlyByteArray} provides write-only access of {@link ReadableWritableByteArray}.
  */
 public interface WriteOnlyByteArray extends ByteArray{
 
