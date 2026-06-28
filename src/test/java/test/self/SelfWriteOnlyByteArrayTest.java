@@ -8,7 +8,6 @@ import com.ansill.arrays.ReadableWritableByteArray;
 import com.ansill.arrays.WriteOnlyByteArray;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.DynamicTest;
-import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestFactory;
 import test.BaseWriteOnlyByteArrayTest;
 import test.arrays.TestOnlyByteArray;
@@ -28,13 +27,11 @@ import java.util.stream.IntStream;
 import static com.ansill.arrays.TestUtility.f;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.fail;
-import static org.junit.jupiter.api.Assumptions.assumeTrue;
 import static org.junit.jupiter.api.DynamicTest.dynamicTest;
 
-public interface SelfWriteOnlyByteArrayTest extends BaseWriteOnlyByteArrayTest{
+public interface SelfWriteOnlyByteArrayTest extends BaseWriteOnlyByteArrayTest, SelfByteArrayTest{
 
   @Nonnull
   static Iterable<DynamicTest> generateTestsInvalidWriteCallsByteArray(
@@ -63,6 +60,58 @@ public interface SelfWriteOnlyByteArrayTest extends BaseWriteOnlyByteArrayTest{
 
       // Test-local RNG
       int testLocalRNG = rng.nextInt();
+
+      // Test null bytearray
+      tests.add(dynamicTest(
+              f("test write(0, null) on ByteArray of {}B size", selfSize),
+              () -> {
+
+                // Wrap in try to make sure memory gets cleaned up
+                try{
+
+                  // Allocate test array
+                  WriteOnlyByteArray testArray = testWOBAAllocator.apply(selfSize);
+
+                  // Assert readonly if applicable
+                  if(!isReadableWritableOk) assertFalse(testArray instanceof ReadableWritableByteArray);
+
+                  // Try and finally to clean up test array
+                  try{
+
+                    // Build the expected exception
+                    IllegalArgumentException expected = assertThrows(
+                            IllegalArgumentException.class,
+                            () -> IndexingUtility.checkWrite(0, null, selfSize)
+                    );
+
+                    // Test it
+	                  //noinspection DataFlowIssue
+                    IllegalArgumentException actual = assertThrows(
+                            IllegalArgumentException.class,
+                            () -> testArray.write(0, null)
+                    );
+
+                    // Compare messages
+                    assertEquals(expected.getMessage(), actual.getMessage());
+
+                    // Check testArray for any side effects
+                    for(long i = 0; i < testArray.size(); i++){
+                      assertEquals((byte) 0, testBAReaderFun.apply(testArray, i));
+                    }
+
+                  }finally{
+                    testWOBACleanerConsumer.accept(testArray);
+                  }
+                }catch(OutOfMemoryError oom){
+                  System.gc();
+                  oom.printStackTrace();
+                  fail("Cannot perform test due to insufficient memory space");
+                }
+
+                // Clean up
+                System.gc();
+              }
+      ));
 
       // Test too-large bytearray
       tests.add(dynamicTest(
@@ -299,27 +348,13 @@ public interface SelfWriteOnlyByteArrayTest extends BaseWriteOnlyByteArrayTest{
     return tests;
   }
 
-  @DisplayName("Test toString()")
-  @Test
-  default void testToString(){
-
-    // Simple toString test
-    WriteOnlyByteArray testByteArray = createTestWriteOnlyByteArray(1);
-
-    // ToString it
-    assertNotNull(testByteArray.toString());
-
-    assumeTrue(false, "redo me");
-
-  }
-
   @DisplayName("Test invalid write(long, ReadOnlyByteArray) calls")
   @TestFactory
   default Iterable<DynamicTest> testInvalidWriteCallsReadOnlyByteArray(){
     return generateTestsInvalidWriteCallsByteArray(
       this.getRNG(),
       "WriteOnlyByteArray",
-      this::readTestWriteOnlyByteArray,
+      this::readTestByteArray,
       this::createTestWriteOnlyByteArray,
       this::cleanTestByteArray,
       this.isReadableWritableOK()
@@ -332,7 +367,7 @@ public interface SelfWriteOnlyByteArrayTest extends BaseWriteOnlyByteArrayTest{
     return generateTestsInvalidWriteCallsByteArray(
       this.getRNG(),
       "ReadableWritableByteArray",
-      this::readTestWriteOnlyByteArray,
+      this::readTestByteArray,
       this::createTestWriteOnlyByteArray,
       this::cleanTestByteArray,
       this.isReadableWritableOK()
@@ -414,7 +449,7 @@ public interface SelfWriteOnlyByteArrayTest extends BaseWriteOnlyByteArrayTest{
 
                 // Check it (slow, I know)
                 for(int i = 0; i < controlOne.size(); i++){
-                  byte testVal = readTestWriteOnlyByteArray(testByteArray, i);
+                  byte testVal = readTestByteArray(testByteArray, i);
                   if(written.contains(i)) assertEquals(controlOne.readByte(i), testVal);
                   else assertEquals(0, testVal);
                 }
@@ -454,7 +489,7 @@ public interface SelfWriteOnlyByteArrayTest extends BaseWriteOnlyByteArrayTest{
 
                 // Check it (slow, I know)
                 for(int i = 0; i < controlOne.size(); i++){
-                  byte testVal = readTestWriteOnlyByteArray(testByteArray, i);
+                  byte testVal = readTestByteArray(testByteArray, i);
                   if(written.contains(i)) assertEquals(controlTwo.readByte(i), testVal);
                   else assertEquals(controlOne.readByte(i), testVal);
                 }
@@ -561,7 +596,7 @@ public interface SelfWriteOnlyByteArrayTest extends BaseWriteOnlyByteArrayTest{
 
                 // Check it (slow, I know)
                 for(int i = 0; i < controlOne.size(); i++){
-                  byte testVal = readTestWriteOnlyByteArray(testByteArray, i);
+                  byte testVal = readTestByteArray(testByteArray, i);
                   if(written.contains(i)) assertEquals(controlOne.readByte(i), testVal);
                   else assertEquals(0, testVal);
                 }
@@ -606,7 +641,7 @@ public interface SelfWriteOnlyByteArrayTest extends BaseWriteOnlyByteArrayTest{
 
                 // Check it (slow, I know)
                 for(int i = 0; i < controlOne.size(); i++){
-                  byte testVal = readTestWriteOnlyByteArray(testByteArray, i);
+                  byte testVal = readTestByteArray(testByteArray, i);
                   if(written.contains(i)) assertEquals(controlTwo.readByte(i), testVal);
                   else assertEquals(controlOne.readByte(i), testVal);
                 }
@@ -717,7 +752,7 @@ public interface SelfWriteOnlyByteArrayTest extends BaseWriteOnlyByteArrayTest{
 
                 // Check it (slow, I know)
                 for(int i = 0; i < controlOne.size(); i++){
-                  byte testVal = readTestWriteOnlyByteArray(testByteArray, i);
+                  byte testVal = readTestByteArray(testByteArray, i);
                   if(written.contains(i)) assertEquals(controlOne.readByte(i), testVal);
                   else assertEquals(0, testVal);
                 }
@@ -766,7 +801,7 @@ public interface SelfWriteOnlyByteArrayTest extends BaseWriteOnlyByteArrayTest{
 
                 // Check it (slow, I know)
                 for(int i = 0; i < controlOne.size(); i++){
-                  byte testVal = readTestWriteOnlyByteArray(testByteArray, i);
+                  byte testVal = readTestByteArray(testByteArray, i);
                   if(written.contains(i)) assertEquals(controlTwo.readByte(i), testVal);
                   else assertEquals(controlOne.readByte(i), testVal);
                 }
@@ -885,7 +920,7 @@ public interface SelfWriteOnlyByteArrayTest extends BaseWriteOnlyByteArrayTest{
 
                 // Check it (slow, I know)
                 for(int i = 0; i < controlOne.size(); i++){
-                  byte testVal = readTestWriteOnlyByteArray(testByteArray, i);
+                  byte testVal = readTestByteArray(testByteArray, i);
                   if(written.contains(i)) assertEquals(controlOne.readByte(i), testVal);
                   else assertEquals(0, testVal);
                 }
@@ -942,7 +977,7 @@ public interface SelfWriteOnlyByteArrayTest extends BaseWriteOnlyByteArrayTest{
 
                 // Check it (slow, I know)
                 for(int i = 0; i < controlOne.size(); i++){
-                  byte testVal = readTestWriteOnlyByteArray(testByteArray, i);
+                  byte testVal = readTestByteArray(testByteArray, i);
                   if(written.contains(i)) assertEquals(controlTwo.readByte(i), testVal);
                   else assertEquals(controlOne.readByte(i), testVal);
                 }
@@ -1055,7 +1090,7 @@ public interface SelfWriteOnlyByteArrayTest extends BaseWriteOnlyByteArrayTest{
 
                 // Check it (slow, I know)
                 for(int i = 0; i < controlOne.size(); i++){
-                  byte testVal = readTestWriteOnlyByteArray(testByteArray, i);
+                  byte testVal = readTestByteArray(testByteArray, i);
                   if(written.contains(i)) assertEquals(controlOne.readByte(i), testVal);
                   else assertEquals(0, testVal);
                 }
@@ -1105,7 +1140,7 @@ public interface SelfWriteOnlyByteArrayTest extends BaseWriteOnlyByteArrayTest{
 
                 // Check it (slow, I know)
                 for(int i = 0; i < controlOne.size(); i++){
-                  byte testVal = readTestWriteOnlyByteArray(testByteArray, i);
+                  byte testVal = readTestByteArray(testByteArray, i);
                   if(written.contains(i)) assertEquals(controlTwo.readByte(i), testVal);
                   else assertEquals(controlOne.readByte(i), testVal);
                 }
@@ -1226,7 +1261,7 @@ public interface SelfWriteOnlyByteArrayTest extends BaseWriteOnlyByteArrayTest{
 
                 // Check it (slow, I know)
                 for(int i = 0; i < controlOne.size(); i++){
-                  byte testVal = readTestWriteOnlyByteArray(testByteArray, i);
+                  byte testVal = readTestByteArray(testByteArray, i);
                   if(written.contains(i)) assertEquals(controlOne.readByte(i), testVal);
                   else assertEquals(0, testVal);
                 }
@@ -1285,7 +1320,7 @@ public interface SelfWriteOnlyByteArrayTest extends BaseWriteOnlyByteArrayTest{
 
                 // Check it (slow, I know)
                 for(int i = 0; i < controlOne.size(); i++){
-                  byte testVal = readTestWriteOnlyByteArray(testByteArray, i);
+                  byte testVal = readTestByteArray(testByteArray, i);
                   if(written.contains(i)) assertEquals(controlTwo.readByte(i), testVal);
                   else assertEquals(controlOne.readByte(i), testVal);
                 }
@@ -2962,7 +2997,7 @@ public interface SelfWriteOnlyByteArrayTest extends BaseWriteOnlyByteArrayTest{
             if(index < byteIndex || index >= byteIndex + subSize) continue;
             assertEquals(
                     expected,
-                    readTestWriteOnlyByteArray(subset, innerByteIndex),
+                    readTestByteArray(subset, innerByteIndex),
                     "Index: " + innerByteIndex
             );
             innerByteIndex++;
@@ -2985,7 +3020,7 @@ public interface SelfWriteOnlyByteArrayTest extends BaseWriteOnlyByteArrayTest{
           for(long index = 0; index < size; index++){
             byte expected = (byte) testRNG.nextInt();
             if(index >= byteIndex && index < byteIndex + subSize) expected = (byte) altRNG.nextInt();
-            assertEquals(expected, readTestWriteOnlyByteArray(testByteArray, index), "Index: " + index);
+            assertEquals(expected, readTestByteArray(testByteArray, index), "Index: " + index);
           }
         }
 

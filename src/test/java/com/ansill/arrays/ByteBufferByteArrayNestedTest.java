@@ -1,11 +1,15 @@
 package com.ansill.arrays;
 
+import org.jspecify.annotations.NonNull;
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.DynamicTest;
 import org.junit.jupiter.api.Nested;
+import org.junit.jupiter.api.TestFactory;
 import test.BaseByteArrayTest;
 import test.other.ReadOnlyByteArrayWithOtherByteArrayTest;
 import test.other.ReadableWritableByteArrayWithOtherByteArrayTest;
 import test.other.WriteOnlyByteArrayWithOtherByteArrayTest;
+import test.self.SelfByteArrayTest;
 import test.self.SelfReadOnlyByteArrayTest;
 import test.self.SelfReadableWritableByteArrayTest;
 import test.self.SelfWriteOnlyByteArrayTest;
@@ -18,27 +22,22 @@ public class ByteBufferByteArrayNestedTest{
 
   public abstract static class ByteBufferByteArrayTest implements BaseByteArrayTest{
 
-    public byte readTestWriteOnlyByteArray(@Nonnull WriteOnlyByteArray testByteArray, long byteIndex){
-
-      // Check if wrapper, unwrap it
-      while(testByteArray instanceof WriteOnlyByteArrayWrapper){
-        testByteArray = ((WriteOnlyByteArrayWrapper) testByteArray).original;
-      }
-
-      // Check if it's ours
-      if(!(testByteArray instanceof ByteBufferByteArray)){
-        throw new IllegalArgumentException("Not bytebuffer byte array. Actual: " + testByteArray.getClass().getName());
-      }
-
-      // Read
-      return ((ByteBufferByteArray) testByteArray).readByte(byteIndex);
+    @Override
+    public @NonNull String getExpectedToStringClassName() {
+      return "ByteBufferByteArray";
     }
 
-    public void writeTestReadOnlyByteArray(@Nonnull ReadOnlyByteArray testByteArray, long byteIndex, byte value){
+    @Override
+    public void writeTestByteArray(@NonNull ByteArray testByteArray, long byteIndex, byte value) {
 
       // Check if wrapper, unwrap it
-      while(testByteArray instanceof ReadOnlyByteArrayWrapper){
-        testByteArray = ((ReadOnlyByteArrayWrapper) testByteArray).original;
+      while(testByteArray instanceof  ReadOnlyByteArrayWrapper || testByteArray instanceof  WriteOnlyByteArrayWrapper){
+        while(testByteArray instanceof ReadOnlyByteArrayWrapper){
+          testByteArray = ((ReadOnlyByteArrayWrapper) testByteArray).original;
+        }
+        while(testByteArray instanceof WriteOnlyByteArrayWrapper){
+          testByteArray = ((WriteOnlyByteArrayWrapper) testByteArray).original;
+        }
       }
 
       // Check if it's ours
@@ -48,6 +47,28 @@ public class ByteBufferByteArrayNestedTest{
 
       // Update
       ((ByteBufferByteArray) testByteArray).writeByte((int) byteIndex, value);
+    }
+
+    @Override
+    public byte readTestByteArray(@NonNull ByteArray testByteArray, long byteIndex) {
+
+      // Check if wrapper, unwrap it
+      while(testByteArray instanceof  ReadOnlyByteArrayWrapper || testByteArray instanceof  WriteOnlyByteArrayWrapper){
+        while(testByteArray instanceof ReadOnlyByteArrayWrapper){
+          testByteArray = ((ReadOnlyByteArrayWrapper) testByteArray).original;
+        }
+        while(testByteArray instanceof WriteOnlyByteArrayWrapper){
+          testByteArray = ((WriteOnlyByteArrayWrapper) testByteArray).original;
+        }
+      }
+
+      // Check if it's ours
+      if(!(testByteArray instanceof ByteBufferByteArray)){
+        throw new IllegalArgumentException("Not bytebuffer byte array. Actual: " + testByteArray.getClass().getName());
+      }
+
+      // Read
+      return ((ByteBufferByteArray) testByteArray).readByte(byteIndex);
     }
 
     @Nonnull
@@ -79,6 +100,22 @@ public class ByteBufferByteArrayNestedTest{
     @DisplayName("ReadOnly test")
     public class ReadOnlyByteBufferByteArrayTest extends ByteBufferByteArrayTest implements SelfReadOnlyByteArrayTest{
 
+      @Override
+      @TestFactory
+      @DisplayName("Test toString()")
+      public Iterable<DynamicTest> testToString() {
+        return SelfByteArrayTest.generateTestsToString(
+                getRNG(),
+                "ReadOnlyByteArray",
+                getToStringPerformanceLimit(),
+                getExpectedToStringClassName(),
+                this::createTestReadOnlyByteArray,
+                this::writeTestByteArray,
+                this::readTestByteArray,
+                this::cleanTestByteArray,
+                this.isReadableWritableOK()
+        );
+      }
     }
 
     @Nested
@@ -137,6 +174,22 @@ public class ByteBufferByteArrayNestedTest{
     @DisplayName("WriteOnly test")
     public class WriteOnlyByteBufferByteArrayTest extends ByteBufferByteArrayTest implements SelfWriteOnlyByteArrayTest{
 
+      @Override
+      @TestFactory
+      @DisplayName("Test toString()")
+      public Iterable<DynamicTest> testToString() {
+        return SelfByteArrayTest.generateTestsToString(
+                getRNG(),
+                "WriteOnlyByteArray",
+                getToStringPerformanceLimit(),
+                getExpectedToStringClassName(),
+                this::createTestWriteOnlyByteArray,
+                this::writeTestByteArray,
+                this::readTestByteArray,
+                this::cleanTestByteArray,
+                this.isReadableWritableOK()
+        );
+      }
     }
 
     @Nested
@@ -190,7 +243,6 @@ public class ByteBufferByteArrayNestedTest{
   @DisplayName("ReadableWritable Tests")
   public class ReadableWritableTests{
 
-
     @Nested
     @DisplayName("ReadableWritable test")
     public class ReadableWritableByteBufferByteArrayTest extends ByteBufferByteArrayTest
@@ -209,6 +261,23 @@ public class ByteBufferByteArrayNestedTest{
       @Override
       public boolean isReadableWritableOK(){
         return true;
+      }
+
+      @Override
+      @TestFactory
+      @DisplayName("Test toString()")
+      public Iterable<DynamicTest> testToString() {
+        return SelfByteArrayTest.generateTestsToString(
+                getRNG(),
+                "ReadableWritableByteArray",
+                getToStringPerformanceLimit(),
+                getExpectedToStringClassName(),
+                this::createTestReadableWritableByteArray,
+                this::writeTestByteArray,
+                this::readTestByteArray,
+                this::cleanTestByteArray,
+                this.isReadableWritableOK()
+        );
       }
     }
 
@@ -246,17 +315,7 @@ public class ByteBufferByteArrayNestedTest{
       implements
       ReadableWritableByteArrayWithOtherByteArrayTest{
 
-      @Nonnull
-      public ReadOnlyByteArray createTestReadOnlyByteArray(long size){
-        return createTestReadableWritableByteArray(size);
-      }
-
-      @Nonnull
-      public WriteOnlyByteArray createTestWriteOnlyByteArray(long size){
-        return createTestReadableWritableByteArray(size);
-      }
-
-      @Override
+	    @Override
       public boolean isReadableWritableOK(){
         return true;
       }

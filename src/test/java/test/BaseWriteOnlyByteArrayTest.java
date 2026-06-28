@@ -11,8 +11,6 @@ public interface BaseWriteOnlyByteArrayTest extends BaseByteArrayTest{
   @Nonnull
   WriteOnlyByteArray createTestWriteOnlyByteArray(@Nonnegative long size);
 
-  byte readTestWriteOnlyByteArray(@Nonnull WriteOnlyByteArray testByteArray, @Nonnegative long byteIndex);
-
   @Nonnull
   @Override
   default ByteArray createTestByteArray(long size){

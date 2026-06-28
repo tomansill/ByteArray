@@ -14,7 +14,7 @@ import static com.ansill.arrays.IndexingUtility.checkSubsetOf;
 import static com.ansill.arrays.IndexingUtility.checkWrite;
 
 /** {@link ReadableWritableByteArray} implementation using {@link ByteBuffer} as the backing data */
-final class ByteBufferByteArray implements ReadableWritableByteArray{
+final class ByteBufferByteArray implements ReadableWritableByteArray, ReadOnlyByteArray, WriteOnlyByteArray{
 
   /** Logger */
   private static final Logger LOGGER = LoggerFactory.getLogger(ByteBufferByteArray.class);

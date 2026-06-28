@@ -83,7 +83,7 @@ public interface SelfWriteOnlyByteArray64BitTest extends SelfWriteOnlyByteArrayT
           // Check it
           assertEquals(
             value,
-            assertDoesNotThrow(() -> readTestWriteOnlyByteArray(testByteArray, byteIndex)),
+            assertDoesNotThrow(() -> readTestByteArray(testByteArray, byteIndex)),
             "Index: " + byteIndex
           );
 

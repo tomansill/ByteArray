@@ -410,7 +410,7 @@ public interface ReadOnlyByteArrayWithOtherByteArrayTest extends BaseReadOnlyByt
     return generateValidSubsetOfByteArrayTests(
       getRNG(),
       "WriteOnlyByteArray",
-      this::writeTestReadOnlyByteArray,
+      this::writeTestByteArray,
       this::createTestReadOnlyByteArray,
       this::cleanTestByteArray,
       this::createControlReadableWritable,
@@ -426,7 +426,7 @@ public interface ReadOnlyByteArrayWithOtherByteArrayTest extends BaseReadOnlyByt
     return generateValidSubsetOfByteArrayTests(
       getRNG(),
       "ReadableWritableByteArray",
-      this::writeTestReadOnlyByteArray,
+      this::writeTestByteArray,
       this::createTestReadOnlyByteArray,
       this::cleanTestByteArray,
       this::createControlReadableWritable,
@@ -442,7 +442,7 @@ public interface ReadOnlyByteArrayWithOtherByteArrayTest extends BaseReadOnlyByt
     return generateReadByteArrayTests(
       getRNG(),
       "WriteOnlyByteArray",
-      this::writeTestReadOnlyByteArray,
+      this::writeTestByteArray,
       this::createTestReadOnlyByteArray,
       this::cleanTestByteArray,
       this::createControlReadableWritable,
@@ -458,7 +458,7 @@ public interface ReadOnlyByteArrayWithOtherByteArrayTest extends BaseReadOnlyByt
     return generateReadByteArrayTests(
       getRNG(),
       "ReadableWritableByteArray",
-      this::writeTestReadOnlyByteArray,
+      this::writeTestByteArray,
       this::createTestReadOnlyByteArray,
       this::cleanTestByteArray,
       this::createControlReadableWritable,

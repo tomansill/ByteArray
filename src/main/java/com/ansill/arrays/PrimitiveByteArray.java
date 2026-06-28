@@ -13,7 +13,7 @@ import static com.ansill.arrays.IndexingUtility.checkSubsetOf;
 import static com.ansill.arrays.IndexingUtility.checkWrite;
 
 /** {@link ReadableWritableByteArray} implementation using primitive byte array as backing data */
-final class PrimitiveByteArray implements ReadableWritableByteArray, ReadOnlyByteArray{
+final class PrimitiveByteArray implements ReadableWritableByteArray, ReadOnlyByteArray, WriteOnlyByteArray{
 
   /** Logger */
   private static final Logger LOGGER = LoggerFactory.getLogger(PrimitiveByteArray.class);

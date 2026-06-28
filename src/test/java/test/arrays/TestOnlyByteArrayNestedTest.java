@@ -6,12 +6,16 @@ import com.ansill.arrays.ReadOnlyByteArray;
 import com.ansill.arrays.ReadableWritableByteArray;
 import com.ansill.arrays.TestUtility;
 import com.ansill.arrays.WriteOnlyByteArray;
+import org.jspecify.annotations.NonNull;
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.DynamicTest;
 import org.junit.jupiter.api.Nested;
+import org.junit.jupiter.api.TestFactory;
 import test.BaseByteArrayTest;
 import test.BaseReadableWritableByteArrayTest;
 import test.other.ReadOnlyByteArrayWithOtherByteArrayTest;
 import test.other.WriteOnlyByteArrayWithOtherByteArrayTest;
+import test.self.SelfByteArrayTest;
 import test.self.SelfReadOnlyByteArray64BitTest;
 import test.self.SelfReadableWritableByteArray64BitTest;
 import test.self.SelfWriteOnlyByteArray64BitTest;
@@ -21,10 +25,15 @@ import javax.annotation.Nonnull;
 @DisplayName("TestOnlyByteArray Test Suite")
 public class TestOnlyByteArrayNestedTest{
 
-  public interface TestOnlyByteArrayTest extends BaseByteArrayTest{
+  public abstract static class TestOnlyByteArrayTest implements BaseByteArrayTest{
 
     @Override
-    default void cleanTestByteArray(@Nonnull ByteArray byteArray){
+    public @NonNull String getExpectedToStringClassName() {
+      return "TestOnlyByteArray";
+    }
+
+    @Override
+    public void cleanTestByteArray(@Nonnull ByteArray byteArray){
 
       // Save size
       long size = byteArray.size();
@@ -39,21 +48,22 @@ public class TestOnlyByteArrayNestedTest{
       if(size >= (Integer.MAX_VALUE * 0.5)) System.out.println("Cleared away " + size + "B");
     }
 
-  }
-
-  @Nested
-  @DisplayName("ReadOnly test")
-  public class ReadOnlyTestOnlyByteArrayTest
-    implements SelfReadOnlyByteArray64BitTest, TestOnlyByteArrayTest, ReadOnlyByteArrayWithOtherByteArrayTest{
-
-    @Nonnull
     @Override
-    public ReadOnlyByteArray createTestReadOnlyByteArray(long size){
-      return new TestOnlyByteArray(size);
+    public byte readTestByteArray(@NonNull ByteArray testByteArray, long byteIndex) {
+
+      // Check if TestByteArray
+      if(!(testByteArray instanceof TestOnlyByteArray)) throw new RuntimeException();
+
+      // Write
+      try{
+        return ((TestOnlyByteArray) testByteArray).readByte(byteIndex);
+      }catch(ByteArrayIndexOutOfBoundsException e){
+        throw new RuntimeException(e);
+      }
     }
 
     @Override
-    public void writeTestReadOnlyByteArray(@Nonnull ReadOnlyByteArray testByteArray, long byteIndex, byte value){
+    public void writeTestByteArray(@Nonnull ByteArray testByteArray, long byteIndex, byte value){
 
       // Check if TestByteArray
       if(!(testByteArray instanceof TestOnlyByteArray)) throw new RuntimeException();
@@ -65,17 +75,45 @@ public class TestOnlyByteArrayNestedTest{
         throw new RuntimeException(e);
       }
     }
+  }
+
+  @Nested
+  @DisplayName("ReadOnly test")
+  public class ReadOnlyTestOnlyByteArrayTest extends TestOnlyByteArrayTest
+    implements SelfReadOnlyByteArray64BitTest, ReadOnlyByteArrayWithOtherByteArrayTest{
+
+    @Override
+    @TestFactory
+    @DisplayName("Test toString()")
+    public Iterable<DynamicTest> testToString() {
+      return SelfByteArrayTest.generateTestsToString(
+              getRNG(),
+              "ReadOnlyByteArray",
+              getToStringPerformanceLimit(),
+              getExpectedToStringClassName(),
+              this::createTestReadOnlyByteArray,
+              this::writeTestByteArray,
+              this::readTestByteArray,
+              this::cleanTestByteArray,
+              this.isReadableWritableOK()
+      );
+    }
 
     @Override
     public boolean isReadableWritableOK(){
       return true;
     }
+
+    @Override
+    public @NonNull ReadOnlyByteArray createTestReadOnlyByteArray(long size) {
+      return new TestOnlyByteArray(size);
+    }
   }
 
   @Nested
   @DisplayName("WriteOnly test")
-  public class WriteOnlyTestOnlyByteArrayTest
-    implements SelfWriteOnlyByteArray64BitTest, TestOnlyByteArrayTest, WriteOnlyByteArrayWithOtherByteArrayTest{
+  public class WriteOnlyTestOnlyByteArrayTest extends TestOnlyByteArrayTest
+    implements SelfWriteOnlyByteArray64BitTest, WriteOnlyByteArrayWithOtherByteArrayTest{
 
     @Override
     public boolean isReadableWritableOK(){
@@ -87,30 +125,48 @@ public class TestOnlyByteArrayNestedTest{
     public WriteOnlyByteArray createTestWriteOnlyByteArray(long size){
       return new TestOnlyByteArray(size).toWriteOnly();
     }
-
     @Override
-    public byte readTestWriteOnlyByteArray(@Nonnull WriteOnlyByteArray testByteArray, long byteIndex){
-
-      // Check if TestByteArray
-      if(!(testByteArray instanceof TestOnlyByteArray)) throw new RuntimeException();
-
-      // Write
-      try{
-        return ((TestOnlyByteArray) testByteArray).readByte(byteIndex);
-      }catch(ByteArrayIndexOutOfBoundsException e){
-        throw new RuntimeException(e);
-      }
+    @TestFactory
+    @DisplayName("Test toString()")
+    public Iterable<DynamicTest> testToString() {
+      return SelfByteArrayTest.generateTestsToString(
+              getRNG(),
+              "WriteOnlyByteArray",
+              getToStringPerformanceLimit(),
+              getExpectedToStringClassName(),
+              this::createTestWriteOnlyByteArray,
+              this::writeTestByteArray,
+              this::readTestByteArray,
+              this::cleanTestByteArray,
+              this.isReadableWritableOK()
+      );
     }
   }
 
   @Nested
   @DisplayName("ReadableWritable test")
-  public class ReadableWritableByteArrayTest
-    implements TestOnlyByteArrayTest, BaseReadableWritableByteArrayTest, SelfReadableWritableByteArray64BitTest{
+  public class ReadableWritableByteArrayTest extends TestOnlyByteArrayTest
+    implements BaseReadableWritableByteArrayTest, SelfReadableWritableByteArray64BitTest{
 
     @Override
     public boolean isReadableWritableOK(){
       return true;
+    }
+    @Override
+    @TestFactory
+    @DisplayName("Test toString()")
+    public Iterable<DynamicTest> testToString() {
+      return SelfByteArrayTest.generateTestsToString(
+              getRNG(),
+              "ReadableWritableByteArray",
+              getToStringPerformanceLimit(),
+              getExpectedToStringClassName(),
+              this::createTestReadableWritableByteArray,
+              this::writeTestByteArray,
+              this::readTestByteArray,
+              this::cleanTestByteArray,
+              this.isReadableWritableOK()
+      );
     }
 
     @Nonnull
@@ -119,32 +175,5 @@ public class TestOnlyByteArrayNestedTest{
       return new TestOnlyByteArray(size);
     }
 
-    @Override
-    public byte readTestWriteOnlyByteArray(@Nonnull WriteOnlyByteArray testByteArray, long byteIndex){
-
-      // Check if TestByteArray
-      if(!(testByteArray instanceof TestOnlyByteArray)) throw new RuntimeException();
-
-      // Write
-      try{
-        return ((TestOnlyByteArray) testByteArray).readByte(byteIndex);
-      }catch(ByteArrayIndexOutOfBoundsException e){
-        throw new RuntimeException(e);
-      }
     }
-
-    @Override
-    public void writeTestReadOnlyByteArray(@Nonnull ReadOnlyByteArray testByteArray, long byteIndex, byte value){
-
-      // Check if TestByteArray
-      if(!(testByteArray instanceof TestOnlyByteArray)) throw new RuntimeException();
-
-      // Write
-      try{
-        ((TestOnlyByteArray) testByteArray).writeByte(byteIndex, value);
-      }catch(ByteArrayIndexOutOfBoundsException e){
-        throw new RuntimeException(e);
-      }
-    }
-  }
 }

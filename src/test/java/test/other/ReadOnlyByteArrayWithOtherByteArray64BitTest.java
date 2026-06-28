@@ -122,7 +122,7 @@ public interface ReadOnlyByteArrayWithOtherByteArray64BitTest extends BaseReadOn
   default void testReadWriteOnly64(){
     testReadOn64BitData(
       getRNG(),
-      this::writeTestReadOnlyByteArray,
+      this::writeTestByteArray,
       this::createTestReadOnlyByteArray,
       this::cleanTestByteArray,
       this::createControlReadableWritable,
@@ -137,7 +137,7 @@ public interface ReadOnlyByteArrayWithOtherByteArray64BitTest extends BaseReadOn
   default void testReadReadableWritable64(){
     testReadOn64BitData(
       getRNG(),
-      this::writeTestReadOnlyByteArray,
+      this::writeTestByteArray,
       this::createTestReadOnlyByteArray,
       this::cleanTestByteArray,
       this::createControlReadableWritable,

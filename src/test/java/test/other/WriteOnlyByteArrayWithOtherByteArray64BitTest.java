@@ -120,7 +120,7 @@ public interface WriteOnlyByteArrayWithOtherByteArray64BitTest
   default void testWriteWriteOnly64(){
     testWriteOn64BitData(
       getRNG(),
-      this::readTestWriteOnlyByteArray,
+      this::readTestByteArray,
       this::createTestWriteOnlyByteArray,
       this::cleanTestByteArray,
       this::createControlReadableWritable,
@@ -135,7 +135,7 @@ public interface WriteOnlyByteArrayWithOtherByteArray64BitTest
   default void testWriteReadableWritable64(){
     testWriteOn64BitData(
       getRNG(),
-      this::readTestWriteOnlyByteArray,
+      this::readTestByteArray,
       this::createTestWriteOnlyByteArray,
       this::cleanTestByteArray,
       this::createControlReadableWritable,

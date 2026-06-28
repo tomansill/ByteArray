@@ -1,10 +1,10 @@
 package test;
 
-import com.ansill.arrays.ByteArray;
+import com.ansill.arrays.*;
 
 import javax.annotation.Nonnegative;
 import javax.annotation.Nonnull;
-import java.util.Random;
+import java.util.*;
 
 public interface BaseByteArrayTest{
 
@@ -38,4 +38,16 @@ public interface BaseByteArrayTest{
 
   @Nonnull
   ByteArray createTestByteArray(long size);
+
+  default long getToStringPerformanceLimit(){
+    return 128L;
+  }
+
+  @Nonnull
+  String getExpectedToStringClassName();
+
+  void writeTestByteArray(@Nonnull ByteArray testByteArray, @Nonnegative long byteIndex, byte value);
+
+  byte readTestByteArray(@Nonnull ByteArray byteArray, long index);
+
 }

@@ -122,14 +122,15 @@ public class TestOnlyByteArray implements ReadableWritableByteArray{
     }
 
     // If truncated, then add ellipsis
-    if(size != this.size()) bytes.add("...");
+    var combined = String.join("_", bytes);
+    if(size != this.size()) combined += "...";
 
     // Build string and return
-    return ReadableWritableByteArray.class.getSimpleName() +
+    return TestOnlyByteArray.class.getSimpleName() +
            "(size=" +
            this.size() +
            ", content=[" +
-           String.join("_", bytes) +
+            combined +
            "])";
   }
 

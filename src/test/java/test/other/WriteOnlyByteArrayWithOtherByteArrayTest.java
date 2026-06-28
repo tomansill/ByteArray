@@ -200,7 +200,7 @@ public interface WriteOnlyByteArrayWithOtherByteArrayTest extends BaseWriteOnlyB
     return generateWriteByteArrayTests(
       getRNG(),
       "ReadOnlyByteArray",
-      this::readTestWriteOnlyByteArray,
+      this::readTestByteArray,
       this::createTestWriteOnlyByteArray,
       this::cleanTestByteArray,
       this::createControlReadableWritable,
@@ -216,7 +216,7 @@ public interface WriteOnlyByteArrayWithOtherByteArrayTest extends BaseWriteOnlyB
     return generateWriteByteArrayTests(
       getRNG(),
       "ReadableWritableByteArray",
-      this::readTestWriteOnlyByteArray,
+      this::readTestByteArray,
       this::createTestWriteOnlyByteArray,
       this::cleanTestByteArray,
       this::createControlReadableWritable,

@@ -15,7 +15,7 @@ import static com.ansill.arrays.IndexingUtility.checkSubsetOf;
 import static com.ansill.arrays.IndexingUtility.checkWrite;
 
 /** ReadableWritableByteArray implementation that supports multiple byte arrays */
-final class ReadableWritableMultipleByteArray implements ReadableWritableByteArray{
+final class ReadableWritableMultipleByteArray implements ReadableWritableByteArray, ReadOnlyByteArray, WriteOnlyByteArray{
 
   /** Index map containing byte arrays */
   @Nonnull

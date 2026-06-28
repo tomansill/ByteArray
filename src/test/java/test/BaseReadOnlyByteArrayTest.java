@@ -16,6 +16,4 @@ public interface BaseReadOnlyByteArrayTest extends BaseByteArrayTest{
 
   @Nonnull
   ReadOnlyByteArray createTestReadOnlyByteArray(@Nonnegative long size);
-
-  void writeTestReadOnlyByteArray(@Nonnull ReadOnlyByteArray testByteArray, @Nonnegative long byteIndex, byte value);
 }

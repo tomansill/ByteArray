@@ -79,7 +79,7 @@ public interface SelfReadOnlyByteArray64BitTest extends SelfReadOnlyByteArrayTes
           byte value = (byte) rng.nextInt();
 
           // Write
-          writeTestReadOnlyByteArray(testByteArray, byteIndex, value);
+          writeTestByteArray(testByteArray, byteIndex, value);
 
           // Check it
           assertEquals(value, assertDoesNotThrow(() -> testByteArray.readByte(byteIndex)), "Index: " + byteIndex);

@@ -1,12 +1,16 @@
 package com.ansill.arrays;
 
+import org.jspecify.annotations.NonNull;
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.DynamicTest;
 import org.junit.jupiter.api.Nested;
+import org.junit.jupiter.api.TestFactory;
 import test.BaseByteArrayTest;
 import test.arrays.TestOnlyByteArray;
 import test.other.ReadOnlyByteArrayWithOtherByteArray64BitTest;
 import test.other.ReadableWritableByteArrayWithOtherByteArray64BitTest;
 import test.other.WriteOnlyByteArrayWithOtherByteArray64BitTest;
+import test.self.SelfByteArrayTest;
 import test.self.SelfReadOnlyByteArray64BitTest;
 import test.self.SelfReadableWritableByteArray64BitTest;
 import test.self.SelfWriteOnlyByteArray64BitTest;
@@ -51,9 +55,126 @@ public class MultipleByteArrayNestedTest{
 
   public abstract static class MultipleByteArrayTest implements BaseByteArrayTest{
 
+    @Override
+    public @NonNull String getExpectedToStringClassName() {
+      return "ReadableWritableMultipleByteArray";
+    }
+
     @Nonnull
     public ReadableWritableByteArray createTestReadableWritableByteArray(long size){
       return createReadableWritableByteArray(size, 34343);
+    }
+
+    @Override
+    public void writeTestByteArray(@NonNull ByteArray testByteArray, long byteIndex, byte value) {
+
+      // Check if wrapper, unwrap it
+      while(testByteArray instanceof  ReadOnlyByteArrayWrapper || testByteArray instanceof  WriteOnlyByteArrayWrapper){
+        while(testByteArray instanceof ReadOnlyByteArrayWrapper){
+          testByteArray = ((ReadOnlyByteArrayWrapper) testByteArray).original;
+        }
+        while(testByteArray instanceof WriteOnlyByteArrayWrapper){
+          testByteArray = ((WriteOnlyByteArrayWrapper) testByteArray).original;
+        }
+      }
+
+      // Check type
+      if(testByteArray instanceof ReadOnlyMultipleByteArray){
+
+        // Get the array
+        var entry = ((ReadOnlyMultipleByteArray) testByteArray).indexMap.floorEntry(byteIndex);
+
+        // Extract
+        long start = entry.getKey();
+        ReadOnlyByteArray byteArray = entry.getValue();
+        byteIndex -= start;
+
+        // ByteArray should be TestOnlyByteArray and variants
+        if(byteArray instanceof TestOnlyByteArray){
+          var data = ((TestOnlyByteArray) byteArray).data;
+          long startba = ((TestOnlyByteArray) byteArray).start;
+          byteIndex += startba;
+          for(ByteBuffer bb : data){
+            int len = bb.limit() - bb.position();
+            if(byteIndex >= len) byteIndex -= len;
+            else{
+              bb.put((int) byteIndex, value);
+              return;
+            }
+          }
+        }else if(byteArray instanceof TestOnlyByteArray.ReadOnly){
+          var data = ((TestOnlyByteArray.ReadOnly) byteArray).original.data;
+          long startba = ((TestOnlyByteArray.ReadOnly) byteArray).original.start;
+          byteIndex += startba;
+          for(ByteBuffer bb : data){
+            int len = bb.limit() - bb.position();
+            if(byteIndex >= len) byteIndex -= len;
+            else{
+              bb.put((int) byteIndex, value);
+              return;
+            }
+          }
+        }else throw new IllegalArgumentException("Not testonlybytearray");
+
+      }else if(testByteArray instanceof ReadableWritableMultipleByteArray){
+
+        // Get the array
+        var entry = ((ReadableWritableMultipleByteArray) testByteArray).indexMap.floorEntry(byteIndex);
+
+        // Extract
+        long start = entry.getKey();
+        var byteArray = entry.getValue();
+
+        // Write
+        try{
+          byteArray.writeByte(byteIndex - start, value);
+        }catch(ByteArrayIndexOutOfBoundsException e){
+          throw new RuntimeException(e);
+        }
+
+      }else throw new IllegalArgumentException("Not multiplebytearray");
+    }
+
+    @Override
+    public byte readTestByteArray(@NonNull ByteArray testByteArray, long byteIndex) {
+
+      // Check if wrapper, unwrap it
+      while(testByteArray instanceof  ReadOnlyByteArrayWrapper || testByteArray instanceof  WriteOnlyByteArrayWrapper){
+        while(testByteArray instanceof ReadOnlyByteArrayWrapper){
+          testByteArray = ((ReadOnlyByteArrayWrapper) testByteArray).original;
+        }
+        while(testByteArray instanceof WriteOnlyByteArrayWrapper){
+          testByteArray = ((WriteOnlyByteArrayWrapper) testByteArray).original;
+        }
+      }
+
+      // Check if it's ours
+      if(testByteArray instanceof ReadableWritableMultipleByteArray){
+        try{
+          return ((ReadableWritableMultipleByteArray) testByteArray).readByte(byteIndex);
+        }catch(ByteArrayIndexOutOfBoundsException e){
+          throw new RuntimeException(e);
+        }
+      }
+      if(testByteArray instanceof ReadOnlyMultipleByteArray){
+        try{
+          return ((ReadOnlyMultipleByteArray) testByteArray).readByte(byteIndex);
+        }catch(ByteArrayIndexOutOfBoundsException e){
+          throw new RuntimeException(e);
+        }
+      }
+
+      // TestOnlyByteArray ends up here somehow
+      if(testByteArray instanceof TestOnlyByteArray){
+        try{
+          return ((TestOnlyByteArray) testByteArray).readByte(byteIndex);
+        }catch(ByteArrayIndexOutOfBoundsException e){
+          throw new RuntimeException(e);
+        }
+      }
+
+      // Fail
+      throw new IllegalArgumentException("Not multiplebytearray: " + testByteArray.getClass().getName());
     }
 
     @Override
@@ -117,70 +238,6 @@ public class MultipleByteArrayNestedTest{
       return new ReadOnlyMultipleByteArray(bytearrays);
     }
 
-    public void writeTestReadOnlyByteArray(@Nonnull ReadOnlyByteArray testByteArray, long byteIndex, byte value){
-
-      // Check if wrapper, unwrap it
-      if(testByteArray instanceof ReadOnlyByteArrayWrapper){
-        testByteArray = ((ReadOnlyByteArrayWrapper) testByteArray).original;
-      }
-
-      // Check type
-      if(testByteArray instanceof ReadOnlyMultipleByteArray){
-
-        // Get the array
-        var entry = ((ReadOnlyMultipleByteArray) testByteArray).indexMap.floorEntry(byteIndex);
-
-        // Extract
-        long start = entry.getKey();
-        ReadOnlyByteArray byteArray = entry.getValue();
-        byteIndex -= start;
-
-        // ByteArray should be TestOnlyByteArray and variants
-        if(byteArray instanceof TestOnlyByteArray){
-          var data = ((TestOnlyByteArray) byteArray).data;
-          long startba = ((TestOnlyByteArray) byteArray).start;
-          byteIndex += startba;
-          for(ByteBuffer bb : data){
-            int len = bb.limit() - bb.position();
-            if(byteIndex >= len) byteIndex -= len;
-            else{
-              bb.put((int) byteIndex, value);
-              return;
-            }
-          }
-        }else if(byteArray instanceof TestOnlyByteArray.ReadOnly){
-          var data = ((TestOnlyByteArray.ReadOnly) byteArray).original.data;
-          long startba = ((TestOnlyByteArray.ReadOnly) byteArray).original.start;
-          byteIndex += startba;
-          for(ByteBuffer bb : data){
-            int len = bb.limit() - bb.position();
-            if(byteIndex >= len) byteIndex -= len;
-            else{
-              bb.put((int) byteIndex, value);
-              return;
-            }
-          }
-        }else throw new IllegalArgumentException("Not testonlybytearray");
-
-      }else if(testByteArray instanceof ReadableWritableMultipleByteArray){
-
-        // Get the array
-        var entry = ((ReadableWritableMultipleByteArray) testByteArray).indexMap.floorEntry(byteIndex);
-
-        // Extract
-        long start = entry.getKey();
-        var byteArray = entry.getValue();
-
-        // Write
-        try{
-          byteArray.writeByte(byteIndex - start, value);
-        }catch(ByteArrayIndexOutOfBoundsException e){
-          throw new RuntimeException(e);
-        }
-
-      }else throw new IllegalArgumentException("Not multiplebytearray");
-    }
-
     @Override
     public boolean isReadableWritableOK(){
       return false;
@@ -189,35 +246,6 @@ public class MultipleByteArrayNestedTest{
     @Nonnull
     public WriteOnlyByteArray createTestWriteOnlyByteArray(long size){
       return createTestReadableWritableByteArray(size).toWriteOnly();
-    }
-
-    public byte readTestWriteOnlyByteArray(@Nonnull WriteOnlyByteArray testByteArray, long byteIndex){
-
-      // Check if wrapper, unwrap it
-      if(testByteArray instanceof WriteOnlyByteArrayWrapper){
-        testByteArray = ((WriteOnlyByteArrayWrapper) testByteArray).original;
-      }
-
-      // Check if it's ours
-      if(testByteArray instanceof ReadableWritableMultipleByteArray){
-        try{
-          return ((ReadableWritableMultipleByteArray) testByteArray).readByte(byteIndex);
-        }catch(ByteArrayIndexOutOfBoundsException e){
-          throw new RuntimeException(e);
-        }
-      }
-
-      // TestOnlyByteArray ends up here somehow
-      if(testByteArray instanceof TestOnlyByteArray){
-        try{
-          return ((TestOnlyByteArray) testByteArray).readByte(byteIndex);
-        }catch(ByteArrayIndexOutOfBoundsException e){
-          throw new RuntimeException(e);
-        }
-      }
-
-      // Fail
-      throw new IllegalArgumentException("Not multiplebytearray: " + testByteArray.getClass().getName());
     }
   }
 
@@ -275,6 +303,27 @@ public class MultipleByteArrayNestedTest{
     @DisplayName("ReadOnly test")
     public class ReadOnlyMultipleByteArrayTest extends MultipleByteArrayTest implements SelfReadOnlyByteArray64BitTest{
 
+      @Override
+      public @NonNull String getExpectedToStringClassName() {
+        return "ReadOnlyMultipleByteArray";
+      }
+
+      @Override
+      @TestFactory
+      @DisplayName("Test toString()")
+      public Iterable<DynamicTest> testToString() {
+        return SelfByteArrayTest.generateTestsToString(
+                getRNG(),
+                "ReadOnlyByteArray",
+                getToStringPerformanceLimit(),
+                getExpectedToStringClassName(),
+                this::createTestReadOnlyByteArray,
+                this::writeTestByteArray,
+                this::readTestByteArray,
+                this::cleanTestByteArray,
+                this.isReadableWritableOK()
+        );
+      }
     }
   }
 
@@ -332,6 +381,27 @@ public class MultipleByteArrayNestedTest{
     public class WriteOnlyMultipleByteArrayTest extends MultipleByteArrayTest
       implements SelfWriteOnlyByteArray64BitTest{
 
+      @Override
+      public @NonNull String getExpectedToStringClassName() {
+        return "ReadableWritableMultipleByteArray";
+      }
+
+      @Override
+      @TestFactory
+      @DisplayName("Test toString()")
+      public Iterable<DynamicTest> testToString() {
+        return SelfByteArrayTest.generateTestsToString(
+                getRNG(),
+                "WriteOnlyByteArray",
+                getToStringPerformanceLimit(),
+                getExpectedToStringClassName(),
+                this::createTestWriteOnlyByteArray,
+                this::writeTestByteArray,
+                this::readTestByteArray,
+                this::cleanTestByteArray,
+                this.isReadableWritableOK()
+        );
+      }
     }
   }
 
@@ -345,20 +415,11 @@ public class MultipleByteArrayNestedTest{
       extends ReadableWritableTests.ReadableWritableMultipleByteArrayTest
       implements ReadableWritableByteArrayWithOtherByteArray64BitTest{
 
-      @Nonnull
-      public ReadOnlyByteArray createTestReadOnlyByteArray(long size){
-        return createTestReadableWritableByteArray(size);
-      }
-
-      @Nonnull
-      public WriteOnlyByteArray createTestWriteOnlyByteArray(long size){
-        return createTestReadableWritableByteArray(size);
-      }
-
-      @Override
+	    @Override
       public boolean isReadableWritableOK(){
         return true;
       }
+
     }
 
     @Nested
@@ -414,6 +475,23 @@ public class MultipleByteArrayNestedTest{
       @Nonnull
       public WriteOnlyByteArray createTestWriteOnlyByteArray(long size){
         return createTestReadableWritableByteArray(size);
+      }
+
+      @Override
+      @TestFactory
+      @DisplayName("Test toString()")
+      public Iterable<DynamicTest> testToString() {
+        return SelfByteArrayTest.generateTestsToString(
+                getRNG(),
+                "ReadableWritableByteArray",
+                getToStringPerformanceLimit(),
+                getExpectedToStringClassName(),
+                this::createTestReadableWritableByteArray,
+                this::writeTestByteArray,
+                this::readTestByteArray,
+                this::cleanTestByteArray,
+                this.isReadableWritableOK()
+        );
       }
 
       @Override
