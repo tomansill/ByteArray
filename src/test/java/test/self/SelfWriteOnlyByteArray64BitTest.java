@@ -3,6 +3,8 @@ package test.self;
 import com.ansill.arrays.ReadableWritableByteArray;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.HashSet;
 import java.util.Random;
@@ -15,6 +17,8 @@ import static org.junit.jupiter.api.Assertions.fail;
 
 public interface SelfWriteOnlyByteArray64BitTest extends SelfWriteOnlyByteArrayTest{
 
+  Logger LOGGER = LoggerFactory.getLogger(SelfWriteOnlyByteArray64BitTest.class);
+
   @DisplayName("Test readcopyFrom(long) on 64-bit addressable data")
   @Test
   default void testWriteByteOn64BitData(){
@@ -26,15 +30,7 @@ public interface SelfWriteOnlyByteArray64BitTest extends SelfWriteOnlyByteArrayT
     long size = ((long) Integer.MAX_VALUE) + rng.nextInt(9_000) + 1_000;
 
     // Print size
-    System.out.println("Size: " +
-                       size +
-                       "B - " +
-                       String.format("%.2f", size / 1000.0) +
-                       "KB - " +
-                       String.format("%.2f", size / 1_000_000.0) +
-                       "MB - " +
-                       String.format("%.2f", size / 1_000_000_000.0) +
-                       "GB");
+	  LOGGER.debug("Size: {}B - {}KB - {}MB - {}GB", size, String.format("%.2f", size / 1000.0), String.format("%.2f", size / 1_000_000.0), String.format("%.2f", size / 1_000_000_000.0));
 
     try{
 

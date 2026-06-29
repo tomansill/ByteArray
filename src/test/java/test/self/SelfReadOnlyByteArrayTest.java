@@ -418,8 +418,7 @@ public interface SelfReadOnlyByteArrayTest extends BaseReadOnlyByteArrayTest, Se
 
         }catch(OutOfMemoryError oom){
           System.gc();
-          oom.printStackTrace();
-          System.out.println("Out of memory. Cannot perform this test due to insufficient memory space");
+          LOGGER.warn("Out of memory. Cannot perform this test due to insufficient memory space", oom);
           fail("Cannot perform test due to insufficient memory space");
         }
 
@@ -499,8 +498,7 @@ public interface SelfReadOnlyByteArrayTest extends BaseReadOnlyByteArrayTest, Se
 
         }catch(OutOfMemoryError oom){
           System.gc();
-          oom.printStackTrace();
-          System.out.println("Out of memory. Cannot perform this test due to insufficient memory space");
+          LOGGER.warn("Out of memory. Cannot perform this test due to insufficient memory space", oom);
           fail("Cannot perform test due to insufficient memory space");
         }
 
@@ -581,8 +579,7 @@ public interface SelfReadOnlyByteArrayTest extends BaseReadOnlyByteArrayTest, Se
 
         }catch(OutOfMemoryError oom){
           System.gc();
-          oom.printStackTrace();
-          System.out.println("Out of memory. Cannot perform this test due to insufficient memory space");
+          LOGGER.warn("Out of memory. Cannot perform this test due to insufficient memory space", oom);
           fail("Cannot perform test due to insufficient memory space");
         }
 
@@ -663,8 +660,7 @@ public interface SelfReadOnlyByteArrayTest extends BaseReadOnlyByteArrayTest, Se
 
         }catch(OutOfMemoryError oom){
           System.gc();
-          oom.printStackTrace();
-          System.out.println("Out of memory. Cannot perform this test due to insufficient memory space");
+          LOGGER.warn("Out of memory. Cannot perform this test due to insufficient memory space", oom);
           fail("Cannot perform test due to insufficient memory space");
         }
 
@@ -747,8 +743,7 @@ public interface SelfReadOnlyByteArrayTest extends BaseReadOnlyByteArrayTest, Se
 
         }catch(OutOfMemoryError oom){
           System.gc();
-          oom.printStackTrace();
-          System.out.println("Out of memory. Cannot perform this test due to insufficient memory space");
+          LOGGER.warn("Out of memory. Cannot perform this test due to insufficient memory space", oom);
           fail("Cannot perform test due to insufficient memory space");
         }
 
@@ -833,8 +828,7 @@ public interface SelfReadOnlyByteArrayTest extends BaseReadOnlyByteArrayTest, Se
 
         }catch(OutOfMemoryError oom){
           System.gc();
-          oom.printStackTrace();
-          System.out.println("Out of memory. Cannot perform this test due to insufficient memory space");
+          LOGGER.warn("Out of memory. Cannot perform this test due to insufficient memory space", oom);
           fail("Cannot perform test due to insufficient memory space");
         }
 
@@ -921,8 +915,7 @@ public interface SelfReadOnlyByteArrayTest extends BaseReadOnlyByteArrayTest, Se
 
         }catch(OutOfMemoryError oom){
           System.gc();
-          oom.printStackTrace();
-          System.out.println("Out of memory. Cannot perform this test due to insufficient memory space");
+          LOGGER.warn("Out of memory. Cannot perform this test due to insufficient memory space", oom);
           fail("Cannot perform test due to insufficient memory space");
         }
 
@@ -1003,8 +996,7 @@ public interface SelfReadOnlyByteArrayTest extends BaseReadOnlyByteArrayTest, Se
 
         }catch(OutOfMemoryError oom){
           System.gc();
-          oom.printStackTrace();
-          System.out.println("Out of memory. Cannot perform this test due to insufficient memory space");
+          LOGGER.warn("Out of memory. Cannot perform this test due to insufficient memory space", oom);
           fail("Cannot perform test due to insufficient memory space");
         }
 
@@ -1087,8 +1079,7 @@ public interface SelfReadOnlyByteArrayTest extends BaseReadOnlyByteArrayTest, Se
 
         }catch(OutOfMemoryError oom){
           System.gc();
-          oom.printStackTrace();
-          System.out.println("Out of memory. Cannot perform this test due to insufficient memory space");
+          LOGGER.warn("Out of memory. Cannot perform this test due to insufficient memory space", oom);
           fail("Cannot perform test due to insufficient memory space");
         }
 
@@ -1173,8 +1164,7 @@ public interface SelfReadOnlyByteArrayTest extends BaseReadOnlyByteArrayTest, Se
 
         }catch(OutOfMemoryError oom){
           System.gc();
-          oom.printStackTrace();
-          System.out.println("Out of memory. Cannot perform this test due to insufficient memory space");
+          LOGGER.warn("Out of memory. Cannot perform this test due to insufficient memory space", oom);
           fail("Cannot perform test due to insufficient memory space");
         }
 
@@ -1261,8 +1251,7 @@ public interface SelfReadOnlyByteArrayTest extends BaseReadOnlyByteArrayTest, Se
 
         }catch(OutOfMemoryError oom){
           System.gc();
-          oom.printStackTrace();
-          System.out.println("Out of memory. Cannot perform this test due to insufficient memory space");
+          LOGGER.warn("Out of memory. Cannot perform this test due to insufficient memory space", oom);
           fail("Cannot perform test due to insufficient memory space");
         }
 
@@ -1354,8 +1343,7 @@ public interface SelfReadOnlyByteArrayTest extends BaseReadOnlyByteArrayTest, Se
 
         }catch(OutOfMemoryError oom){
           System.gc();
-          oom.printStackTrace();
-          System.out.println("Out of memory. Cannot perform this test due to insufficient memory space");
+          LOGGER.warn("Out of memory. Cannot perform this test due to insufficient memory space", oom);
           fail("Cannot perform test due to insufficient memory space");
         }
 
@@ -1521,8 +1509,7 @@ public interface SelfReadOnlyByteArrayTest extends BaseReadOnlyByteArrayTest, Se
 
         }catch(OutOfMemoryError oom){
           System.gc();
-          oom.printStackTrace();
-          System.out.println("Out of memory. Cannot perform this test due to insufficient memory space");
+          LOGGER.warn("Out of memory. Cannot perform this test due to insufficient memory space", oom);
           fail("Cannot perform test due to insufficient memory space");
         }
 
@@ -1617,8 +1604,7 @@ public interface SelfReadOnlyByteArrayTest extends BaseReadOnlyByteArrayTest, Se
 
         }catch(OutOfMemoryError oom){
           System.gc();
-          oom.printStackTrace();
-          System.out.println("Out of memory. Cannot perform this test due to insufficient memory space");
+          LOGGER.warn("Out of memory. Cannot perform this test due to insufficient memory space", oom);
           fail("Cannot perform test due to insufficient memory space");
         }
 
@@ -1739,8 +1725,7 @@ public interface SelfReadOnlyByteArrayTest extends BaseReadOnlyByteArrayTest, Se
 
         }catch(OutOfMemoryError oom){
           System.gc();
-          oom.printStackTrace();
-          System.out.println("Out of memory. Cannot perform this test due to insufficient memory space");
+          LOGGER.warn("Out of memory. Cannot perform this test due to insufficient memory space", oom);
           fail("Cannot perform test due to insufficient memory space");
         }
 
@@ -1835,8 +1820,7 @@ public interface SelfReadOnlyByteArrayTest extends BaseReadOnlyByteArrayTest, Se
 
         }catch(OutOfMemoryError oom){
           System.gc();
-          oom.printStackTrace();
-          System.out.println("Out of memory. Cannot perform this test due to insufficient memory space");
+          LOGGER.warn("Out of memory. Cannot perform this test due to insufficient memory space", oom);
           fail("Cannot perform test due to insufficient memory space");
         }
 
@@ -1931,8 +1915,7 @@ public interface SelfReadOnlyByteArrayTest extends BaseReadOnlyByteArrayTest, Se
 
         }catch(OutOfMemoryError oom){
           System.gc();
-          oom.printStackTrace();
-          System.out.println("Out of memory. Cannot perform this test due to insufficient memory space");
+          LOGGER.warn("Out of memory. Cannot perform this test due to insufficient memory space", oom);
           fail("Cannot perform test due to insufficient memory space");
         }
 
@@ -2004,8 +1987,7 @@ public interface SelfReadOnlyByteArrayTest extends BaseReadOnlyByteArrayTest, Se
 
         }catch(OutOfMemoryError oom){
           System.gc();
-          oom.printStackTrace();
-          System.out.println("Out of memory. Cannot perform this test due to insufficient memory space");
+          LOGGER.warn("Out of memory. Cannot perform this test due to insufficient memory space", oom);
           fail("Cannot perform test due to insufficient memory space");
         }
 
@@ -2100,8 +2082,7 @@ public interface SelfReadOnlyByteArrayTest extends BaseReadOnlyByteArrayTest, Se
 
         }catch(OutOfMemoryError oom){
           System.gc();
-          oom.printStackTrace();
-          System.out.println("Out of memory. Cannot perform this test due to insufficient memory space");
+          LOGGER.warn("Out of memory. Cannot perform this test due to insufficient memory space", oom);
           fail("Cannot perform test due to insufficient memory space");
         }
 
@@ -2196,8 +2177,7 @@ public interface SelfReadOnlyByteArrayTest extends BaseReadOnlyByteArrayTest, Se
 
         }catch(OutOfMemoryError oom){
           System.gc();
-          oom.printStackTrace();
-          System.out.println("Out of memory. Cannot perform this test due to insufficient memory space");
+          LOGGER.warn("Out of memory. Cannot perform this test due to insufficient memory space", oom);
           fail("Cannot perform test due to insufficient memory space");
         }
 
@@ -2269,8 +2249,7 @@ public interface SelfReadOnlyByteArrayTest extends BaseReadOnlyByteArrayTest, Se
 
         }catch(OutOfMemoryError oom){
           System.gc();
-          oom.printStackTrace();
-          System.out.println("Out of memory. Cannot perform this test due to insufficient memory space");
+          LOGGER.warn("Out of memory. Cannot perform this test due to insufficient memory space", oom);
           fail("Cannot perform test due to insufficient memory space");
         }
 
@@ -2365,8 +2344,7 @@ public interface SelfReadOnlyByteArrayTest extends BaseReadOnlyByteArrayTest, Se
 
         }catch(OutOfMemoryError oom){
           System.gc();
-          oom.printStackTrace();
-          System.out.println("Out of memory. Cannot perform this test due to insufficient memory space");
+          LOGGER.warn("Out of memory. Cannot perform this test due to insufficient memory space", oom);
           fail("Cannot perform test due to insufficient memory space");
         }
 
@@ -2461,8 +2439,7 @@ public interface SelfReadOnlyByteArrayTest extends BaseReadOnlyByteArrayTest, Se
 
         }catch(OutOfMemoryError oom){
           System.gc();
-          oom.printStackTrace();
-          System.out.println("Out of memory. Cannot perform this test due to insufficient memory space");
+          LOGGER.warn("Out of memory. Cannot perform this test due to insufficient memory space", oom);
           fail("Cannot perform test due to insufficient memory space");
         }
 
@@ -2534,8 +2511,7 @@ public interface SelfReadOnlyByteArrayTest extends BaseReadOnlyByteArrayTest, Se
 
         }catch(OutOfMemoryError oom){
           System.gc();
-          oom.printStackTrace();
-          System.out.println("Out of memory. Cannot perform this test due to insufficient memory space");
+          LOGGER.warn("Out of memory. Cannot perform this test due to insufficient memory space", oom);
           fail("Cannot perform test due to insufficient memory space");
         }
 
@@ -2630,8 +2606,7 @@ public interface SelfReadOnlyByteArrayTest extends BaseReadOnlyByteArrayTest, Se
 
         }catch(OutOfMemoryError oom){
           System.gc();
-          oom.printStackTrace();
-          System.out.println("Out of memory. Cannot perform this test due to insufficient memory space");
+          LOGGER.warn("Out of memory. Cannot perform this test due to insufficient memory space", oom);
           fail("Cannot perform test due to insufficient memory space");
         }
 
@@ -2726,8 +2701,7 @@ public interface SelfReadOnlyByteArrayTest extends BaseReadOnlyByteArrayTest, Se
 
         }catch(OutOfMemoryError oom){
           System.gc();
-          oom.printStackTrace();
-          System.out.println("Out of memory. Cannot perform this test due to insufficient memory space");
+          LOGGER.warn("Out of memory. Cannot perform this test due to insufficient memory space", oom);
           fail("Cannot perform test due to insufficient memory space");
         }
 
@@ -2799,8 +2773,7 @@ public interface SelfReadOnlyByteArrayTest extends BaseReadOnlyByteArrayTest, Se
 
         }catch(OutOfMemoryError oom){
           System.gc();
-          oom.printStackTrace();
-          System.out.println("Out of memory. Cannot perform this test due to insufficient memory space");
+          LOGGER.warn("Out of memory. Cannot perform this test due to insufficient memory space", oom);
           fail("Cannot perform test due to insufficient memory space");
         }
 
@@ -2895,8 +2868,7 @@ public interface SelfReadOnlyByteArrayTest extends BaseReadOnlyByteArrayTest, Se
 
         }catch(OutOfMemoryError oom){
           System.gc();
-          oom.printStackTrace();
-          System.out.println("Out of memory. Cannot perform this test due to insufficient memory space");
+          LOGGER.warn("Out of memory. Cannot perform this test due to insufficient memory space", oom);
           fail("Cannot perform test due to insufficient memory space");
         }
 
@@ -2991,8 +2963,7 @@ public interface SelfReadOnlyByteArrayTest extends BaseReadOnlyByteArrayTest, Se
 
         }catch(OutOfMemoryError oom){
           System.gc();
-          oom.printStackTrace();
-          System.out.println("Out of memory. Cannot perform this test due to insufficient memory space");
+          LOGGER.warn("Out of memory. Cannot perform this test due to insufficient memory space", oom);
           fail("Cannot perform test due to insufficient memory space");
         }
 
@@ -3064,8 +3035,7 @@ public interface SelfReadOnlyByteArrayTest extends BaseReadOnlyByteArrayTest, Se
 
         }catch(OutOfMemoryError oom){
           System.gc();
-          oom.printStackTrace();
-          System.out.println("Out of memory. Cannot perform this test due to insufficient memory space");
+          LOGGER.warn("Out of memory. Cannot perform this test due to insufficient memory space", oom);
           fail("Cannot perform test due to insufficient memory space");
         }
 
@@ -3160,8 +3130,7 @@ public interface SelfReadOnlyByteArrayTest extends BaseReadOnlyByteArrayTest, Se
 
         }catch(OutOfMemoryError oom){
           System.gc();
-          oom.printStackTrace();
-          System.out.println("Out of memory. Cannot perform this test due to insufficient memory space");
+          LOGGER.warn("Out of memory. Cannot perform this test due to insufficient memory space", oom);
           fail("Cannot perform test due to insufficient memory space");
         }
 
@@ -3256,8 +3225,7 @@ public interface SelfReadOnlyByteArrayTest extends BaseReadOnlyByteArrayTest, Se
 
         }catch(OutOfMemoryError oom){
           System.gc();
-          oom.printStackTrace();
-          System.out.println("Out of memory. Cannot perform this test due to insufficient memory space");
+          LOGGER.warn("Out of memory. Cannot perform this test due to insufficient memory space", oom);
           fail("Cannot perform test due to insufficient memory space");
         }
 
@@ -3329,8 +3297,7 @@ public interface SelfReadOnlyByteArrayTest extends BaseReadOnlyByteArrayTest, Se
 
         }catch(OutOfMemoryError oom){
           System.gc();
-          oom.printStackTrace();
-          System.out.println("Out of memory. Cannot perform this test due to insufficient memory space");
+          LOGGER.warn("Out of memory. Cannot perform this test due to insufficient memory space", oom);
           fail("Cannot perform test due to insufficient memory space");
         }
 
@@ -3425,8 +3392,7 @@ public interface SelfReadOnlyByteArrayTest extends BaseReadOnlyByteArrayTest, Se
 
         }catch(OutOfMemoryError oom){
           System.gc();
-          oom.printStackTrace();
-          System.out.println("Out of memory. Cannot perform this test due to insufficient memory space");
+          LOGGER.warn("Out of memory. Cannot perform this test due to insufficient memory space", oom);
           fail("Cannot perform test due to insufficient memory space");
         }
 
@@ -3521,8 +3487,7 @@ public interface SelfReadOnlyByteArrayTest extends BaseReadOnlyByteArrayTest, Se
 
         }catch(OutOfMemoryError oom){
           System.gc();
-          oom.printStackTrace();
-          System.out.println("Out of memory. Cannot perform this test due to insufficient memory space");
+          LOGGER.warn("Out of memory. Cannot perform this test due to insufficient memory space", oom);
           fail("Cannot perform test due to insufficient memory space");
         }
 
@@ -3594,8 +3559,7 @@ public interface SelfReadOnlyByteArrayTest extends BaseReadOnlyByteArrayTest, Se
 
         }catch(OutOfMemoryError oom){
           System.gc();
-          oom.printStackTrace();
-          System.out.println("Out of memory. Cannot perform this test due to insufficient memory space");
+          LOGGER.warn("Out of memory. Cannot perform this test due to insufficient memory space", oom);
           fail("Cannot perform test due to insufficient memory space");
         }
 
@@ -3690,8 +3654,7 @@ public interface SelfReadOnlyByteArrayTest extends BaseReadOnlyByteArrayTest, Se
 
         }catch(OutOfMemoryError oom){
           System.gc();
-          oom.printStackTrace();
-          System.out.println("Out of memory. Cannot perform this test due to insufficient memory space");
+          LOGGER.warn("Out of memory. Cannot perform this test due to insufficient memory space", oom);
           fail("Cannot perform test due to insufficient memory space");
         }
 
@@ -3786,8 +3749,7 @@ public interface SelfReadOnlyByteArrayTest extends BaseReadOnlyByteArrayTest, Se
 
         }catch(OutOfMemoryError oom){
           System.gc();
-          oom.printStackTrace();
-          System.out.println("Out of memory. Cannot perform this test due to insufficient memory space");
+          LOGGER.warn("Out of memory. Cannot perform this test due to insufficient memory space", oom);
           fail("Cannot perform test due to insufficient memory space");
         }
 
@@ -3859,8 +3821,7 @@ public interface SelfReadOnlyByteArrayTest extends BaseReadOnlyByteArrayTest, Se
 
         }catch(OutOfMemoryError oom){
           System.gc();
-          oom.printStackTrace();
-          System.out.println("Out of memory. Cannot perform this test due to insufficient memory space");
+          LOGGER.warn("Out of memory. Cannot perform this test due to insufficient memory space", oom);
           fail("Cannot perform test due to insufficient memory space");
         }
 
@@ -3955,8 +3916,7 @@ public interface SelfReadOnlyByteArrayTest extends BaseReadOnlyByteArrayTest, Se
 
         }catch(OutOfMemoryError oom){
           System.gc();
-          oom.printStackTrace();
-          System.out.println("Out of memory. Cannot perform this test due to insufficient memory space");
+          LOGGER.warn("Out of memory. Cannot perform this test due to insufficient memory space", oom);
           fail("Cannot perform test due to insufficient memory space");
         }
 
@@ -4051,8 +4011,7 @@ public interface SelfReadOnlyByteArrayTest extends BaseReadOnlyByteArrayTest, Se
 
         }catch(OutOfMemoryError oom){
           System.gc();
-          oom.printStackTrace();
-          System.out.println("Out of memory. Cannot perform this test due to insufficient memory space");
+          LOGGER.warn("Out of memory. Cannot perform this test due to insufficient memory space", oom);
           fail("Cannot perform test due to insufficient memory space");
         }
 
@@ -4124,8 +4083,7 @@ public interface SelfReadOnlyByteArrayTest extends BaseReadOnlyByteArrayTest, Se
 
         }catch(OutOfMemoryError oom){
           System.gc();
-          oom.printStackTrace();
-          System.out.println("Out of memory. Cannot perform this test due to insufficient memory space");
+          LOGGER.warn("Out of memory. Cannot perform this test due to insufficient memory space", oom);
           fail("Cannot perform test due to insufficient memory space");
         }
 
@@ -4220,8 +4178,7 @@ public interface SelfReadOnlyByteArrayTest extends BaseReadOnlyByteArrayTest, Se
 
         }catch(OutOfMemoryError oom){
           System.gc();
-          oom.printStackTrace();
-          System.out.println("Out of memory. Cannot perform this test due to insufficient memory space");
+          LOGGER.warn("Out of memory. Cannot perform this test due to insufficient memory space", oom);
           fail("Cannot perform test due to insufficient memory space");
         }
 
@@ -4316,8 +4273,7 @@ public interface SelfReadOnlyByteArrayTest extends BaseReadOnlyByteArrayTest, Se
 
         }catch(OutOfMemoryError oom){
           System.gc();
-          oom.printStackTrace();
-          System.out.println("Out of memory. Cannot perform this test due to insufficient memory space");
+          LOGGER.warn("Out of memory. Cannot perform this test due to insufficient memory space", oom);
           fail("Cannot perform test due to insufficient memory space");
         }
 

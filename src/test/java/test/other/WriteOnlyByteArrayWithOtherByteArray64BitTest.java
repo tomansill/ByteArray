@@ -5,6 +5,8 @@ import com.ansill.arrays.ReadableWritableByteArray;
 import com.ansill.arrays.WriteOnlyByteArray;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import test.BaseOtherByteArrayTest;
 import test.BaseWriteOnlyByteArrayTest;
 
@@ -21,6 +23,8 @@ import static org.junit.jupiter.api.Assertions.fail;
 public interface WriteOnlyByteArrayWithOtherByteArray64BitTest
   extends BaseWriteOnlyByteArrayTest, BaseOtherByteArrayTest{
 
+  Logger LOGGER = LoggerFactory.getLogger(WriteOnlyByteArrayWithOtherByteArray64BitTest.class);
+
   static <T extends ReadOnlyByteArray> void testWriteOn64BitData(
     @Nonnull Random rng,
     @Nonnull BiFunction<WriteOnlyByteArray,Long,Byte> testBAReaderFun,
@@ -36,15 +40,7 @@ public interface WriteOnlyByteArrayWithOtherByteArray64BitTest
     long size = ((long) Integer.MAX_VALUE) + rng.nextInt(9_000) + 1_000;
 
     // Print size
-    System.out.println("Size: " +
-                       size +
-                       "B - " +
-                       String.format("%.2f", size / 1000.0) +
-                       "KB - " +
-                       String.format("%.2f", size / 1_000_000.0) +
-                       "MB - " +
-                       String.format("%.2f", size / 1_000_000_000.0) +
-                       "GB");
+	  LOGGER.debug("Size: {}B - {}KB - {}MB - {}GB", size, String.format("%.2f", size / 1000.0), String.format("%.2f", size / 1_000_000.0), String.format("%.2f", size / 1_000_000_000.0));
 
     try{
 

@@ -6,6 +6,8 @@ import com.ansill.arrays.WriteOnlyByteArray;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.DynamicTest;
 import org.junit.jupiter.api.TestFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import test.BaseOtherByteArrayTest;
 import test.BaseReadOnlyByteArrayTest;
 import test.TriConsumer;
@@ -28,6 +30,8 @@ import static org.junit.jupiter.api.Assertions.fail;
 import static org.junit.jupiter.api.DynamicTest.dynamicTest;
 
 public interface ReadOnlyByteArrayWithOtherByteArrayTest extends BaseReadOnlyByteArrayTest, BaseOtherByteArrayTest{
+
+  Logger LOGGER = LoggerFactory.getLogger(ReadOnlyByteArrayWithOtherByteArrayTest.class);
 
   @Nonnull
   static <T extends WriteOnlyByteArray> Iterable<DynamicTest> generateValidSubsetOfByteArrayTests(
@@ -127,8 +131,7 @@ public interface ReadOnlyByteArrayWithOtherByteArrayTest extends BaseReadOnlyByt
 
         }catch(OutOfMemoryError oom){
           System.gc();
-          oom.printStackTrace();
-          System.out.println("Out of memory. Cannot perform this test due to insufficient memory space");
+          LOGGER.warn("Out of memory. Cannot perform this test due to insufficient memory space", oom);
           fail("Cannot perform test due to insufficient memory space");
         }
 

@@ -11,6 +11,8 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.DynamicTest;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.TestFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import test.BaseByteArrayTest;
 import test.BaseReadableWritableByteArrayTest;
 import test.other.ReadOnlyByteArrayWithOtherByteArrayTest;
@@ -22,8 +24,11 @@ import test.self.SelfWriteOnlyByteArray64BitTest;
 
 import javax.annotation.Nonnull;
 
-@DisplayName("TestOnlyByteArray Test Suite")
+/** Serves as a sanity check and ensure this test is working as expected */
+@DisplayName("TestOnlyByteArray Test Suite - (sanity check)")
 public class TestOnlyByteArrayNestedTest{
+
+  private static final Logger LOGGER = LoggerFactory.getLogger(TestOnlyByteArrayNestedTest.class);
 
   public abstract static class TestOnlyByteArrayTest implements BaseByteArrayTest{
 
@@ -45,7 +50,7 @@ public class TestOnlyByteArrayNestedTest{
       System.gc();
 
       // Log it if actually big
-      if(size >= (Integer.MAX_VALUE * 0.5)) System.out.println("Cleared away " + size + "B");
+      if(size >= (Integer.MAX_VALUE * 0.5)) LOGGER.debug("Cleared away {}B", size);
     }
 
     @Override
@@ -78,7 +83,7 @@ public class TestOnlyByteArrayNestedTest{
   }
 
   @Nested
-  @DisplayName("ReadOnly test")
+  @DisplayName("TestOnlyByteArray ReadOnly test on self")
   public class ReadOnlyTestOnlyByteArrayTest extends TestOnlyByteArrayTest
     implements SelfReadOnlyByteArray64BitTest, ReadOnlyByteArrayWithOtherByteArrayTest{
 
@@ -111,7 +116,7 @@ public class TestOnlyByteArrayNestedTest{
   }
 
   @Nested
-  @DisplayName("WriteOnly test")
+  @DisplayName("TestOnlyByteArray WriteOnly test on self")
   public class WriteOnlyTestOnlyByteArrayTest extends TestOnlyByteArrayTest
     implements SelfWriteOnlyByteArray64BitTest, WriteOnlyByteArrayWithOtherByteArrayTest{
 
@@ -144,7 +149,7 @@ public class TestOnlyByteArrayNestedTest{
   }
 
   @Nested
-  @DisplayName("ReadableWritable test")
+  @DisplayName("TestOnlyByteArray ReadableWritable test on self")
   public class ReadableWritableByteArrayTest extends TestOnlyByteArrayTest
     implements BaseReadableWritableByteArrayTest, SelfReadableWritableByteArray64BitTest{
 

@@ -11,6 +11,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.nio.file.Files;
@@ -23,61 +24,76 @@ public class TestOnlyByteArray implements ReadableWritableByteArray{
 
   private static final Logger LOGGER = LoggerFactory.getLogger(TestOnlyByteArray.class);
 
+  private static final int MAX_IN_MEMORY_SIZE = Integer.MAX_VALUE / 2;
+
   public final long start;
 
   public final long size;
 
-  public final Runnable onClose;
+  private final Runnable onClose;
 
-  public final RandomAccessFile data;
+  @Nullable
+  private final RandomAccessFile raf;
+
+  @Nullable
+  private final byte[] bytes;
 
   public TestOnlyByteArray(long size){
     if(size == 0) throw new IllegalArgumentException();
     start = 0;
     this.size = size;
-	  try {
-      var file = Files.createTempFile("byte-array-test",".bin").toFile();
-      file.deleteOnExit();
-      this.data = new RandomAccessFile(file, "rw");
-      data.setLength(size);
-      onClose = () -> {
-        try{
-          data.close();
-        }catch (Exception e){
-          LOGGER.warn("Failed to close RandomAccessFile", e);
-        }
-        try{
-          if(file.delete()){
-            LOGGER.debug("Successfully deleted RandomAccessFile {}", file.getAbsolutePath());
-          }else{
-            LOGGER.warn("Failed to delete RandomAccessFile {}", file.getAbsolutePath());
+    if(size >= MAX_IN_MEMORY_SIZE) {
+      this.bytes = null;
+      try {
+        var file = Files.createTempFile("byte-array-test-", ".bin").toFile();
+        file.deleteOnExit();
+        this.raf = new RandomAccessFile(file, "rw");
+        raf.setLength(size);
+        LOGGER.debug("Created temporary file {} of {}B", file.getAbsolutePath(), size);
+        onClose = () -> {
+          try {
+            raf.close();
+          } catch (Exception e) {
+            LOGGER.warn("Failed to close RandomAccessFile", e);
           }
-        }catch (Exception e){
-          LOGGER.warn("Failed to delete RandomAccessFile '{}'", file.getAbsolutePath(), e);
-        }
-      };
-	  } catch (IOException e) {
-		  throw new RuntimeException(e);
-	  }
+          try {
+            if (file.delete()) {
+              LOGGER.debug("Successfully deleted RandomAccessFile '{}' of {}B", file.getAbsolutePath(), size);
+            } else {
+              LOGGER.warn("Failed to delete RandomAccessFile '{}' of {}B", file.getAbsolutePath(), size);
+            }
+          } catch (Exception e) {
+            LOGGER.warn("Failed to delete RandomAccessFile '{}' of {}B", file.getAbsolutePath(), size, e);
+          }
+        };
+      } catch (IOException e) {
+        throw new RuntimeException(e);
+      }
+    }else{
+      this.bytes = new byte[(int) size];
+      this.raf = null;
+      this.onClose = () -> {};
+    }
   }
 
-  protected TestOnlyByteArray(long start, long size, @Nonnull Runnable onClose, @Nonnull RandomAccessFile data){
+  protected TestOnlyByteArray(long start, long size, @Nonnull Runnable onClose, @Nullable RandomAccessFile raf, @Nullable byte[] bytes){
     this.start = start;
     this.size = size;
-    this.data = data;
+    this.raf = raf;
     this.onClose = onClose;
+    this.bytes = bytes;
   }
 
   @Nonnull
   @Override
   public ReadOnlyByteArray toReadOnly(){
-    return new ReadOnly(this.start, size, onClose, data);
+    return new ReadOnly(this.start, size, onClose, raf, bytes);
   }
 
   @Nonnull
   @Override
   public WriteOnlyByteArray toWriteOnly(){
-    return new WriteOnly(this.start, size, onClose, data);
+    return new WriteOnly(this.start, size, onClose, raf, bytes);
   }
 
   @Override
@@ -89,24 +105,33 @@ public class TestOnlyByteArray implements ReadableWritableByteArray{
   public synchronized byte readByte(long byteIndex) throws ByteArrayIndexOutOfBoundsException{
     checkReadWriteByte(byteIndex, size);
     byteIndex += start;
-	  try {
-      this.data.seek(byteIndex);
-      return this.data.readByte();
-	  } catch (IOException e) {
-		  throw new RuntimeException(e);
-	  }
+    if(this.raf != null) {
+      try {
+        this.raf.seek(byteIndex);
+        return this.raf.readByte();
+      } catch (IOException e) {
+        throw new RuntimeException(e);
+      }
+    }else if(this.bytes != null){
+      return this.bytes[(int) byteIndex];
+    }
+    throw new RuntimeException("Unknown state");
   }
 
   @Override
   public synchronized void writeByte(long byteIndex, byte value) throws ByteArrayIndexOutOfBoundsException{
     checkReadWriteByte(byteIndex, size);
     byteIndex += this.start;
-    try {
-      this.data.seek(byteIndex);
-      this.data.writeByte(value);
-      this.data.getFD().sync(); // Expensive - should be used only for this unit test
-    } catch (IOException e) {
-      throw new RuntimeException(e);
+    if(this.raf != null) {
+      try {
+        this.raf.seek(byteIndex);
+        this.raf.writeByte(value);
+        this.raf.getFD().sync(); // Expensive - should be used only for this unit test
+      } catch (IOException e) {
+        throw new RuntimeException(e);
+      }
+    }else if(bytes != null){
+      this.bytes[(int) byteIndex] = value;
     }
   }
 
@@ -116,7 +141,7 @@ public class TestOnlyByteArray implements ReadableWritableByteArray{
   throws ByteArrayIndexOutOfBoundsException, ByteArrayLengthOverBoundsException, ByteArrayInvalidLengthException{
     if(start == 0 && length == size) return this;
     IndexingUtility.checkSubsetOf(start, length, this.size);
-    return new TestOnlyByteArray(this.start + start, length, onClose, data);
+    return new TestOnlyByteArray(this.start + start, length, onClose, raf, bytes);
   }
 
   public void clean(){
@@ -166,8 +191,8 @@ public class TestOnlyByteArray implements ReadableWritableByteArray{
     @Nonnull
     public final TestOnlyByteArray original;
 
-    protected ReadOnly(long start, long size, @Nonnull Runnable onClose, @Nonnull RandomAccessFile data){
-      this.original = new TestOnlyByteArray(start, size, onClose, data);
+    protected ReadOnly(long start, long size, @Nonnull Runnable onClose, @Nullable RandomAccessFile data, @Nullable byte[] bb){
+      this.original = new TestOnlyByteArray(start, size, onClose, data, bb);
     }
 
     @Override
@@ -192,14 +217,14 @@ public class TestOnlyByteArray implements ReadableWritableByteArray{
       IndexingUtility.checkSubsetOf(start, length, original.size());
 
       // Modify and return
-      return new ReadOnly(original.start + start, length, original.onClose, original.data);
+      return new ReadOnly(original.start + start, length, original.onClose, original.raf, original.bytes);
     }
   }
 
   public static class WriteOnly extends TestOnlyByteArray implements WriteOnlyByteArray{
 
-    protected WriteOnly(long start, long size, @Nonnull Runnable onClose, @Nonnull RandomAccessFile data){
-      super(start, size, onClose, data);
+    protected WriteOnly(long start, long size, @Nonnull Runnable onClose, @Nullable RandomAccessFile data, @Nullable byte[] bb){
+      super(start, size, onClose, data, bb);
     }
   }
 }

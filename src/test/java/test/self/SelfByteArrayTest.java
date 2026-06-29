@@ -4,6 +4,8 @@ import com.ansill.arrays.*;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.DynamicTest;
 import org.junit.jupiter.api.TestFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import test.BaseByteArrayTest;
 import test.TriConsumer;
 
@@ -23,6 +25,8 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.junit.jupiter.api.DynamicTest.dynamicTest;
 
 public interface SelfByteArrayTest extends BaseByteArrayTest{
+
+  Logger LOGGER = LoggerFactory.getLogger(SelfByteArrayTest.class);
 
   @Nonnull
   static Iterable<DynamicTest> generateTestsToString(
@@ -220,8 +224,7 @@ public interface SelfByteArrayTest extends BaseByteArrayTest{
 
         }catch(OutOfMemoryError oom){
           System.gc();
-          oom.printStackTrace();
-          System.out.println("Out of memory. Cannot perform this test due to insufficient memory space");
+          LOGGER.warn("Out of memory. Cannot perform this test due to insufficient memory space", oom);
           fail("Cannot perform test due to insufficient memory space");
         }
 
@@ -310,8 +313,7 @@ public interface SelfByteArrayTest extends BaseByteArrayTest{
 
         }catch(OutOfMemoryError oom){
           System.gc();
-          oom.printStackTrace();
-          System.out.println("Out of memory. Cannot perform this test due to insufficient memory space");
+          LOGGER.warn("Out of memory. Cannot perform this test due to insufficient memory space", oom);
           fail("Cannot perform test due to insufficient memory space");
         }
 
@@ -358,7 +360,7 @@ public interface SelfByteArrayTest extends BaseByteArrayTest{
             } catch (OutOfMemoryError oom) {
               System.gc();
               oom.printStackTrace();
-              System.out.println("Out of memory. Cannot perform this test due to insufficient memory space");
+              LOGGER.warn("Out of memory. Cannot perform this test due to insufficient memory space");
               fail("Cannot perform test due to insufficient memory space");
             }
 
@@ -449,8 +451,7 @@ public interface SelfByteArrayTest extends BaseByteArrayTest{
 
         }catch(OutOfMemoryError oom){
           System.gc();
-          oom.printStackTrace();
-          System.out.println("Out of memory. Cannot perform this test due to insufficient memory space");
+          LOGGER.warn("Out of memory. Cannot perform this test due to insufficient memory space", oom);
           fail("Cannot perform test due to insufficient memory space");
         }
 
@@ -493,8 +494,7 @@ public interface SelfByteArrayTest extends BaseByteArrayTest{
 
         }catch(OutOfMemoryError oom){
           System.gc();
-          oom.printStackTrace();
-          System.out.println("Out of memory. Cannot perform this test due to insufficient memory space");
+          LOGGER.warn("Out of memory. Cannot perform this test due to insufficient memory space", oom);
           fail("Cannot perform test due to insufficient memory space");
         }
 

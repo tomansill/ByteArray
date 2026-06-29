@@ -91,11 +91,11 @@ public class PrimitiveByteArrayNestedTest{
   }
 
   @Nested
-  @DisplayName("ReadOnly tests")
+  @DisplayName("PrimitiveByteArray ReadOnly tests")
   public class ReadOnlyTests{
 
     @Nested
-    @DisplayName("ReadOnly test")
+    @DisplayName("PrimitiveByteArray ReadOnly test on self")
     public class ReadOnlyPrimitiveByteArrayTest extends PrimitiveByteArrayTest implements SelfReadOnlyByteArrayTest{
       @Override
       @DisplayName("Test toString()")
@@ -116,7 +116,7 @@ public class PrimitiveByteArrayNestedTest{
     }
 
     @Nested
-    @DisplayName("ReadOnly test with ByteBufferByteArray implementation")
+    @DisplayName("PrimitiveByteArray ReadOnly test with ByteBufferByteArray implementation")
     public class ReadOnlyPrimitiveByteArrayWithByteBufferByteArrayTest
       extends ReadOnlyPrimitiveByteArrayWithControlByteArrayTest{
 
@@ -128,13 +128,13 @@ public class PrimitiveByteArrayNestedTest{
     }
 
     @Nested
-    @DisplayName("ReadOnly test with control ByteArray implementation")
+    @DisplayName("PrimitiveByteArray ReadOnly test with control ByteArray implementation")
     public class ReadOnlyPrimitiveByteArrayWithControlByteArrayTest extends PrimitiveByteArrayTest
       implements ReadOnlyByteArrayWithOtherByteArrayTest{
     }
 
     @Nested
-    @DisplayName("ReadOnly test with MultipleByteArray implementation")
+    @DisplayName("PrimitiveByteArray ReadOnly test with MultipleByteArray implementation")
     public
     class ReadOnlyPrimitiveByteArrayWithMultipleByteArrayTest
       extends ReadOnlyPrimitiveByteArrayWithControlByteArrayTest{
@@ -150,7 +150,7 @@ public class PrimitiveByteArrayNestedTest{
     }
 
     @Nested
-    @DisplayName("ReadOnly test with PrimitiveByteArray implementation")
+    @DisplayName("PrimitiveByteArray ReadOnly test with PrimitiveByteArray implementation")
     public class ReadOnlyPrimitiveByteArrayWithSelfTest extends ReadOnlyPrimitiveByteArrayWithControlByteArrayTest{
 
       @Nonnull
@@ -162,11 +162,11 @@ public class PrimitiveByteArrayNestedTest{
   }
 
   @Nested
-  @DisplayName("WriteOnly tests")
+  @DisplayName("PrimitiveByteArray WriteOnly tests")
   public class WriteOnlyTests{
 
     @Nested
-    @DisplayName("WriteOnly test")
+    @DisplayName("PrimitiveByteArray WriteOnly test on self")
     public class WriteOnlyPrimitiveByteArrayTest extends PrimitiveByteArrayTest implements SelfWriteOnlyByteArrayTest, SelfByteArrayTest{
 
       @Override
@@ -188,7 +188,7 @@ public class PrimitiveByteArrayNestedTest{
     }
 
     @Nested
-    @DisplayName("WriteOnly test with ByteBufferByteArray implementation")
+    @DisplayName("PrimitiveByteArray WriteOnly test with ByteBufferByteArray implementation")
     public class WriteOnlyPrimitiveByteArrayWithByteBufferByteArrayTest
       extends WriteOnlyPrimitiveByteArrayWithControlByteArrayTest{
 
@@ -200,7 +200,7 @@ public class PrimitiveByteArrayNestedTest{
     }
 
     @Nested
-    @DisplayName("WriteOnly test with control ByteArray implementation")
+    @DisplayName("PrimitiveByteArray WriteOnly test with control ByteArray implementation")
     public class WriteOnlyPrimitiveByteArrayWithControlByteArrayTest extends PrimitiveByteArrayTest implements
       WriteOnlyByteArrayWithOtherByteArrayTest{
 
@@ -211,7 +211,7 @@ public class PrimitiveByteArrayNestedTest{
     }
 
     @Nested
-    @DisplayName("WriteOnly test with MultipleByteArray implementation")
+    @DisplayName("PrimitiveByteArray WriteOnly test with MultipleByteArray implementation")
     public class WriteOnlyPrimitiveByteArrayWithMultipleByteArrayTest
       extends WriteOnlyPrimitiveByteArrayWithControlByteArrayTest{
 
@@ -226,7 +226,7 @@ public class PrimitiveByteArrayNestedTest{
     }
 
     @Nested
-    @DisplayName("WriteOnly test with PrimitiveByteArray implementation")
+    @DisplayName("PrimitiveByteArray WriteOnly test with PrimitiveByteArray implementation")
     public class WriteOnlyPrimitiveByteArrayWithSelfTest extends WriteOnlyPrimitiveByteArrayWithControlByteArrayTest{
 
       @Nonnull
@@ -238,11 +238,11 @@ public class PrimitiveByteArrayNestedTest{
   }
 
   @Nested
-  @DisplayName("ReadableWritable test")
+  @DisplayName("PrimitiveByteArray ReadableWritable tests")
   public class ReadableWritableTests{
 
     @Nested
-    @DisplayName("ReadableWritable test")
+    @DisplayName("PrimitiveByteArray ReadableWritable test on self")
     public class ReadableWritablePrimitiveByteArrayTest extends PrimitiveByteArrayTest
       implements SelfReadableWritableByteArrayTest{
 
@@ -280,7 +280,7 @@ public class PrimitiveByteArrayNestedTest{
     }
 
     @Nested
-    @DisplayName("ReadableWritable test with ByteBufferByteArray implementation")
+    @DisplayName("PrimitiveByteArray ReadableWritable test with ByteBufferByteArray implementation")
     public class ReadableWritablePrimitiveByteArrayWithByteBufferByteArrayTest
       extends ReadableWritableTests.ReadableWritablePrimitiveByteArrayWithControlByteArrayTest{
 
@@ -292,7 +292,7 @@ public class PrimitiveByteArrayNestedTest{
     }
 
     @Nested
-    @DisplayName("ReadableWritable test with control ByteArray implementation")
+    @DisplayName("PrimitiveByteArray ReadableWritable test with control ByteArray implementation")
     public class ReadableWritablePrimitiveByteArrayWithControlByteArrayTest extends PrimitiveByteArrayTest implements
       ReadableWritableByteArrayWithOtherByteArrayTest{
 
@@ -313,7 +313,7 @@ public class PrimitiveByteArrayNestedTest{
     }
 
     @Nested
-    @DisplayName("ReadableWritable test with MultipleByteArray implementation")
+    @DisplayName("PrimitiveByteArray ReadableWritable test with MultipleByteArray implementation")
     public
     class ReadableWritablePrimitiveByteArrayWithMultipleByteArrayTest
       extends ReadableWritableTests.ReadableWritablePrimitiveByteArrayWithControlByteArrayTest{
@@ -329,7 +329,7 @@ public class PrimitiveByteArrayNestedTest{
     }
 
     @Nested
-    @DisplayName("ReadableWritable test with PrimitiveByteArray implementation")
+    @DisplayName("PrimitiveByteArray ReadableWritable test with PrimitiveByteArray implementation")
     public class ReadableWritablePrimitiveByteArrayWithSelfTest
       extends ReadableWritableTests.ReadableWritablePrimitiveByteArrayWithControlByteArrayTest{
 
