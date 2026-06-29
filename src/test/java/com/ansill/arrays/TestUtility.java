@@ -1,26 +1,11 @@
 package com.ansill.arrays;
 
-import sun.misc.Unsafe;
 import test.arrays.TestOnlyByteArray;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-import java.lang.reflect.Field;
-import java.nio.ByteBuffer;
 
 public final class TestUtility{
-
-  public static final Unsafe UNSAFE;
-
-  static{
-    try{
-      Field f = Unsafe.class.getDeclaredField("theUnsafe");
-      f.setAccessible(true);
-      UNSAFE = (Unsafe) f.get(null);
-    }catch(NoSuchFieldException | IllegalAccessException nsfe){
-      throw new ExceptionInInitializerError(nsfe);
-    }
-  }
 
   public static short flipEndian(short value){
     int b1 = (value >> 8) & 0xff;
@@ -105,30 +90,29 @@ public final class TestUtility{
   /**
    * Recursively cleans ByteArrays by looking for TestOnlyByteArrays and invoke Unsafe::invokeCleaner to clean up DirectByteBuffers
    *
-   * @param unsafe    unsafe object
    * @param byteArray byte array to be cleaned
    */
-  public static void clean(@Nonnull Unsafe unsafe, @Nonnull ByteArray byteArray){
+  public static void clean(@Nonnull ByteArray byteArray){
 
     // Detect and cast it to appropriate class
     if(byteArray instanceof ReadableWritableMultipleByteArray){
       ReadableWritableMultipleByteArray rwmba = (ReadableWritableMultipleByteArray) byteArray;
-      for(ReadableWritableByteArray inner : rwmba.indexMap.values()) clean(unsafe, inner);
+      for(ReadableWritableByteArray inner : rwmba.indexMap.values()) clean(inner);
     }else if(byteArray instanceof ReadOnlyMultipleByteArray){
       ReadOnlyMultipleByteArray romba = (ReadOnlyMultipleByteArray) byteArray;
-      for(ReadOnlyByteArray inner : romba.indexMap.values()) clean(unsafe, inner);
+      for(ReadOnlyByteArray inner : romba.indexMap.values()) clean(inner);
     }else if(byteArray instanceof TestOnlyByteArray.ReadOnly){
       TestOnlyByteArray.ReadOnly tobaro = (TestOnlyByteArray.ReadOnly) byteArray;
-      clean(unsafe, tobaro.original);
+      clean(tobaro.original);
     }else if(byteArray instanceof WriteOnlyByteArrayWrapper){
       WriteOnlyByteArrayWrapper wobaw = (WriteOnlyByteArrayWrapper) byteArray;
-      clean(unsafe, wobaw.original);
+      clean(wobaw.original);
     }else if(byteArray instanceof ReadOnlyByteArrayWrapper){
       ReadOnlyByteArrayWrapper robaw = (ReadOnlyByteArrayWrapper) byteArray;
-      clean(unsafe, robaw.original);
+      clean(robaw.original);
     }else if(byteArray instanceof TestOnlyByteArray){
       TestOnlyByteArray toba = (TestOnlyByteArray) byteArray;
-      for(ByteBuffer buffer : toba.data) unsafe.invokeCleaner(buffer);
+      toba.clean();
     }else System.err.println("Unhandled class: " + byteArray.getClass().getName());
   }
 }

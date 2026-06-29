@@ -39,7 +39,7 @@ public class TestOnlyByteArrayNestedTest{
       long size = byteArray.size();
 
       // Do a recursive clean
-      TestUtility.clean(TestUtility.UNSAFE, byteArray);
+      TestUtility.clean(byteArray);
 
       // Trigger a GC to blast away any unused stuff
       System.gc();

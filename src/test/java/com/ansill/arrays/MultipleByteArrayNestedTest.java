@@ -91,29 +91,9 @@ public class MultipleByteArrayNestedTest{
 
         // ByteArray should be TestOnlyByteArray and variants
         if(byteArray instanceof TestOnlyByteArray){
-          var data = ((TestOnlyByteArray) byteArray).data;
-          long startba = ((TestOnlyByteArray) byteArray).start;
-          byteIndex += startba;
-          for(ByteBuffer bb : data){
-            int len = bb.limit() - bb.position();
-            if(byteIndex >= len) byteIndex -= len;
-            else{
-              bb.put((int) byteIndex, value);
-              return;
-            }
-          }
+          ((TestOnlyByteArray) byteArray).writeByte(byteIndex, value);
         }else if(byteArray instanceof TestOnlyByteArray.ReadOnly){
-          var data = ((TestOnlyByteArray.ReadOnly) byteArray).original.data;
-          long startba = ((TestOnlyByteArray.ReadOnly) byteArray).original.start;
-          byteIndex += startba;
-          for(ByteBuffer bb : data){
-            int len = bb.limit() - bb.position();
-            if(byteIndex >= len) byteIndex -= len;
-            else{
-              bb.put((int) byteIndex, value);
-              return;
-            }
-          }
+          ((TestOnlyByteArray.ReadOnly) byteArray).original.writeByte(byteIndex, value);
         }else throw new IllegalArgumentException("Not testonlybytearray");
 
       }else if(testByteArray instanceof ReadableWritableMultipleByteArray){
@@ -184,7 +164,7 @@ public class MultipleByteArrayNestedTest{
       long size = byteArray.size();
 
       // Do a recursive clean
-      TestUtility.clean(TestUtility.UNSAFE, byteArray);
+      TestUtility.clean(byteArray);
 
       // Trigger a GC to blast away any unused stuff
       System.gc();
