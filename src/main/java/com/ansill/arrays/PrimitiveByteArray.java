@@ -6,6 +6,8 @@ import org.slf4j.LoggerFactory;
 import javax.annotation.Nonnegative;
 import javax.annotation.Nonnull;
 
+import java.util.concurrent.atomic.AtomicBoolean;
+
 import static com.ansill.arrays.IndexingUtility.checkCopyTo;
 import static com.ansill.arrays.IndexingUtility.checkReadWrite;
 import static com.ansill.arrays.IndexingUtility.checkReadWriteByte;
@@ -18,9 +20,9 @@ final class PrimitiveByteArray implements ReadableWritableByteArray, ReadOnlyByt
   /** Logger */
   private static final Logger LOGGER = LoggerFactory.getLogger(PrimitiveByteArray.class);
 
-  private static boolean INEFFICIENT_COPY_WARN_READ_LOGGED = false;
+  private static final AtomicBoolean INEFFICIENT_COPY_WARN_READ_LOGGED = new AtomicBoolean(false);
 
-  private static boolean INEFFICIENT_COPY_WARN_WRITE_LOGGED = false;
+  private static final AtomicBoolean INEFFICIENT_COPY_WARN_WRITE_LOGGED = new AtomicBoolean(false);
 
   /** Starting index of byte array */
   @Nonnegative
@@ -210,8 +212,7 @@ final class PrimitiveByteArray implements ReadableWritableByteArray, ReadOnlyByt
     }else{
 
       // Otherwise, use manual copy. Warn about it through logger
-      if(!INEFFICIENT_COPY_WARN_READ_LOGGED) {
-        INEFFICIENT_COPY_WARN_READ_LOGGED = true;
+      if(INEFFICIENT_COPY_WARN_READ_LOGGED.compareAndSet(false, true)) {
         LOGGER.warn(
                 "No implementation found to handle efficient bulk copy for {}. Using manual per-byte copy.",
                 destination.getClass().getName()
@@ -339,8 +340,7 @@ final class PrimitiveByteArray implements ReadableWritableByteArray, ReadOnlyByt
     }else{
 
       // Otherwise, use manual copy. Warn about it through logger
-      if(!INEFFICIENT_COPY_WARN_WRITE_LOGGED) {
-        INEFFICIENT_COPY_WARN_WRITE_LOGGED = true;
+      if(INEFFICIENT_COPY_WARN_WRITE_LOGGED.compareAndSet(false, true)) {
         LOGGER.warn(
                 "No implementation found to handle efficient bulk copy for {}. Using manual per-byte copy.",
                 source.getClass().getName()

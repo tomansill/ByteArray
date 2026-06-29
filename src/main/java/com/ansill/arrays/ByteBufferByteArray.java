@@ -7,6 +7,7 @@ import javax.annotation.Nonnegative;
 import javax.annotation.Nonnull;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import static com.ansill.arrays.IndexingUtility.checkCopyTo;
 import static com.ansill.arrays.IndexingUtility.checkReadWrite;
@@ -20,9 +21,9 @@ final class ByteBufferByteArray implements ReadableWritableByteArray, ReadOnlyBy
   /** Logger */
   private static final Logger LOGGER = LoggerFactory.getLogger(ByteBufferByteArray.class);
 
-  private static boolean INEFFICIENT_COPY_WARN_READ_LOGGED = false;
+  private static final AtomicBoolean INEFFICIENT_COPY_WARN_READ_LOGGED = new AtomicBoolean(false);
 
-  private static boolean INEFFICIENT_COPY_WARN_WRITE_LOGGED = false;
+  private static final AtomicBoolean INEFFICIENT_COPY_WARN_WRITE_LOGGED = new AtomicBoolean(false);
 
   /** {@link ByteBuffer} data that backs this {@link ReadableWritableByteArray} */
   @Nonnull
@@ -341,8 +342,7 @@ final class ByteBufferByteArray implements ReadableWritableByteArray, ReadOnlyBy
     }else{
 
       // Manual Copy (And warn about it)
-      if(!INEFFICIENT_COPY_WARN_READ_LOGGED) {
-        INEFFICIENT_COPY_WARN_READ_LOGGED = true;
+      if(INEFFICIENT_COPY_WARN_READ_LOGGED.compareAndSet(false, true)) {
         LOGGER.warn(
                 "No implementation found to handle efficient bulk copy for {}. Using manual per-byte copy.",
                 destination.getClass().getName()
@@ -393,8 +393,7 @@ final class ByteBufferByteArray implements ReadableWritableByteArray, ReadOnlyBy
     }else{
 
       // Manual Copy (And warn about it)
-      if(!INEFFICIENT_COPY_WARN_WRITE_LOGGED) {
-        INEFFICIENT_COPY_WARN_WRITE_LOGGED = true;
+      if(INEFFICIENT_COPY_WARN_WRITE_LOGGED.compareAndSet(false, true)) {
         LOGGER.warn(
                 "No implementation found to handle efficient bulk copy for {}. Using manual per-byte copy.",
                 source.getClass().getName()
