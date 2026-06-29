@@ -4,10 +4,7 @@ import javax.annotation.Nonnegative;
 import javax.annotation.Nonnull;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.TreeMap;
+import java.util.*;
 
 import static com.ansill.arrays.IndexingUtility.checkCopyTo;
 import static com.ansill.arrays.IndexingUtility.checkReadWrite;
@@ -20,7 +17,7 @@ final class ReadableWritableMultipleByteArray implements ReadableWritableByteArr
 
   /** Index map containing byte arrays */
   @Nonnull
-  final TreeMap<Long,ReadableWritableByteArray> indexMap = new TreeMap<>();
+  final NavigableMap<Long,ReadableWritableByteArray> indexMap;
 
   /** Size of this ByteArray */
   @Nonnegative
@@ -41,8 +38,11 @@ final class ReadableWritableMultipleByteArray implements ReadableWritableByteArr
     long size = 0;
 
     // Iterate over byte arrays
+    var indexMap = new TreeMap<Long,ReadableWritableByteArray>();
     var ro = new ArrayList<ReadOnlyByteArray>();
     for(var byteArray : byteArrays){
+      // We want to flatten the MultipleByteArrays if any is found to avoid deep call stacks if we combine
+      // multiple MultipleByteArrays
       if(byteArray instanceof com.ansill.arrays.ReadableWritableMultipleByteArray){
         var innerByteArrays = ((com.ansill.arrays.ReadableWritableMultipleByteArray) byteArray).indexMap.values();
         for(var innerByteArray : innerByteArrays){
@@ -58,6 +58,7 @@ final class ReadableWritableMultipleByteArray implements ReadableWritableByteArr
     }
 
     // Save
+    this.indexMap = Collections.unmodifiableNavigableMap(indexMap);
     this.readOnlyByteArrays = Collections.unmodifiableList(ro);
 
     // Set size
@@ -79,7 +80,7 @@ final class ReadableWritableMultipleByteArray implements ReadableWritableByteArr
   @SuppressWarnings("unchecked")
   @Nonnull
   static <T extends ByteArray> List<T> innerSubsetOf(
-    @Nonnull TreeMap<Long,T> indexMap,
+    @Nonnull NavigableMap<Long,T> indexMap,
     final long start,
     final long length
   ) throws ByteArrayIndexOutOfBoundsException, ByteArrayLengthOverBoundsException, ByteArrayInvalidLengthException{

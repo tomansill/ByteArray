@@ -4,8 +4,7 @@ import javax.annotation.Nonnegative;
 import javax.annotation.Nonnull;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
-import java.util.List;
-import java.util.TreeMap;
+import java.util.*;
 
 import static com.ansill.arrays.IndexingUtility.checkCopyTo;
 import static com.ansill.arrays.IndexingUtility.checkReadWrite;
@@ -18,7 +17,7 @@ final class ReadOnlyMultipleByteArray implements ReadOnlyByteArray{
 
   /** Index map containing byte arrays */
   @Nonnull
-  final TreeMap<Long,ReadOnlyByteArray> indexMap = new TreeMap<>();
+  final NavigableMap<Long,ReadOnlyByteArray> indexMap;
 
   /** Size of this ByteArray */
   @Nonnegative
@@ -35,14 +34,20 @@ final class ReadOnlyMultipleByteArray implements ReadOnlyByteArray{
     long size = 0;
 
     // Iterate over byte arrays
+    var indexMap = new TreeMap<Long,ReadOnlyByteArray>();
     for(var byteArray : byteArrays){
+      // We want to flatten the MultipleByteArrays if any is found to avoid deep call stacks if we combine
+      // multiple MultipleByteArrays
       if(byteArray instanceof ReadableWritableMultipleByteArray){
         var innerByteArrays = ((ReadableWritableMultipleByteArray) byteArray).indexMap.values();
         for(var innerByteArray : innerByteArrays){
           indexMap.put(size, innerByteArray.toReadOnly());
           size += innerByteArray.size();
         }
-      }else if(byteArray instanceof com.ansill.arrays.ReadOnlyMultipleByteArray){
+      }
+
+      // Again for ReadOnlyMultipleByteArrays
+      else if(byteArray instanceof com.ansill.arrays.ReadOnlyMultipleByteArray){
         var innerByteArrays = ((com.ansill.arrays.ReadOnlyMultipleByteArray) byteArray).indexMap.values();
         for(var innerByteArray : innerByteArrays){
           indexMap.put(size, innerByteArray);
@@ -57,13 +62,14 @@ final class ReadOnlyMultipleByteArray implements ReadOnlyByteArray{
       }
     }
 
-    // Save byte arrays to field
+    // Set field
+    this.indexMap = Collections.unmodifiableNavigableMap(indexMap);
 
     // Set size
     this.size = size;
   }
 
-  static <T extends ReadOnlyByteArray> byte innerReadByte(@Nonnull TreeMap<Long,T> indexMap, long byteIndex)
+  static <T extends ReadOnlyByteArray> byte innerReadByte(@Nonnull NavigableMap<Long,T> indexMap, long byteIndex)
   throws ByteArrayIndexOutOfBoundsException{
 
     // Get ByteArray
@@ -83,7 +89,7 @@ final class ReadOnlyMultipleByteArray implements ReadOnlyByteArray{
   }
 
   static <T extends ReadOnlyByteArray> void innerRead(
-    @Nonnull TreeMap<Long,T> indexMap,
+    @Nonnull NavigableMap<Long,T> indexMap,
     long byteIndex,
     @Nonnull WriteOnlyByteArray destination
   ) throws ByteArrayIndexOutOfBoundsException, ByteArrayLengthOverBoundsException{
